@@ -71,6 +71,7 @@ class index extends Component {
         date = [dateArray[2], dateArray[0], dateArray[1]].join("-");
       }
       return (
+          // console.log(el.selectUserIndex)
         <Todo
           key={i}
           title={el.title}
@@ -82,9 +83,10 @@ class index extends Component {
           date={date}
           todoId ={this.state.todoIds[i]}
           timer={el.timer}
+
         />
-      );
-    });
+        );
+      });
     deleteAll = (todoIds) => {
       todoIds.forEach(el=>{
         db.collection("todos").doc(el).delete()
