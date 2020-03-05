@@ -20,7 +20,7 @@ const firebaseConfig = {
 
   var db = firebase.firestore()
 
-  // var database = firebase.database();
+  // var storage = firebase.storage();
 
 
   export {db}

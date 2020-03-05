@@ -16,7 +16,6 @@ class Allusers extends Component {
         let user = doc.data();
         users.push(user);
       });
-
       this.setState({ users: users });
     });
   };
@@ -63,12 +62,11 @@ class Allusers extends Component {
         </Link>
         <table style={{ width: "100%" }}>
           <thead>
-
-          <tr>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Tools</th>
-          </tr>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Tools</th>
+            </tr>
           </thead>
           <tbody>{this.showUsers()}</tbody>
         </table>

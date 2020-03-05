@@ -4,6 +4,9 @@ import { Link } from "react-router-dom";
 import Todo from "./Table/todo";
 import Button from "../utils/Button";
 
+//firebase
+import { db } from "../../config/firebase";
+
 //context
 import { AuthContext } from "../../context/AuthContext";
 
@@ -13,41 +16,85 @@ import Img from "../../images/person.jpg";
 class index extends Component {
   static contextType = AuthContext;
   state = {
-    todos: [
-      {
-        title: "Testing",
-        commentsLength: 2,
-        personImg: Img,
-        tracking: "1 Hour",
-        state:"Delete"
-      }
-    ]
+    todos: [],
+    todoIds: []
   };
+
+  //for getting all todos
+  componentDidMount = () => {
+    db.collection("todos").onSnapshot(querySnapshot => {
+      let todos = [];
+      const todoIds = []
+      querySnapshot.forEach(doc => {
+        let todo = doc.data();
+        todoIds.push(doc.id)
+        todos.push(todo);
+      });
+      this.setState({ todos,todoIds });
+    });
+  };
+
+
+ 
+
+
+
+
+
+  //for new todo
   handleClick = () => {
     const newTodo = {
       title: (
-        <input name="title" placeholder="title" />
+        <input
+          // pattern="\d{1,2}/\d{1,2}/\d{4}"
+          required
+          className="valuePicker"
+          name="title"
+          placeholder="title"
+        />
       ),
-      commentsLength: 0,
+      // commentsLength: 0,
       personImg: Img,
       tracking: "1 Hour",
-      state:"Add"
+      state: "Add",
+      status: "Not Started",
+      selectUserIndex : 0,
+
     };
     this.setState({ todos: [...this.state.todos, newTodo] });
   };
   showTodos = () =>
-    this.state.todos.map((el, i) => (
-      <Todo 
-      key={i}
-        title={el.title}
-        commentsLength={el.commentsLength}
-        personImg={el.personImg}
-        tracking={el.tracking}
-        index={i}
-        state={el.state}
-        
-      />
-    ));
+    this.state.todos.map((el, i) => {
+      let date
+      if(el.date){
+        let dateArray = el.date.split("-");
+        date = [dateArray[2], dateArray[0], dateArray[1]].join("-");
+      }
+      return (
+        <Todo
+          key={i}
+          title={el.title}
+          commentsLength={0}
+          status={el.status}
+          index={i}
+          selectUserIndex={el.selectUserIndex}
+          state={el.state? el.state : "Delete"}
+          date={date}
+          todoId ={this.state.todoIds[i]}
+          timer={el.timer}
+        />
+      );
+    });
+    deleteAll = (todoIds) => {
+      todoIds.forEach(el=>{
+        db.collection("todos").doc(el).delete()
+        .then(() => {
+          console.log("deleted")
+        }).catch( (error)=> {
+            console.error("Error removing document: ", error);
+        });
+      })
+    }
   render() {
     return (
       <div className="container mx-auto pt-16">
@@ -70,6 +117,7 @@ class index extends Component {
           <button
             className="rounded px-4 py-2 text-center bg-red-800 text-white cursor-pointer ml-3 outline-none"
             id="delete_all_btn"
+            onClick={()=>this.deleteAll(this.state.todoIds)}
           >
             Delete All
           </button>
@@ -82,7 +130,7 @@ class index extends Component {
           <thead>
             <tr>
               <th width="35%" className="text-purple-600 text-xl text-left">
-                This Week's Status
+                Tasks
               </th>
               <th>People</th>
               <th width="20%">Status</th>

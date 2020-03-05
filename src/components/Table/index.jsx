@@ -4,7 +4,7 @@ import React, { Component } from "react";
 import Todo from "./todo";
 
 //images
-import Img from '../../images/person.jpg'
+import Img from "../../images/person.jpg";
 
 class Table extends Component {
   render() {
@@ -14,7 +14,7 @@ class Table extends Component {
           <thead>
             <tr>
               <th width="35%" className="text-purple-600 text-xl text-left">
-                This Week's Status
+                Tasks
               </th>
               <th>People</th>
               <th width="20%">Status</th>
@@ -22,15 +22,15 @@ class Table extends Component {
               <th>Time Tracking</th>
             </tr>
           </thead>
-            <tbody>
+          <tbody>
             <Todo
-            title="Testing 1"
-            commentsLength = {2}
-            personImg = {Img}
-            tracking='1 hour'
-            index={0}
+              title="Testing 1"
+              commentsLength={2}
+              personImg={Img}
+              tracking="1 hour"
+              index={0}
             />
-            </tbody>
+          </tbody>
         </table>
       </div>
     );
