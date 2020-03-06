@@ -9,7 +9,8 @@ import Todo from "./todo";
 class Table extends Component {
   state = {
     users: [],
-    todos: []
+    todos: [],
+    comments: []
   };
 
   //! getting data from fatabase
@@ -19,6 +20,7 @@ class Table extends Component {
       let todos = [];
       querySnapshot.forEach(doc => {
         let todo = doc.data();
+        todo.id = doc.id;
         todos.push(todo);
       });
       this.setState({
@@ -37,30 +39,44 @@ class Table extends Component {
         users
       });
     });
+    //! for rendering comments from database
+    db.collection("comments").onSnapshot(querySnapshot => {
+      let comments = [];
+      querySnapshot.forEach(doc => {
+        let comment = doc.data();
+        comment.id = doc.id;
+        comments.push(comment);
+      });
+      comments = comments.filter(el => {
+        return el.todoId;
+      });
+      this.setState({
+        comments
+      });
+    });
   };
 
   //! show todos from database
   showTodos = () => {
     return this.state.todos.map((el, i) => {
       if (this.state.users.length > 0) {
+        const commentsLength = this.state.comments.filter(comment => {
+          return el.id === comment.todoId;
+        }).length;
         return (
-          
           <Todo
             key={i}
             title={el.title}
             index={i}
             status={el.status}
             date={el.date}
-            // commentsLength={2}
+            commentsLength={commentsLength}
             assignedUser={this.state.users[el.selectUserIndex].url}
+            url={el.id}
           />
         );
       } else {
-        return (
-        <tr>
-          <td></td>
-        </tr>
-        )
+        return <tr key={i}></tr>;
       }
     });
   };

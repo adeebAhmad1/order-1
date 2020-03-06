@@ -6,20 +6,39 @@ import { db } from "../../../config/firebase";
 
 class Allusers extends Component {
   state = {
-    users: []
+    users: [],
+    userIds: []
   };
 
   componentDidMount = () => {
     db.collection("users").onSnapshot(querySnapshot => {
       let users = [];
+      let userIds = [];
       querySnapshot.forEach(doc => {
         let user = doc.data();
+        userIds.push(doc.id);
         users.push(user);
       });
-      this.setState({ users: users });
+      this.setState({ users, userIds });
     });
   };
 
+  //! handle submit for deleting user
+  deleteOne = userId => {
+    db.collection("users")
+      .doc(userId)
+      .delete()
+      .then(() => {
+        console.log("deleted");
+      })
+      .catch(error => {
+        console.error("Error removing document: ", error);
+      });
+  };
+
+
+
+  //! rendering user from database
   showUsers = () => {
     let users = this.state.users;
     console.log(users);
@@ -37,10 +56,16 @@ class Allusers extends Component {
           </td>
           <td> {user.name} </td>
           <td>
-            <button className="rounded px-4 py-2 text-center bg-purple-600 text-white cursor-pointer outline-none">
+            <Link
+              to={`/all_users/edit_user/${this.state.userIds[i]}`}
+              className="rounded px-4 py-2 text-center bg-purple-600 text-white cursor-pointer outline-none"
+            >
               Edit
-            </button>
-            <button className="rounded px-4 py-2 text-center bg-red-600 text-white cursor-pointer outline-none">
+            </Link>
+            <button
+              onClick={() => this.deleteOne(this.state.userIds[i])}
+              className="rounded px-4 py-2  text-center bg-red-600 text-white cursor-pointer outline-none"
+            >
               Delete
             </button>
           </td>

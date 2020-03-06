@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-
+import { Link } from "react-router-dom";
 //firebase
 import { db } from "../../config/firebase";
 let time = ``;
@@ -22,7 +22,13 @@ class Todo extends Component {
         console.log("Document successfully updated!");
       });
   };
-
+  componentWillUnmount() {
+    window.removeEventListener("click", this.removeDropdown2);
+  }
+  removeDropdown2 = e => {
+    if (e.target.id === "dropdown1") return false;
+    this.refs.dropdown1.classList.remove("block");
+  };
   componentWillUpdate() {
     var text = this.refs.status.textContent;
     if (text === "Done") {
@@ -44,14 +50,11 @@ class Todo extends Component {
         let user = doc.data();
         users.push(user);
       });
+      window.addEventListener("click", this.removeDropdown2);
       this.setState({
         users,
         selectUserIndex: this.props.selectUserIndex
       });
-      // this.refs.images.style.backgroundImage = `url(${
-      //   this.state.users[this.props.selectUserIndex].url
-      //   console.log(this.props.selectUserIndex)
-      // })`;
     });
   };
 
@@ -81,11 +84,7 @@ class Todo extends Component {
         status_priority_dropdown[i].style.display = "none";
       }
     }
-    if (status_priority_dropdown[id].style.display === "block") {
-      status_priority_dropdown[id].style.display = "none";
-    } else {
-      status_priority_dropdown[id].style.display = "block";
-    }
+    status_priority_dropdown[id].classList.toggle("block");
     const status_priority_wrapper = document.querySelector(
       `.status_priority_wrapper${id}`
     );
@@ -136,12 +135,15 @@ class Todo extends Component {
       <tr className="bg-gray-100 border-b border-gray-100">
         <td className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container">
           {this.props.title}
-          {/* <div className="relative chat-wrapper cursor-pointer">
+          <Link
+            to={`/home/comments/${this.props.url}`}
+            className="relative chat-wrapper cursor-pointer"
+          >
             <i className="text-3xl text-gray-500 chat-icon far fa-comment"></i>
             <div className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none">
               {this.props.commentsLength}
             </div>
-          </div> */}
+          </Link>
         </td>
         <td style={{ position: "relative" }}>
           <div
@@ -157,19 +159,17 @@ class Todo extends Component {
           className={`bg-green-500 text-white relative cursor-pointer status_priority_wrapper status_priority_wrapper${this.props.index}`}
           onClick={() => this.handleDropdown(this.props.index)}
         >
-          <p
-            ref="status"
-            onChange={() => {
-              this.updateStatus(this.props.todoId);
-            }}
-          >
+          <p ref="status" id="dropdown1">
             {this.props.status}
           </p>
-          <ul className="absolute top-0 mt-12 shadow-xl -ml-8 left-0 w-48 bg-white dropdown z-50 hidden status_priority_dropdown">
+          <ul
+            ref="dropdown1"
+            className="absolute top-0 mt-12 shadow-xl -ml-8 left-0 w-48 bg-white dropdown z-50 hidden status_priority_dropdown"
+          >
             <li className="border-b border-gray-300 text-green-600 py-3 flex flex-start items-center px-4">
               <span
                 className="w-4 h-4 rounded-full block mr-3"
-                style={{ backgroundColor: `royalblue` }}
+                style={{ backgroundColor: `#599EFD` }}
               ></span>
               <p>Not Started</p>
             </li>
@@ -188,10 +188,12 @@ class Todo extends Component {
           </ul>
         </td>
         <td>
-          <span className="block mx-auto rounded-full h-6 w-6/7  bg-black overflow-hidden relative">
+          <span
+            className="block mx-auto rounded-full h-6 w-6/7  bg-black overflow-hidden relative"
+            style={{ zIndex: 0 }}
+          >
             <div className="bg-purple-600 w-1/2 h-full z-10 relative"></div>
             <input
-              // type="date"
               readOnly
               ref="date"
               defaultValue={this.props.date}

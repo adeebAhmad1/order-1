@@ -1,20 +1,22 @@
 import React, { Component } from "react";
-
+import Confetti from "react-dom-confetti";
 //firebase
 import { db } from "../../../config/firebase";
+
+import { Link } from "react-router-dom";
 class Todo extends Component {
   state = {
     selectUserIndex: 0,
     id: null,
     users: [],
     iTimes: 0,
-    time: ``
+    time: ``,
+    confettiStart: false
   };
 
   // ! update status function
   updateStatus = todosId => {
     let status = this.refs.status.innerText;
-    console.log(status);
     db.collection("todos")
       .doc(todosId)
       .update({
@@ -27,7 +29,8 @@ class Todo extends Component {
 
   //! handle submit for adding todo
   add = () => {
-    let title = document.querySelector(".valuePicker").value;
+    let title = document.querySelector(".valuePicker").selectedOptions[0]
+      .innerText;
     let selectUserIndex = this.state.selectUserIndex;
     let status = this.refs.status.innerText;
     let dateArray = this.refs.date.value.split("-");
@@ -38,10 +41,10 @@ class Todo extends Component {
     } else {
       db.collection("todos")
         .add({
-          title: title,
-          selectUserIndex: selectUserIndex,
-          status: status,
-          date: date
+          title,
+          selectUserIndex,
+          status,
+          date
         })
         .then(docRef => {
           this.setState({
@@ -70,19 +73,19 @@ class Todo extends Component {
   componentWillUpdate() {
     var text = this.refs.status.textContent;
     if (text === "Done") {
-      this.refs.status_wrapper.style.backgroundColor = "#48bb77";
+      this.refs.dropdown1.style.backgroundColor = "#03C977";
     } else if (text === "Stuck") {
-      this.refs.status_wrapper.children[0].innerText = "Stuck";
+      this.refs.dropdown1.children[0].innerColor = "#E1445B";
     } else if (text === "Working on It") {
-      this.refs.status_wrapper.style.backgroundColor = "#d69e2e";
+      this.refs.dropdown1.style.backgroundColor = "#F7AE3C";
       if (this.state.iTimes === 0) this.updateTime();
       // this.setState({iTimes: 1})
     } else if (text === "Not Started") {
-      this.refs.status_wrapper.style.backgroundColor = "royalblue";
+      this.refs.dropdown1.style.backgroundColor = "#599EFD";
     }
   }
-  //! getting users from fatabase
-  componentDidMount = () => {
+  componentDidMount() {
+    //! getting users from fatabase
     db.collection("users").onSnapshot(querySnapshot => {
       let users = [];
       querySnapshot.forEach(doc => {
@@ -93,27 +96,34 @@ class Todo extends Component {
         users,
         selectUserIndex: this.props.selectUserIndex
       });
+      window.addEventListener("click", this.removeDropdown);
+      window.addEventListener("click", this.removeDropdown2);
       this.refs.images.style.backgroundImage = `url(${
         this.state.users[this.props.selectUserIndex].url
       })`;
     });
-  };
-
-  //for showing users in dropdown
+  }
+  componentWillUnmount() {
+    window.removeEventListener("click", this.removeDropdown);
+    window.removeEventListener("click", this.removeDropdown2);
+  }
+  //! for showing users in dropdown
   showUsers = () => {
     let users = this.state.users;
     return users.map((user, i) => {
       return (
         <div key={i} className="user" data-num={i}>
           <div
-            className="h-full bg-cover rounded-full mx-auto"
+            className="h-full bg-cover rounded-full mx-auto "
             ref={`dropdown-img-${i}`}
             onClick={this.onSelect}
             style={{
               backgroundImage: `url(${users[i].url})`,
-              width: "40px",
-              height: `40px`,
-              display: `inline-block`
+              width: "50px",
+              height: "50px",
+              margin: "0 auto",
+              padding: "2%",
+              boxSizing: "content-box"
             }}
           ></div>
           <span className="userName" onClick={this.onSelect}>
@@ -124,9 +134,17 @@ class Todo extends Component {
     });
   };
 
-  //show dropdown for users
+  //! show dropdown for users
   showDropdown = () => {
     this.refs.dropdown.classList.toggle("block");
+  };
+  removeDropdown = e => {
+    if (e.target.id === "dropdown") return false;
+    this.refs.dropdown.classList.remove("block");
+  };
+  removeDropdown2 = e => {
+    if (e.target.id === "dropdown1") return false;
+    this.refs.dropdown1.classList.remove("block");
   };
   updateTime = () => {
     const timer = this.props.timer ? this.props.timer : new Date().getTime();
@@ -146,7 +164,7 @@ class Todo extends Component {
       });
     }, 1000);
   };
-  //status dropdown
+  //! status dropdown
   handleDropdown = id => {
     const status_priority_dropdown = document.querySelectorAll(
       ".status_priority_wrapper > .status_priority_dropdown"
@@ -156,11 +174,8 @@ class Todo extends Component {
         status_priority_dropdown[i].style.display = "none";
       }
     }
-    if (status_priority_dropdown[id].style.display === "block") {
-      status_priority_dropdown[id].style.display = "none";
-    } else {
-      status_priority_dropdown[id].style.display = "block";
-    }
+    status_priority_dropdown[id].classList.toggle("block");
+
     const status_priority_wrapper = document.querySelector(
       `.status_priority_wrapper${id}`
     );
@@ -174,14 +189,17 @@ class Todo extends Component {
         [i].addEventListener("click", e => {
           var text = e.target.innerText;
           if (text === "Done") {
-            status_priority_wrapper.style.backgroundColor = "#48bb77";
+            this.setState({
+              confettiStart: true
+            });
+            status_priority_wrapper.style.backgroundColor = "#03C977";
             status_priority_wrapper.children[0].innerText = "Done";
           } else if (text === "Stuck") {
-            status_priority_wrapper.style.backgroundColor = "#f56464";
+            status_priority_wrapper.style.backgroundColor = "#E1445B";
             status_priority_wrapper.children[0].innerText = "Stuck";
           } else if (text === "Working on it") {
             status_priority_wrapper.children[0].innerText = "Working on It";
-            status_priority_wrapper.style.backgroundColor = "#d69e2e";
+            status_priority_wrapper.style.backgroundColor = "#F7AE3C";
             this.updateTime();
             const timer = this.props.timer
               ? this.props.timer
@@ -206,34 +224,50 @@ class Todo extends Component {
     }
     this.setState({ id });
   };
-
   //user select
   onSelect = e => {
-    const num = e.target.dataset.num
+    const selectUserIndex = e.target.dataset.num
       ? e.target.dataset.num
       : e.target.parentNode.dataset.num;
     this.setState({
-      selectUserIndex: num
+      selectUserIndex
     });
     this.refs.images.style.backgroundImage = this.refs[
-      `dropdown-img-${num}`
+      `dropdown-img-${selectUserIndex}`
     ].style.backgroundImage;
   };
   render() {
+    const config = {
+      angle: 90,
+      spread: "179",
+      startVelocity: 50,
+      elementCount: 500,
+      dragFriction: 0,
+      duration: 3000,
+      stagger: 0,
+      width: "15px",
+      height: "15px",
+      colors: ["#a864fd", "#29cdff", "#78ff44", "#ff718d", "#fdff6a"]
+    };
     return (
       <tr className="bg-gray-100 border-b border-gray-100">
         <td className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container">
           {this.props.title}
-          <div className="relative chat-wrapper cursor-pointer">
+          <Link
+            to={`/admin_panel/comments/${this.props.url}`}
+            className="relative chat-wrapper cursor-pointer"
+          >
             <i className="text-3xl text-gray-500 chat-icon far fa-comment"></i>
             <div className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none">
               {this.props.commentsLength}
             </div>
-          </div>
+          </Link>
+          <Confetti active={this.state.confettiStart} config={config} />
         </td>
         <td style={{ position: "relative" }}>
           <div
             ref="images"
+            id="dropdown"
             className="h-full bg-cover rounded-full mx-auto "
             style={{
               width: "40px"
@@ -245,35 +279,42 @@ class Todo extends Component {
           </div>
         </td>
         <td
-          ref="status_wrapper"
           className={`bg-green-500 text-white relative cursor-pointer status_priority_wrapper status_priority_wrapper${this.props.index}`}
           onClick={() => this.handleDropdown(this.props.index)}
         >
-          <p
-            ref="status"
-            onChange={() => {
-              this.updateStatus(this.props.todoId);
-            }}
-          >
+          <p ref="status" id="dropdown1">
             {this.props.status}
           </p>
-          <ul className="absolute top-0 mt-12 shadow-xl -ml-8 left-0 w-48 bg-white dropdown z-50 hidden status_priority_dropdown">
-            <li className="border-b border-gray-300 text-green-600 py-3 flex flex-start items-center px-4">
+          <ul
+            ref="dropdown1"
+            className="absolute top-0 mt-12 shadow-xl -ml-8 left-0 w-48 bg-white dropdown z-50 hidden status_priority_dropdown"
+            style={{ backgroundColor: `#fff` }}
+          >
+            <li className="select1 border-b border-gray-300 text-green-600 py-3 flex flex-start items-center px-4">
               <span
                 className="w-4 h-4 rounded-full block mr-3"
-                style={{ backgroundColor: `royalblue` }}
+                style={{ backgroundColor: "#599EFD" }}
               ></span>
               <p>Not Started</p>
             </li>
-            <li className="border-b border-gray-300 text-green-600 py-3 flex flex-start items-center px-4">
+            <li
+              style={this.props.vision}
+              className="select1 border-b border-gray-300 text-green-600 py-3 flex flex-start items-center px-4"
+            >
               <span className="w-4 h-4 rounded-full bg-green-600 block mr-3"></span>
               <p>Done</p>
             </li>
-            <li className="border-b border-gray-300 text-yellow-600 py-3 flex flex-start items-center px-4">
+            <li
+              style={this.props.vision}
+              className="select1 border-b border-gray-300 text-yellow-600 py-3 flex flex-start items-center px-4"
+            >
               <span className="w-4 h-4 rounded-full bg-yellow-600 block mr-3"></span>
               <p>Working on it</p>
             </li>
-            <li className="border-b border-gray-300 text-red-500 py-3 flex flex-start items-center px-4">
+            <li
+              style={this.props.vision}
+              className="select1 border-b border-gray-300 text-red-500 py-3 flex flex-start items-center px-4"
+            >
               <span className="w-4 h-4 rounded-full bg-red-500 block mr-3"></span>
               <p>Stuck</p>
             </li>
