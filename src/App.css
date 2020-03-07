@@ -677,7 +677,7 @@
   }
   
   .select {
-    background: url(images/clock.svg) left center no-repeat, url(images/dropdown.svg) right center no-repeat;
+    background: url(images/clock.svg) left center no-repeat;
     background-size: 17px, 25px;
   }
   

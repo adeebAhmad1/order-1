@@ -17,7 +17,6 @@ class Login extends Component {
       .signOut()
       .then(() => {})
       .catch(error => {
-        // An error happened.
       });
   }
   handleSubmit = e => {

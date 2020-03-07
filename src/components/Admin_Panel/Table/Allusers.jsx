@@ -36,8 +36,6 @@ class Allusers extends Component {
       });
   };
 
-
-
   //! rendering user from database
   showUsers = () => {
     let users = this.state.users;
@@ -59,10 +57,16 @@ class Allusers extends Component {
             <Link
               to={`/all_users/edit_user/${this.state.userIds[i]}`}
               className="rounded px-4 py-2 text-center bg-purple-600 text-white cursor-pointer outline-none"
+              style={{
+                display: "inline-block",
+                width: "100px",
+                marginRight: "4px"
+              }}
             >
               Edit
             </Link>
             <button
+              style={{ width: "100px" }}
               onClick={() => this.deleteOne(this.state.userIds[i])}
               className="rounded px-4 py-2  text-center bg-red-600 text-white cursor-pointer outline-none"
             >

@@ -55,6 +55,11 @@ code {
   margin: 40px;
   /* text-align: center; */
 }
+.invisible{
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+}
 .inner input {
   width: 400px;
   border-bottom: 3px solid #ddd;

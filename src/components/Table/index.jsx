@@ -15,8 +15,8 @@ class Table extends Component {
 
   //! getting data from fatabase
   componentDidMount = () => {
-    //for users
-    db.collection("todos").onSnapshot(querySnapshot => {
+    //! for todos
+    db.collection("todos").get().then(querySnapshot => {
       let todos = [];
       querySnapshot.forEach(doc => {
         let todo = doc.data();
@@ -28,8 +28,8 @@ class Table extends Component {
       });
     });
 
-    //for users
-    db.collection("users").onSnapshot(querySnapshot => {
+    //! for users
+    db.collection("users").get().then(querySnapshot => {
       let users = [];
       querySnapshot.forEach(doc => {
         let user = doc.data();
@@ -40,7 +40,7 @@ class Table extends Component {
       });
     });
     //! for rendering comments from database
-    db.collection("comments").onSnapshot(querySnapshot => {
+    db.collection("comments").get().then(querySnapshot => {
       let comments = [];
       querySnapshot.forEach(doc => {
         let comment = doc.data();
@@ -73,6 +73,9 @@ class Table extends Component {
             commentsLength={commentsLength}
             assignedUser={this.state.users[el.selectUserIndex].url}
             url={el.id}
+            timer={el.timer}
+            endTime = {el.endTime? el.endTime : ""}
+            todoId={el.id}
           />
         );
       } else {

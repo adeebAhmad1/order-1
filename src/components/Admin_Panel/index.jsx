@@ -2,16 +2,12 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 //components
 import Todo from "./Table/todo";
-import Button from "../utils/Button";
 
 //firebase
-import { db } from "../../config/firebase";
+import firebase, { db } from "../../config/firebase";
 
 //context
 import { AuthContext } from "../../context/AuthContext";
-
-//images
-import Img from "../../images/person.jpg";
 
 class index extends Component {
   static contextType = AuthContext;
@@ -25,43 +21,49 @@ class index extends Component {
 
   componentDidMount = () => {
     //! for getting all todos
-    db.collection("todos").onSnapshot(querySnapshot => {
-      let todos = [];
-      const todoIds = [];
-      querySnapshot.forEach(doc => {
-        let todo = doc.data();
-        todo.id = doc.id;
-        todoIds.push(doc.id);
-        todos.push(todo);
+    db.collection("todos")
+      .get()
+      .then(querySnapshot => {
+        let todos = [];
+        const todoIds = [];
+        querySnapshot.forEach(doc => {
+          let todo = doc.data();
+          todo.id = doc.id;
+          todoIds.push(doc.id);
+          todos.push(todo);
+        });
+        this.setState({ todos, todoIds });
       });
-      this.setState({ todos, todoIds });
-    });
     //! getting tasks from fatabase
-    db.collection("tasks").onSnapshot(querySnapshot => {
-      let tasks = [];
-      let taskIds = [];
-      querySnapshot.forEach(doc => {
-        let task = doc.data();
-        taskIds.push(doc.id);
-        tasks.push(task);
+    db.collection("tasks")
+      .get()
+      .then(querySnapshot => {
+        let tasks = [];
+        let taskIds = [];
+        querySnapshot.forEach(doc => {
+          let task = doc.data();
+          taskIds.push(doc.id);
+          tasks.push(task);
+        });
+        this.setState({ tasks, taskIds });
       });
-      this.setState({ tasks, taskIds });
-    });
     //! for rendering comments from database
-    db.collection("comments").onSnapshot(querySnapshot => {
-      let comments = [];
-      querySnapshot.forEach(doc => {
-        let comment = doc.data();
-        comment.id = doc.id;
-        comments.push(comment);
+    db.collection("comments")
+      .get()
+      .then(querySnapshot => {
+        let comments = [];
+        querySnapshot.forEach(doc => {
+          let comment = doc.data();
+          comment.id = doc.id;
+          comments.push(comment);
+        });
+        comments = comments.filter(el => {
+          return el.todoId;
+        });
+        this.setState({
+          comments
+        });
       });
-      comments = comments.filter(el => {
-        return el.todoId;
-      });
-      this.setState({
-        comments
-      });
-    });
   };
 
   //!dropdown for tasksvalues
@@ -76,10 +78,9 @@ class index extends Component {
   handleClick = () => {
     const newTodo = {
       title: <select className="valuePicker">{this.showTasksValues()}</select>,
-      personImg: Img,
-      tracking: "1 Hour",
       state: "Add",
       status: "Not Started",
+      timer: "",
       selectUserIndex: 0
     };
     this.setState({ todos: [...this.state.todos, newTodo] });
@@ -99,16 +100,17 @@ class index extends Component {
       return (
         <Todo
           key={i}
-          title={el.title}
+          title={<p> {el.title} </p>}
           commentsLength={commentsLength}
           status={el.status}
           index={i}
           selectUserIndex={el.selectUserIndex}
           state={el.state ? el.state : "Delete"}
           date={date}
-          todoId={this.state.todoIds[i]}
+          todoId={el.id}
           timer={el.timer}
           url={el.id}
+          endTime={el.endTime}
         />
       );
     });
@@ -120,6 +122,7 @@ class index extends Component {
         .doc(el)
         .delete()
         .then(() => {
+          window.location.reload();
           console.log("deleted");
         })
         .catch(error => {
@@ -136,7 +139,7 @@ class index extends Component {
             id="add_task_btn"
             onClick={this.handleClick}
           >
-            Add Task
+            Add Todo
           </button>
           <Link
             to="/all_user"
@@ -146,11 +149,9 @@ class index extends Component {
               paddingTop: "10px"
             }}
             className="rounded px-4 py-2 text-center border border-purple-600 bg-yellow-600 text-white cursor-pointer outline-none"
-            id="manage_pupil_btn"
           >
             Manage People
           </Link>
-
           <Link
             to="/all_tasks"
             className="rounded px-4 py-2 text-center border border-purple-600 bg-green-600 text-white cursor-pointer outline-none"
@@ -168,10 +169,31 @@ class index extends Component {
           >
             Delete All
           </button>
-          <Button
-            link="/admin-login"
-            name={this.context.isAuthenticated ? "Sign OUT" : "Sign IN"}
-          />
+          {this.context.isAuthenticated ? (
+            <Link
+              className="rounded px-8 ml-3 py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none"
+              onClick={() =>
+                firebase
+                  .auth()
+                  .signOut()
+                  .then(() => {})
+                  .catch(error => {
+                    // An error happened.
+                    alert(error);
+                  })
+              }
+              to="/"
+            >
+              Sign Out
+            </Link>
+          ) : (
+            <Link
+              className="rounded px-8 ml-3 py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none"
+              to="/admin-login"
+            >
+              Sign In
+            </Link>
+          )}
         </div>
         <table className="w-full">
           <thead>

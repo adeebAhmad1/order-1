@@ -15,14 +15,13 @@ class Comments extends Component {
   };
   selectOption = e => {
     const i = e.target.dataset.id || e.target.parentNode.dataset.id;
-    this.setState({ userId: this.state.users[i] });
+    this.setState({ userId: this.state.users[i].id });
     this.setState({ todoId: this.props.match.params.commentId });
     this.refs.image.style.backgroundImage = `url(${this.state.users[i].url})`;
     this.refs.name.innerHTML = this.state.users[i].name;
   };
   handleUpdate = e => {
     e.preventDefault();
-    console.log(this.state);
     db.collection("comments")
       .add({
         content: this.state.content,
@@ -62,9 +61,9 @@ class Comments extends Component {
         comment.id = doc.id;
         comments.push(comment);
       });
-      comments = comments.filter(el=>{
-        return el.todoId === this.props.match.params.commentId
-      })
+      comments = comments.filter(el => {
+        return el.todoId === this.props.match.params.commentId;
+      });
       this.setState({
         comments
       });
@@ -95,17 +94,15 @@ class Comments extends Component {
 
   showComments = () => {
     return this.state.comments.map((comment, i) => {
-      const user = this.state.users.find(el=> el.id === comment.userId);
+      const user = this.state.users.find(el => el.id === comment.userId);
+      if (user) {
         return (
           <article
             className="mt-10 p-6 border border-gary-600 rounded-lg"
             key={i}
           >
             <div className="flex justify-between items-center">
-              <a
-                href="/"
-                className="flex text-gray-500 hover:text-purple-600"
-              >
+              <a href="/" className="flex text-gray-500 hover:text-purple-600">
                 <div
                   className="h-12 w-12 bg-cover rounded-full mx-auto"
                   style={{
@@ -114,10 +111,19 @@ class Comments extends Component {
                 ></div>
                 <p className="ml-2 flex self-center">{user.name}</p>
               </a>
+              <p className="select appearance-none py-1 pl-6 pr-8 outline-none text-gray-500 cursor-pointer"> {new Date(comment.date).toDateString()} </p>
             </div>
             <p className="text-base pt-6">{comment.content}</p>
           </article>
         );
+      } else {
+        return (
+          <article
+            className="mt-10 p-6 border border-gary-600 rounded-lg"
+            key={i}
+          ></article>
+        );
+      }
     });
   };
 
@@ -127,7 +133,10 @@ class Comments extends Component {
   render() {
     return (
       <div className="fixed w-screen h-screen fixed top-0 left-0 z-50 bg-popup overflow-y-auto">
-        <div className="center bg-white p-8 container rounded-lg center" style={{transform: `translate(-50%,0%)`}}>
+        <div
+          className="center bg-white p-8 container rounded-lg center"
+          style={{ transform: `translate(-50%,0%)` }}
+        >
           <div className="flex justify-end mb-4">
             <i
               onClick={this.props.history.goBack}
@@ -176,8 +185,7 @@ class Comments extends Component {
                 placeholder="Write an Update..."
                 required
                 value={this.state.content}
-              >
-              </textarea>
+              ></textarea>
               <div className="flex justify-between items-center mt-4">
                 <button className="rounded px-8  py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none">
                   Comment
