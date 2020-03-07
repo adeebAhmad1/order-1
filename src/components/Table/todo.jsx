@@ -14,8 +14,7 @@ class Todo extends Component {
     iTimes: 0,
     confettiStart: false,
     time: ``,
-    user: {},
-    commentsLength: 0
+    user: {}
   };
   stopTimer = () => {
     const endTime = this.state.endTime
@@ -51,17 +50,32 @@ class Todo extends Component {
   UNSAFE_componentWillReceiveProps () {
     var text = this.refs.status.textContent;    
     this.setState({ endTime: this.props.endTime,status:text });
-    console.log(this.state.status)
+    this.state.status = text
     if (this.state.status === "Done") {
       this.refs.status_wrapper.style.backgroundColor = "#03C977";
       this.refs.dropdown1.classList.add("invisible");
       this.updateTime();
       this.stopTimer();
     } else if (this.state.status === "Stuck") {
-      console.log(this.props.commentsLength);
       this.refs.status_wrapper.style.backgroundColor = "#E1445B";
-      if (this.state.commentsLength > 0) {
+      if (this.props.commentsLength > 0) {
         this.refs.status_wrapper.style.backgroundColor = "#03c977";
+      }
+      if (this.state.iTimes === 0) this.updateTime();
+    } else if (this.state.status === "Working on It") {
+      this.refs.status_wrapper.style.backgroundColor = "#F7AE3C";
+      if (this.state.iTimes === 0) this.updateTime();
+    } else if (this.state.status === "Not Started") {
+      this.refs.status_wrapper.style.backgroundColor = "#599EFD";
+    }
+  }
+  componentWillUpdate(){
+    if (this.state.status === "Done") {
+      this.refs.status_wrapper.style.backgroundColor = "#03C977";
+    } else if (this.state.status === "Stuck") {
+      this.refs.status_wrapper.style.backgroundColor = "#03c977";
+      if (this.props.commentsLength === 0) {
+        this.refs.status_wrapper.style.backgroundColor = "#E1445B";
       }
     } else if (this.state.status === "Working on It") {
       this.refs.status_wrapper.style.backgroundColor = "#F7AE3C";
@@ -93,7 +107,6 @@ class Todo extends Component {
     const timer = this.props.timer ? this.props.timer : new Date().getTime();
     this.setState({ iTimes: 1 });
     setInterval(() => {
-      this.setState({commentsLength: this.props.commentsLength});
       console.log(this.props.commentsLength)
       const now = this.state.endTime
         ? this.state.endTime
@@ -104,11 +117,15 @@ class Todo extends Component {
       const remainingSeconds = seconds % 60;
       const hours = Math.floor(mins / 60);
       const remainingMins = mins % 60;
-      this.setState({
-        time: `${hours < 10 ? "0" + hours : hours}:${
-          remainingMins < 10 ? "0" + remainingMins : remainingMins
-        }:${remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds}`
-      });
+      if(remainingMins >= 0 && remainingSeconds >= 0){
+        this.setState({
+          time: `${hours < 10 ? "0" + hours : hours}:${
+            remainingMins < 10 ? "0" + remainingMins : remainingMins
+          }:${remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds}`
+        });
+      } else{
+        this.setState({time: `00:00:00`})
+      }
     }, 1000);
   };
   //status dropdown
@@ -141,6 +158,7 @@ class Todo extends Component {
             });
             status_priority_wrapper.style.backgroundColor = "#48bb77";
             status_priority_wrapper.children[0].innerText = "Done";
+            this.updateTime()
             this.stopTimer();
           } else if (this.state.status === "Stuck") {
             status_priority_wrapper.children[0].innerText = "Stuck";
@@ -250,7 +268,7 @@ class Todo extends Component {
             <input
               readOnly
               ref="date"
-              defaultValue={this.props.date}
+              value={new Date(this.props.date).toDateString()}
               className="text-center text-white  text-sm z-20 center bg-transparent"
             />
           </span>

@@ -31,19 +31,16 @@ class Todo extends Component {
 
   //! handle submit for adding todo
   add = () => {
-
-    
-
-
-    let title = document.querySelector(".valuePicker").selectedOptions[0]
-      .innerText;
+    let picker = document.querySelector(".valuePicker");
+    const title= picker.selectedOptions[0].innerText;
     let status = this.refs.status.innerText;
-    let dateArray = this.refs.date.value.split("-");
-    let date = [dateArray[1], dateArray[2], dateArray[0]].join("-");
+    let date = this.refs.date.value ? new Date(this.refs.date.value).toLocaleDateString() : "";
     const userId = this.state.userId;
-
-    if (title === "" && date === "") {
-      alert("Both are required");
+    if (date === "") {
+      this.refs.date.style.color = "red"
+    }else if(picker.selectedIndex === 0){
+      picker.style.color = "red";
+      picker.selectedOptions[0].innerText = "Please Select a Task"
     } else {
       db.collection("todos")
         .add({
@@ -57,7 +54,7 @@ class Todo extends Component {
             todoId: 1
           });
           console.log("Document written with ID: ", docRef.id);
-          window.location.reload();
+          // window.location.reload();
         })
         .catch(error => {
           console.error("Error adding document: ", error);
@@ -177,11 +174,15 @@ class Todo extends Component {
       const remainingSeconds = seconds % 60;
       const hours = Math.floor(mins / 60);
       const remainingMins = mins % 60;
-      this.setState({
-        time: `${hours < 10 ? "0" + hours : hours}:${
-          remainingMins < 10 ? "0" + remainingMins : remainingMins
-        }:${remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds}`
-      });
+      if(remainingMins >= 0 && remainingSeconds >= 0){
+        this.setState({
+          time: `${hours < 10 ? "0" + hours : hours}:${
+            remainingMins < 10 ? "0" + remainingMins : remainingMins
+          }:${remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds}`
+        });
+      } else{
+        this.setState({time: `00:00:00`})
+      }
     }, 1000);
   };
   stopTimer = () => {
@@ -228,7 +229,7 @@ class Todo extends Component {
             status_priority_wrapper.style.backgroundColor = "#03C977";
             status_priority_wrapper.children[0].innerText = "Done";
             status_priority_dropdown[id].classList.add("invisible");
-
+            this.updateTime();
             this.stopTimer();
           } else if (this.state.status === "Stuck") {
             status_priority_wrapper.children[0].innerText = "Stuck";
@@ -327,7 +328,7 @@ class Todo extends Component {
           >
             {this.state.status === "Not Started" ? (
               <li className="select1 border-b border-gray-300 text-green-600 py-3 flex flex-start items-center px-4">
-                <span className="w-4 h-4 rounded-full block mr-3"></span>
+                <span style={{ backgroundColor: "#599EFD" }} className="w-4 h-4 rounded-full block mr-3"></span>
                 <p>Not Started</p>
               </li>
             ) : (
@@ -355,7 +356,7 @@ class Todo extends Component {
               type="date"
               ref="date"
               defaultValue={this.props.date}
-              className="text-center text-white  text-sm z-20 center bg-transparent"
+              className="text-center text-white  text-sm z-20 center bg-transparent calenderShow"
               required
             />
           </span>

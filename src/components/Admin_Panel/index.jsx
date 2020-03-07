@@ -88,8 +88,8 @@ class index extends Component {
   //! for new todo
   handleClick = () => {
     const newTodo = {
-      title: <select className="valuePicker">
-        <option disabled selected>Select Task</option>
+      title: <select className="valuePicker" defaultValue={"select"}>
+        <option disabled value="select">Select Task</option>
         {this.showTasksValues()}</select>,
       state: "Add",
       status: "Not Started",
@@ -103,8 +103,8 @@ class index extends Component {
     this.state.todos.map((el, i) => {
       let date;
       if (el.date) {
-        let dateArray = el.date.split("-");
-        date = [dateArray[2], dateArray[0], dateArray[1]].join("-");
+        let dateArray = el.date.split(" ").join("").split("/");
+        date = [dateArray[2],dateArray[0] >= 10 ? dateArray[0] : "0"+ dateArray[0]  , dateArray[1] >= 10 ? dateArray[1] : "0"+ dateArray[1]].join("-");
       }
       const commentsLength = this.state.comments.filter(
         comment => el.id === comment.todoId

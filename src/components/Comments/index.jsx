@@ -118,7 +118,7 @@ class Comments extends Component {
             key={i}
           >
             <div className="flex justify-between items-center">
-              <a  className="flex text-gray-500 hover:text-purple-600">
+              <div  className="flex text-gray-500 hover:text-purple-600">
                 <div
                   className="h-12 w-12 bg-cover rounded-full mx-auto"
                   style={{
@@ -126,7 +126,7 @@ class Comments extends Component {
                   }}
                 ></div>
                 <p className="ml-2 flex self-center">{user.name}</p>
-              </a>
+              </div>
               <p className="select appearance-none py-1 pl-6 pr-8 outline-none text-gray-500 cursor-pointer">
                 {" "}
                 {new Date(comment.date).toLocaleTimeString()}{" "}

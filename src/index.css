@@ -90,3 +90,25 @@ right:5%
   padding-top: 25px;
   font-weight: bolder;
 }
+
+.calenderShow::-webkit-calendar-picker-indicator{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top:0;
+  left: 0;
+  color: transparent;
+  background-color: transparent;
+}
+.calenderShow{
+  position: relative;
+}
+
+.calenderShow::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+.calenderShow::-webkit-clear-button {
+  position: absolute;
+  top: 0;
+  right: -5%;
+}
