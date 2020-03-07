@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { db } from "../../config/firebase";
+import img from "../../images/no_image.jpg";
 class Comments extends Component {
   state = {
     comments: [],
@@ -7,18 +8,20 @@ class Comments extends Component {
     users: [],
     content: "",
     userId: "",
-    todoId: ""
+    todoId: "",
+    todo: {}
   };
 
   handleDropdown = () => {
     this.refs.dropdown.classList.toggle("block");
   };
   selectOption = e => {
-    const i = e.target.dataset.id || e.target.parentNode.dataset.id;
-    this.setState({ userId: this.state.users[i].id });
+    const id = e.target.dataset.id || e.target.parentNode.dataset.id;
+    const user = this.state.users.find(el => el.id === id);
+    this.setState({ userId: user.id });
     this.setState({ todoId: this.props.match.params.commentId });
-    this.refs.image.style.backgroundImage = `url(${this.state.users[i].url})`;
-    this.refs.name.innerHTML = this.state.users[i].name;
+    this.refs.image.style.backgroundImage = `url(${user.url})`;
+    this.refs.name.innerHTML = user.name;
   };
   handleUpdate = e => {
     e.preventDefault();
@@ -52,6 +55,20 @@ class Comments extends Component {
         userId: users[0].id,
         todoId: this.props.match.params.commentId
       });
+      db.collection("todos").onSnapshot(querySnapshot => {
+        let todos = [];
+        querySnapshot.forEach(doc => {
+          let todo = doc.data();
+          todo.id = doc.id;
+          todos.push(todo);
+        });
+        const todo = todos.find(
+          el => el.id === this.props.match.params.commentId
+        );
+        const userTodo = this.state.users.find(el => el.id === todo.userId);
+        todo.url = userTodo.url || img;
+        this.setState({ todo });
+      });
     });
     //! for rendering comments from database
     db.collection("comments").onSnapshot(querySnapshot => {
@@ -61,12 +78,10 @@ class Comments extends Component {
         comment.id = doc.id;
         comments.push(comment);
       });
-      comments = comments.filter(el => {
-        return el.todoId === this.props.match.params.commentId;
-      });
-      this.setState({
-        comments
-      });
+      comments = comments.filter(
+        el => el.todoId === this.props.match.params.commentId
+      );
+      this.setState({ comments });
     });
   }
   showUsers = () => {
@@ -75,7 +90,7 @@ class Comments extends Component {
         key={i}
         onClick={this.selectOption}
         className="border-b border-gray-300 text-green-600 h-12 flex flex-start items-center px-4 cursor-pointer"
-        data-id={i}
+        data-id={el.id}
       >
         <span
           className=" rounded-full bg-cover block"
@@ -111,7 +126,11 @@ class Comments extends Component {
                 ></div>
                 <p className="ml-2 flex self-center">{user.name}</p>
               </a>
-              <p className="select appearance-none py-1 pl-6 pr-8 outline-none text-gray-500 cursor-pointer"> {new Date(comment.date).toDateString()} </p>
+              <p className="select appearance-none py-1 pl-6 pr-8 outline-none text-gray-500 cursor-pointer">
+                {" "}
+                {new Date(comment.date).toLocaleTimeString()}{" "}
+                {new Date(comment.date).toDateString()}{" "}
+              </p>
             </div>
             <p className="text-base pt-6">{comment.content}</p>
           </article>
@@ -137,6 +156,12 @@ class Comments extends Component {
           className="center bg-white p-8 container rounded-lg center"
           style={{ transform: `translate(-50%,0%)` }}
         >
+          <div className="myDiv">
+            <div className="personImg">
+              <img src={this.state.todo.url} alt="" />
+            </div>
+            <div className="personTask">{this.state.todo.title}</div>
+          </div>
           <div className="flex justify-end mb-4">
             <i
               onClick={this.props.history.goBack}
@@ -147,7 +172,7 @@ class Comments extends Component {
           </div>
           <div className="mt-10 update-section" id="Update_section">
             <p className="text-purple-600 text-xl text-left capitalize mr-6 font-bold text-xl">
-              Select comment
+              Who is Commenting??
             </p>
             <div
               onClick={this.handleDropdown}
@@ -157,9 +182,7 @@ class Comments extends Component {
                 ref="image"
                 className="h-full bg-cover rounded-full  bg-gray-300 relative pic-wrapper"
                 style={{
-                  backgroundImage: `url(${
-                    this.state.users.length > 0 ? this.state.users[0].url : ""
-                  })`,
+                  backgroundImage: `url(${img})`,
                   width: "40px",
                   height: "40px"
                 }}
@@ -173,8 +196,7 @@ class Comments extends Component {
                 </ul>
               </div>
               <p className="ml-2 flex self-center" ref="name">
-                {" "}
-                {this.state.users.length > 0 ? this.state.users[0].name : ""}
+                Select User
               </p>
             </div>
             <form action="/" onSubmit={this.handleUpdate}>

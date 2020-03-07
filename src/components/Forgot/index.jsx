@@ -1,43 +1,31 @@
 import React, { Component } from "react";
 import firebase from "../../config/firebase";
 import { AuthContext } from "../../context/AuthContext";
-
-
-
-
-class Login extends Component {
+class Forgot extends Component {
   static contextType = AuthContext;
   state = {
-    email: "",
     password: ""
   };
 
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
   };
-  componentDidMount() {
-    firebase
-      .auth()
-      .signOut()
-      .then(() => {})
-      .catch(error => {
-      });
-  }
+
   handleSubmit = e => {
     e.preventDefault();
-    console.log(this.state);
 
-    firebase
-      .auth()
-      .signInWithEmailAndPassword(this.state.email, this.state.password).then( () => {
+    var user = firebase.auth().currentUser;
+    var newPassword = this.state.password;
+console.log(user,newPassword,this.state.password)
+    user
+      .updatePassword(newPassword)
+      .then(() => {
+        // Update successful.
+        console.log("forgot done");
         this.props.history.push('/admin_panel')
-      }
-
-      )
+      })
       .catch(error => {
-        // Handle Errors here.
-        // var errorCode = error.code;
-        // var errorMessage = error.message;
+        // An error happened.
         console.log(error);
       });
   };
@@ -49,23 +37,13 @@ class Login extends Component {
           style={{ width: `483px` }}
         >
           <h1 className="text-lg text-purple-600 mb-12 text-center font-bold text-3xl">
-            Login
+            Change Password
           </h1>
-        
           <form onSubmit={this.handleSubmit}>
             <input
               className="shadow w-full text-md mb-6 p-3"
-              type="email"
-              placeholder="Email"
-              name="email"
-              value={this.state.email}
-              onChange={this.handleChange}
-              required
-            />
-            <input
-              className="shadow w-full text-md mb-6 p-3"
               type="password"
-              placeholder="Password"
+              placeholder="New Password"
               name="password"
               value={this.state.password}
               onChange={this.handleChange}
@@ -74,7 +52,8 @@ class Login extends Component {
             <button
               className="px-5 py-2 text-md bg-purple-600 text-white mr-0 ml-auto rounded-lg outline-none"
               id="login_btn"
-            >Submit
+            >
+              Change Password
             </button>
           </form>
         </div>
@@ -83,4 +62,4 @@ class Login extends Component {
   }
 }
 
-export default Login;
+export default Forgot;

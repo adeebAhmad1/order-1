@@ -35,7 +35,7 @@ class Home extends Component {
             className="rounded px-8 ml-3 py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none"
             to="/admin-login"
           >
-            Sign In
+            Admin Login
           </Link>
         )}
         <Table />

@@ -68,3 +68,25 @@ code {
 .inner button{
   margin: 0 auto;
 }
+
+
+/*!  for comments */
+.myDiv{
+  width:500px;
+  position: absolute;
+right:5%
+}
+.personImg{
+  width:15%;
+  float: left;
+
+}
+.personImg img{
+  border-radius: 50%;
+}
+.personTask{
+  width: 80%;
+  float: right;
+  padding-top: 25px;
+  font-weight: bolder;
+}

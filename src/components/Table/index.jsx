@@ -33,6 +33,7 @@ class Table extends Component {
       let users = [];
       querySnapshot.forEach(doc => {
         let user = doc.data();
+        user.id = doc.id
         users.push(user);
       });
       this.setState({
@@ -63,6 +64,9 @@ class Table extends Component {
         const commentsLength = this.state.comments.filter(comment => {
           return el.id === comment.todoId;
         }).length;
+        const user = this.state.users.find(user=> user.id === el.userId) || {};
+        const userId = user.id || "";
+        console.log(userId)
         return (
           <Todo
             key={i}
@@ -71,11 +75,11 @@ class Table extends Component {
             status={el.status}
             date={el.date}
             commentsLength={commentsLength}
-            assignedUser={this.state.users[el.selectUserIndex].url}
             url={el.id}
             timer={el.timer}
             endTime = {el.endTime? el.endTime : ""}
             todoId={el.id}
+            userId={userId}
           />
         );
       } else {

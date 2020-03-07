@@ -14,9 +14,9 @@ class index extends Component {
   state = {
     todos: [],
     todoIds: [],
-    taskIds: [],
     tasks: [],
-    comments: []
+    comments: [],
+    users: []
   };
 
   componentDidMount = () => {
@@ -39,13 +39,11 @@ class index extends Component {
       .get()
       .then(querySnapshot => {
         let tasks = [];
-        let taskIds = [];
         querySnapshot.forEach(doc => {
           let task = doc.data();
-          taskIds.push(doc.id);
           tasks.push(task);
         });
-        this.setState({ tasks, taskIds });
+        this.setState({ tasks });
       });
     //! for rendering comments from database
     db.collection("comments")
@@ -64,6 +62,19 @@ class index extends Component {
           comments
         });
       });
+    db.collection("users")
+      .get()
+      .then(querySnapshot => {
+        let users = [];
+        querySnapshot.forEach(doc => {
+          let user = doc.data();
+          user.id = doc.id;
+          users.push(user);
+        });
+        this.setState({
+          users
+        });
+      });
   };
 
   //!dropdown for tasksvalues
@@ -80,8 +91,7 @@ class index extends Component {
       title: <select className="valuePicker">{this.showTasksValues()}</select>,
       state: "Add",
       status: "Not Started",
-      timer: "",
-      selectUserIndex: 0
+      timer: ""
     };
     this.setState({ todos: [...this.state.todos, newTodo] });
   };
@@ -94,9 +104,10 @@ class index extends Component {
         let dateArray = el.date.split("-");
         date = [dateArray[2], dateArray[0], dateArray[1]].join("-");
       }
-      const commentsLength = this.state.comments.filter(comment => {
-        return el.id === comment.todoId;
-      }).length;
+      const commentsLength = this.state.comments.filter(comment => el.id === comment.todoId).length;
+      const user = this.state.users.find(user=> user.id === el.userId) || {};
+      const userId = user.id || "";
+      console.log(this.state.users,el.userId) 
       return (
         <Todo
           key={i}
@@ -104,13 +115,13 @@ class index extends Component {
           commentsLength={commentsLength}
           status={el.status}
           index={i}
-          selectUserIndex={el.selectUserIndex}
           state={el.state ? el.state : "Delete"}
           date={date}
           todoId={el.id}
           timer={el.timer}
           url={el.id}
           endTime={el.endTime}
+          userId={userId}
         />
       );
     });

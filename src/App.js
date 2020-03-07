@@ -9,6 +9,7 @@ import Header from "./components/layout/Header";
 import Home from "./components/Home";
 
 import Login from "./components/Login";
+import Forgot from "./components/Forgot";
 
 import Comments from "./components/Comments";
 
@@ -39,6 +40,7 @@ class App extends Component {
             <Route path="/home/comments/:commentId" component={Comments} />
 
             <Route exact path="/admin-login" component={Login} />
+            <Route exact path="/admin_forgot" component={Forgot} />
             <Route path="/admin_panel" component={Admin_Panel} />
             <Route
               path="/admin_panel/comments/:commentId"

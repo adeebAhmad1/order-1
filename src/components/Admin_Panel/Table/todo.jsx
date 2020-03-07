@@ -2,11 +2,11 @@ import React, { Component } from "react";
 import Confetti from "react-confetti";
 //firebase
 import { db } from "../../../config/firebase";
-
+import img from "../../../images/no_image.jpg";
 import { Link } from "react-router-dom";
 class Todo extends Component {
   state = {
-    selectUserIndex: 0,
+    userId: "",
     id: null,
     users: [],
     iTimes: 0,
@@ -33,18 +33,17 @@ class Todo extends Component {
   add = () => {
     let title = document.querySelector(".valuePicker").selectedOptions[0]
       .innerText;
-    let selectUserIndex = this.state.selectUserIndex;
     let status = this.refs.status.innerText;
     let dateArray = this.refs.date.value.split("-");
     let date = [dateArray[1], dateArray[2], dateArray[0]].join("-");
-
+    const userId = this.state.userId;
     if (title === "" && date === "") {
       alert("Both are required");
     } else {
       db.collection("todos")
         .add({
           title,
-          selectUserIndex,
+          userId,
           status,
           date
         })
@@ -77,14 +76,17 @@ class Todo extends Component {
   componentWillReceiveProps() {
     var text = this.refs.status.textContent;
     this.setState({ status: text });
-    this.setState({endTime:this.props.endTime})
+    this.setState({ endTime: this.props.endTime });
     if (this.state.status === "Done") {
       this.refs.status1.style.backgroundColor = "#03C977";
       this.refs.dropdown1.classList.add("invisible");
       this.updateTime();
       this.stopTimer();
     } else if (this.state.status === "Stuck") {
-      this.refs.status1.style.backgroundColor = "#E1445B";
+      this.refs.status1.style.backgroundColor = "#03c977";
+      if (this.props.commentsLength === 0) {
+        this.refs.status1.style.backgroundColor = "#E1445B";
+      }
     } else if (this.state.status === "Working on It") {
       this.refs.status1.style.backgroundColor = "#F7AE3C";
       if (this.state.iTimes === 0) this.updateTime();
@@ -100,17 +102,18 @@ class Todo extends Component {
         let users = [];
         querySnapshot.forEach(doc => {
           let user = doc.data();
+          user.id = doc.id;
           users.push(user);
         });
         this.setState({
           users,
-          selectUserIndex: this.props.selectUserIndex
+          userId: this.props.userId
         });
         window.addEventListener("click", this.removeDropdown);
         window.addEventListener("click", this.removeDropdown2);
-        this.refs.images.style.backgroundImage = `url(${
-          this.state.users[this.props.selectUserIndex].url
-        })`;
+        const user =
+          this.state.users.find(el => el.id === this.state.userId) || {};
+        this.refs.images.style.backgroundImage = `url(${user.url || img})`;
       });
   }
   componentWillUnmount() {
@@ -122,10 +125,9 @@ class Todo extends Component {
     let users = this.state.users;
     return users.map((user, i) => {
       return (
-        <div key={i} className="user" data-num={i}>
+        <div key={i} className="user" data-userid={user.id}>
           <div
             className="h-full bg-cover rounded-full mx-auto "
-            ref={`dropdown-img-${i}`}
             onClick={this.onSelect}
             style={{
               backgroundImage: `url(${users[i].url})`,
@@ -178,8 +180,8 @@ class Todo extends Component {
   };
   stopTimer = () => {
     const endTime = this.state.endTime
-        ? this.state.endTime
-        : new Date().getTime();
+      ? this.state.endTime
+      : new Date().getTime();
     if (!this.props.endTime) {
       db.collection("todos")
         .doc(this.props.url)
@@ -223,8 +225,11 @@ class Todo extends Component {
 
             this.stopTimer();
           } else if (this.state.status === "Stuck") {
-            status_priority_wrapper.style.backgroundColor = "#E1445B";
             status_priority_wrapper.children[0].innerText = "Stuck";
+            status_priority_wrapper.style.backgroundColor = "#03c977";
+            if (this.props.commentsLength === 0) {
+              status_priority_wrapper.style.backgroundColor = "#E1445B";
+            }
           } else if (this.state.status === "Working on it") {
             status_priority_wrapper.children[0].innerText = "Working on It";
             status_priority_wrapper.style.backgroundColor = "#F7AE3C";
@@ -255,15 +260,14 @@ class Todo extends Component {
   };
   //! user select
   onSelect = e => {
-    const selectUserIndex = e.target.dataset.num
-      ? e.target.dataset.num
-      : e.target.parentNode.dataset.num;
+    const userId = e.target.dataset.userid
+      ? e.target.dataset.userid
+      : e.target.parentNode.dataset.userid;
     this.setState({
-      selectUserIndex
+      userId
     });
-    this.refs.images.style.backgroundImage = this.refs[
-      `dropdown-img-${selectUserIndex}`
-    ].style.backgroundImage;
+    const user = this.state.users.find(el => el.id === userId);
+    this.refs.images.style.backgroundImage = `url(${user.url})`;
   };
   render() {
     return (
@@ -303,23 +307,21 @@ class Todo extends Component {
         </td>
         <td
           ref="status1"
-          className={`bg-green-500 text-white relative cursor-pointer status_priority_wrapper status_priority_wrapper${this.props.index}`}
+          style={{ backgroundColor: "#599EF1" }}
+          className={`text-white relative cursor-pointer status_priority_wrapper status_priority_wrapper${this.props.index}`}
           onClick={() => this.handleDropdown(this.props.index)}
         >
           <p ref="status" id="dropdown1">
             {this.props.status}
           </p>
-          <ul 
+          <ul
             ref="dropdown1"
             className="absolute top-0 mt-12 shadow-xl -ml-8 left-0 w-48 bg-white dropdown z-50 hidden status_priority_dropdown"
             style={{ backgroundColor: `#fff` }}
           >
             {this.state.status === "Not Started" ? (
               <li className="select1 border-b border-gray-300 text-green-600 py-3 flex flex-start items-center px-4">
-                <span
-                  style={{ backgroundColor: "#599EF1" }}
-                  className="w-4 h-4 rounded-full block mr-3"
-                ></span>
+                <span className="w-4 h-4 rounded-full block mr-3"></span>
                 <p>Not Started</p>
               </li>
             ) : (
