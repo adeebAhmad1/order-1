@@ -80,8 +80,9 @@ class Comments extends Component {
       });
       comments = comments.filter(
         el => el.todoId === this.props.match.params.commentId
-      );
-      this.setState({ comments });
+        );
+        comments.sort((a,b)=>a.date-b.date)
+      this.setState({ comments })
     });
   }
   showUsers = () => {
@@ -117,7 +118,7 @@ class Comments extends Component {
             key={i}
           >
             <div className="flex justify-between items-center">
-              <a href="/" className="flex text-gray-500 hover:text-purple-600">
+              <a  className="flex text-gray-500 hover:text-purple-600">
                 <div
                   className="h-12 w-12 bg-cover rounded-full mx-auto"
                   style={{
@@ -172,7 +173,7 @@ class Comments extends Component {
           </div>
           <div className="mt-10 update-section" id="Update_section">
             <p className="text-purple-600 text-xl text-left capitalize mr-6 font-bold text-xl">
-              Who is Commenting??
+              Who is Commenting?
             </p>
             <div
               onClick={this.handleDropdown}

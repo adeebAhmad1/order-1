@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import Todo from "./Table/todo";
 
 //firebase
-import firebase, { db } from "../../config/firebase";
+import  { db } from "../../config/firebase";
 
 //context
 import { AuthContext } from "../../context/AuthContext";
@@ -88,7 +88,9 @@ class index extends Component {
   //! for new todo
   handleClick = () => {
     const newTodo = {
-      title: <select className="valuePicker">{this.showTasksValues()}</select>,
+      title: <select className="valuePicker">
+        <option disabled selected>Select Task</option>
+        {this.showTasksValues()}</select>,
       state: "Add",
       status: "Not Started",
       timer: ""
@@ -104,10 +106,12 @@ class index extends Component {
         let dateArray = el.date.split("-");
         date = [dateArray[2], dateArray[0], dateArray[1]].join("-");
       }
-      const commentsLength = this.state.comments.filter(comment => el.id === comment.todoId).length;
-      const user = this.state.users.find(user=> user.id === el.userId) || {};
+      const commentsLength = this.state.comments.filter(
+        comment => el.id === comment.todoId
+      ).length;
+      const user = this.state.users.find(user => user.id === el.userId) || {};
       const userId = user.id || "";
-      console.log(this.state.users,el.userId) 
+      console.log(this.state.users, el.userId);
       return (
         <Todo
           key={i}
@@ -144,13 +148,29 @@ class index extends Component {
   render() {
     return (
       <div className="container mx-auto pt-16">
+        <div className="left  justify-end mb-6">
+          {" "}
+          <Link
+            className="rounded px-8 ml-3 py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none"
+            to="/"
+          >
+            Sign Out
+          </Link>
+          <Link
+            className="rounded px-8 ml-3 py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none"
+            to="/admin_forgot"
+          >
+            Change Password
+          </Link>
+        </div>
+
         <div className="flex justify-end mb-6">
           <button
             className="rounded px-4 py-2 text-center border border-purple-600 text-purple-600 mr-3 bg-white-600 text-white outline-none cursor-pointer"
             id="add_task_btn"
             onClick={this.handleClick}
           >
-            Add Todo
+            Add Task
           </button>
           <Link
             to="/all_user"
@@ -180,31 +200,6 @@ class index extends Component {
           >
             Delete All
           </button>
-          {this.context.isAuthenticated ? (
-            <Link
-              className="rounded px-8 ml-3 py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none"
-              onClick={() =>
-                firebase
-                  .auth()
-                  .signOut()
-                  .then(() => {})
-                  .catch(error => {
-                    // An error happened.
-                    alert(error);
-                  })
-              }
-              to="/"
-            >
-              Sign Out
-            </Link>
-          ) : (
-            <Link
-              className="rounded px-8 ml-3 py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none"
-              to="/admin-login"
-            >
-              Sign In
-            </Link>
-          )}
         </div>
         <table className="w-full">
           <thead>

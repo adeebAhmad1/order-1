@@ -31,12 +31,17 @@ class Todo extends Component {
 
   //! handle submit for adding todo
   add = () => {
+
+    
+
+
     let title = document.querySelector(".valuePicker").selectedOptions[0]
       .innerText;
     let status = this.refs.status.innerText;
     let dateArray = this.refs.date.value.split("-");
     let date = [dateArray[1], dateArray[2], dateArray[0]].join("-");
     const userId = this.state.userId;
+
     if (title === "" && date === "") {
       alert("Both are required");
     } else {
@@ -83,6 +88,7 @@ class Todo extends Component {
       this.updateTime();
       this.stopTimer();
     } else if (this.state.status === "Stuck") {
+      if (this.state.iTimes === 0) this.updateTime();
       this.refs.status1.style.backgroundColor = "#03c977";
       if (this.props.commentsLength === 0) {
         this.refs.status1.style.backgroundColor = "#E1445B";
@@ -272,14 +278,14 @@ class Todo extends Component {
   render() {
     return (
       <tr className="bg-gray-100 border-b border-gray-100">
-        <td className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container">
+        <td  className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container">
           {this.props.title}
           <Link
             to={`/admin_panel/comments/${this.props.url}`}
             className="relative chat-wrapper cursor-pointer"
           >
-            <i className="text-3xl text-gray-500 chat-icon far fa-comment"></i>
-            <div className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none">
+            <i style={{color: this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`}}   className="text-3xl text-gray-500 chat-icon far fa-comment"></i>
+            <div style={{backgroundColor: this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`}}  className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none">
               {this.props.commentsLength}
             </div>
           </Link>
@@ -345,6 +351,7 @@ class Todo extends Component {
           <span className="block mx-auto rounded-full h-6 w-6/7  bg-black overflow-hidden relative">
             <div className="bg-purple-600 w-1/2 h-full z-10 relative"></div>
             <input
+            
               type="date"
               ref="date"
               defaultValue={this.props.date}

@@ -49,8 +49,7 @@ class Todo extends Component {
     this.refs.dropdown1.classList.remove("block");
   };
   UNSAFE_componentWillReceiveProps () {
-    var text = this.refs.status.textContent;
-    this.state.status = text
+    var text = this.refs.status.textContent;    
     this.setState({ endTime: this.props.endTime,status:text });
     console.log(this.state.status)
     if (this.state.status === "Done") {
@@ -185,8 +184,8 @@ class Todo extends Component {
             to={`/home/comments/${this.props.url}`}
             className="relative chat-wrapper cursor-pointer"
           >
-            <i className="text-3xl text-gray-500 chat-icon far fa-comment"></i>
-            <div className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none">
+            <i style={{color: this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`}} className="text-3xl text-gray-500 chat-icon far fa-comment"></i>
+            <div  style={{backgroundColor: this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`}} className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none">
               {(this.props.commentsLength)}
             </div>
           </Link>

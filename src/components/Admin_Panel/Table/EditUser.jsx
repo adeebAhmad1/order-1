@@ -7,14 +7,29 @@ import { Link } from "react-router-dom";
 class EditUser extends Component {
   state = {
     name: "",
-    url: ""
+    url: "",
+    users: {}
   };
 
   //getting values in state
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
   };
+  componentDidMount(){
+    db.collection("users")
+      .get()
+      .then(querySnapshot => {
+        let users = [];
+        querySnapshot.forEach(doc => {
+          let user = doc.data();
+          user.id = doc.id;
+          users.push(user);
+        });
+        const {name,url} = users.find(el=> el.id === this.props.match.params.userId) || {name: "",url:""};
 
+        this.setState({name,url});
+      });
+  }
   handleSubmit = (userId, e) => {
     e.preventDefault();
     let name = this.state.name;
@@ -55,6 +70,7 @@ class EditUser extends Component {
                 placeholder="Name"
                 name="name"
                 onChange={this.handleChange}
+                value={this.state.name}
               />
             </div>
             <div className="">
@@ -62,6 +78,7 @@ class EditUser extends Component {
                 placeholder="Image URL"
                 name="url"
                 onChange={this.handleChange}
+                value={this.state.url}
               />
             </div>
             <div className="">
