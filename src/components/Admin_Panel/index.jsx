@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 //components
 import Todo from "./Table/todo";
-
+import firebase from "../../config/firebase"
 //firebase
 import  { db } from "../../config/firebase";
 
@@ -153,6 +153,16 @@ class index extends Component {
           <Link
             className="rounded px-8 ml-3 py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none"
             to="/"
+            onClick={()=>{
+              firebase
+                .auth()
+                .signOut()
+                .then(() => {})
+                .catch(error => {
+                  // An error happened.
+                  alert(error);
+                })
+            }}
           >
             Sign Out
           </Link>
@@ -217,10 +227,7 @@ class index extends Component {
           <tbody ref="tbody">{this.showTodos()}</tbody>
         </table>
         <div className="flex justify-end mb-4">
-          <Link
-            className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
-            to="/"
-          >
+          <Link className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8" to="/">
             Go Back
           </Link>
         </div>

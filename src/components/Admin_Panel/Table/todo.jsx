@@ -13,7 +13,8 @@ class Todo extends Component {
     time: ``,
     confettiStart: false,
     status: "Not Started",
-    endTime: ``
+    endTime: ``,
+    name:""
   };
 
   // ! update status function
@@ -43,14 +44,11 @@ class Todo extends Component {
     } else if (picker.selectedIndex === 0) {
       picker.style.color = "red";
       picker.selectedOptions[0].innerText = "Please Select a Task";
+    } else if(this.state.userId === ""){
+      return ;
     } else {
       db.collection("todos")
-        .add({
-          title,
-          userId,
-          status,
-          date
-        })
+        .add({title,userId,status,date})
         .then(docRef => {
           this.setState({
             todoId: 1
@@ -92,6 +90,18 @@ class Todo extends Component {
     } else if (this.state.status === "Working on It") {
       this.refs.status1.style.backgroundColor = "#F7AE3C";
       if (this.state.iTimes === 0) this.updateTime();
+    } else if (this.state.status === "Not Started") {
+      this.refs.status1.style.backgroundColor = "#599EFD";
+    }
+  }
+  componentWillUpdate(){
+    if (this.state.status === "Done") {
+      this.refs.status1.style.backgroundColor = "#03C977";
+      this.refs.dropdown1.classList.add("invisible");
+    } else if (this.state.status === "Stuck") {
+      this.refs.status1.style.backgroundColor = "#E1445B";
+    } else if (this.state.status === "Working on It") {
+      this.refs.status1.style.backgroundColor = "#F7AE3C";
     } else if (this.state.status === "Not Started") {
       this.refs.status1.style.backgroundColor = "#599EFD";
     }
@@ -240,9 +250,7 @@ class Todo extends Component {
               : new Date().getTime();
             db.collection("todos")
               .doc(this.props.todoId)
-              .update({
-                timer
-              })
+              .update({timer})
               .then(() => {
                 window.location.reload();
                 console.log("Document successfully updated!");
@@ -323,7 +331,8 @@ class Todo extends Component {
             id="dropdown"
             className="h-full bg-cover rounded-full mx-auto"
             style={{
-              width: "40px"
+              width: "40px",
+              backgroundPosition: `center`
             }}
             onClick={this.showDropdown}
           ></div>
