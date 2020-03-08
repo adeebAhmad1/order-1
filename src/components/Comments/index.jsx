@@ -9,7 +9,8 @@ class Comments extends Component {
     content: "",
     userId: "",
     todoId: "",
-    todo: {}
+    todo: {},
+    name: ""
   };
 
   handleDropdown = () => {
@@ -22,10 +23,17 @@ class Comments extends Component {
     this.setState({ todoId: this.props.match.params.commentId });
     this.refs.image.style.backgroundImage = `url(${user.url})`;
     this.refs.name.innerHTML = user.name;
+    this.setState({name:user.name})
   };
   handleUpdate = e => {
     e.preventDefault();
-    db.collection("comments")
+    if(this.state.name === ""){
+      this.refs.name.innerHTML = "Please Select a User";
+      this.refs.name.style.color = "red"
+      return false
+    }
+    else{
+      db.collection("comments")
       .add({
         content: this.state.content,
         userId: this.state.userId,
@@ -40,6 +48,7 @@ class Comments extends Component {
       .catch(error => {
         console.error("Error adding document: ", error);
       });
+    }
   };
   componentDidMount() {
     //! for rendering user from database
@@ -81,7 +90,7 @@ class Comments extends Component {
       comments = comments.filter(
         el => el.todoId === this.props.match.params.commentId
         );
-        comments.sort((a,b)=>a.date-b.date)
+        comments.sort((a,b)=>b.date-a.date)
       this.setState({ comments })
     });
   }

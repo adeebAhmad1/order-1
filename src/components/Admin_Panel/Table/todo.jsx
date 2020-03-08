@@ -32,15 +32,17 @@ class Todo extends Component {
   //! handle submit for adding todo
   add = () => {
     let picker = document.querySelector(".valuePicker");
-    const title= picker.selectedOptions[0].innerText;
+    const title = picker.selectedOptions[0].innerText;
     let status = this.refs.status.innerText;
-    let date = this.refs.date.value ? new Date(this.refs.date.value).toLocaleDateString() : "";
+    let date = this.refs.date.value
+      ? new Date(this.refs.date.value).toLocaleDateString()
+      : "";
     const userId = this.state.userId;
     if (date === "") {
-      this.refs.date.style.color = "red"
-    }else if(picker.selectedIndex === 0){
+      this.refs.date.style.color = "red";
+    } else if (picker.selectedIndex === 0) {
       picker.style.color = "red";
-      picker.selectedOptions[0].innerText = "Please Select a Task"
+      picker.selectedOptions[0].innerText = "Please Select a Task";
     } else {
       db.collection("todos")
         .add({
@@ -54,7 +56,7 @@ class Todo extends Component {
             todoId: 1
           });
           console.log("Document written with ID: ", docRef.id);
-          // window.location.reload();
+          window.location.reload();
         })
         .catch(error => {
           console.error("Error adding document: ", error);
@@ -86,10 +88,7 @@ class Todo extends Component {
       this.stopTimer();
     } else if (this.state.status === "Stuck") {
       if (this.state.iTimes === 0) this.updateTime();
-      this.refs.status1.style.backgroundColor = "#03c977";
-      if (this.props.commentsLength === 0) {
-        this.refs.status1.style.backgroundColor = "#E1445B";
-      }
+      this.refs.status1.style.backgroundColor = "#E1445B";
     } else if (this.state.status === "Working on It") {
       this.refs.status1.style.backgroundColor = "#F7AE3C";
       if (this.state.iTimes === 0) this.updateTime();
@@ -128,23 +127,22 @@ class Todo extends Component {
     let users = this.state.users;
     return users.map((user, i) => {
       return (
-        <div key={i} className="user" data-userid={user.id}>
-          <div
-            className="h-full bg-cover rounded-full mx-auto "
-            onClick={this.onSelect}
+        <li
+          key={i}
+          onClick={this.onSelect}
+          className="border-b border-gray-300 text-green-600 h-12 flex flex-start items-center px-4 cursor-pointer"
+          data-userid={user.id}
+        >
+          <span
+            className=" rounded-full bg-cover block"
             style={{
-              backgroundImage: `url(${users[i].url})`,
-              width: "50px",
-              height: "50px",
-              margin: "0 auto",
-              padding: "2%",
-              boxSizing: "content-box"
+              backgroundImage: `url(${user.url})`,
+              width: "30px",
+              height: "30px"
             }}
-          ></div>
-          <span className="userName" onClick={this.onSelect}>
-            {user.name}
-          </span>
-        </div>
+          ></span>
+          <p className="ml-3">{user.name}</p>
+        </li>
       );
     });
   };
@@ -174,14 +172,16 @@ class Todo extends Component {
       const remainingSeconds = seconds % 60;
       const hours = Math.floor(mins / 60);
       const remainingMins = mins % 60;
-      if(remainingMins >= 0 && remainingSeconds >= 0){
+      if (remainingMins >= 0 && remainingSeconds >= 0) {
         this.setState({
           time: `${hours < 10 ? "0" + hours : hours}:${
             remainingMins < 10 ? "0" + remainingMins : remainingMins
-          }:${remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds}`
+          }:${
+            remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds
+          }`
         });
-      } else{
-        this.setState({time: `00:00:00`})
+      } else {
+        this.setState({ time: `00:00:00` });
       }
     }, 1000);
   };
@@ -233,10 +233,20 @@ class Todo extends Component {
             this.stopTimer();
           } else if (this.state.status === "Stuck") {
             status_priority_wrapper.children[0].innerText = "Stuck";
-            status_priority_wrapper.style.backgroundColor = "#03c977";
-            if (this.props.commentsLength === 0) {
-              status_priority_wrapper.style.backgroundColor = "#E1445B";
-            }
+            status_priority_wrapper.style.backgroundColor = "#E1445B";
+            this.updateTime();
+            const timer = this.props.timer
+              ? this.props.timer
+              : new Date().getTime();
+            db.collection("todos")
+              .doc(this.props.todoId)
+              .update({
+                timer
+              })
+              .then(() => {
+                window.location.reload();
+                console.log("Document successfully updated!");
+              });
           } else if (this.state.status === "Working on it") {
             status_priority_wrapper.children[0].innerText = "Working on It";
             status_priority_wrapper.style.backgroundColor = "#F7AE3C";
@@ -270,23 +280,32 @@ class Todo extends Component {
     const userId = e.target.dataset.userid
       ? e.target.dataset.userid
       : e.target.parentNode.dataset.userid;
-    this.setState({
-      userId
-    });
+    this.setState({ userId });
     const user = this.state.users.find(el => el.id === userId);
     this.refs.images.style.backgroundImage = `url(${user.url})`;
   };
   render() {
     return (
       <tr className="bg-gray-100 border-b border-gray-100">
-        <td  className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container">
+        <td className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container">
           {this.props.title}
           <Link
             to={`/admin_panel/comments/${this.props.url}`}
             className="relative chat-wrapper cursor-pointer"
           >
-            <i style={{color: this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`}}   className="text-3xl text-gray-500 chat-icon far fa-comment"></i>
-            <div style={{backgroundColor: this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`}}  className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none">
+            <i
+              style={{
+                color: this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`
+              }}
+              className="text-3xl text-gray-500 chat-icon far fa-comment"
+            ></i>
+            <div
+              style={{
+                backgroundColor:
+                  this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`
+              }}
+              className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none"
+            >
               {this.props.commentsLength}
             </div>
           </Link>
@@ -302,15 +321,19 @@ class Todo extends Component {
           <div
             ref="images"
             id="dropdown"
-            className="h-full bg-cover rounded-full mx-auto "
+            className="h-full bg-cover rounded-full mx-auto"
             style={{
               width: "40px"
             }}
             onClick={this.showDropdown}
           ></div>
-          <div className="dropdown1" ref="dropdown">
+          <ul
+            ref="dropdown"
+            className="absolute top-0 mt-12 shadow-xl -mr-2 left-0 w-48 bg-white dropdown z-50 capitalize hidden status_priority_dropdown rounded-lg dropdown0"
+            style={{ width: `17.5rem` }}
+          >
             {this.showUsers()}
-          </div>
+          </ul>
         </td>
         <td
           ref="status1"
@@ -328,7 +351,10 @@ class Todo extends Component {
           >
             {this.state.status === "Not Started" ? (
               <li className="select1 border-b border-gray-300 text-green-600 py-3 flex flex-start items-center px-4">
-                <span style={{ backgroundColor: "#599EFD" }} className="w-4 h-4 rounded-full block mr-3"></span>
+                <span
+                  style={{ backgroundColor: "#599EFD" }}
+                  className="w-4 h-4 rounded-full block mr-3"
+                ></span>
                 <p>Not Started</p>
               </li>
             ) : (
@@ -352,7 +378,6 @@ class Todo extends Component {
           <span className="block mx-auto rounded-full h-6 w-6/7  bg-black overflow-hidden relative">
             <div className="bg-purple-600 w-1/2 h-full z-10 relative"></div>
             <input
-            
               type="date"
               ref="date"
               defaultValue={this.props.date}

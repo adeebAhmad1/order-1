@@ -58,9 +58,6 @@ class Todo extends Component {
       this.stopTimer();
     } else if (this.state.status === "Stuck") {
       this.refs.status_wrapper.style.backgroundColor = "#E1445B";
-      if (this.props.commentsLength > 0) {
-        this.refs.status_wrapper.style.backgroundColor = "#03c977";
-      }
       if (this.state.iTimes === 0) this.updateTime();
     } else if (this.state.status === "Working on It") {
       this.refs.status_wrapper.style.backgroundColor = "#F7AE3C";
@@ -73,10 +70,7 @@ class Todo extends Component {
     if (this.state.status === "Done") {
       this.refs.status_wrapper.style.backgroundColor = "#03C977";
     } else if (this.state.status === "Stuck") {
-      this.refs.status_wrapper.style.backgroundColor = "#03c977";
-      if (this.props.commentsLength === 0) {
         this.refs.status_wrapper.style.backgroundColor = "#E1445B";
-      }
     } else if (this.state.status === "Working on It") {
       this.refs.status_wrapper.style.backgroundColor = "#F7AE3C";
       if (this.state.iTimes === 0) this.updateTime();
@@ -162,7 +156,20 @@ class Todo extends Component {
             this.stopTimer();
           } else if (this.state.status === "Stuck") {
             status_priority_wrapper.children[0].innerText = "Stuck";
-            status_priority_wrapper.style.backgroundColor = "#03c977";
+            status_priority_wrapper.style.backgroundColor = "#E1445B";
+            this.updateTime();
+            const timer = this.props.timer
+              ? this.props.timer
+              : new Date().getTime();
+            db.collection("todos")
+              .doc(this.props.todoId)
+              .update({
+                timer
+              })
+              .then(() => {
+                window.location.reload();
+                console.log("Document successfully updated!");
+              });
             if (this.props.commentsLength === 0) {
               status_priority_wrapper.style.backgroundColor = "#E1445B";
             }

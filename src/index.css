@@ -112,3 +112,8 @@ right:5%
   top: 0;
   right: -5%;
 }
+
+table .dropdown0::before{
+  right: auto;
+  left: 10% !important;
+}
