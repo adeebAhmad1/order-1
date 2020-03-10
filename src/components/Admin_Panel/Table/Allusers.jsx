@@ -28,9 +28,6 @@ class Allusers extends Component {
     db.collection("users")
       .doc(userId)
       .delete()
-      .then(() => {
-        console.log("deleted");
-      })
       .catch(error => {
         console.error("Error removing document: ", error);
       });
@@ -38,9 +35,15 @@ class Allusers extends Component {
 
   //! rendering user from database
   showUsers = () => {
-    let users = this.state.users;
-    console.log(users);
-    return users.map((user, i) => {
+ 
+
+ //! for sorting
+ let sortedusers = this.state.users.sort((a, b) => {
+  return a.name.localeCompare(b.name);
+});
+
+
+    return sortedusers.map((user, i) => {
       return (
         <tr key={i}>
           <td>

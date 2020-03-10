@@ -14,7 +14,7 @@ class Todo extends Component {
     confettiStart: false,
     status: "Not Started",
     endTime: ``,
-    name:""
+    name: ""
   };
 
   // ! update status function
@@ -24,9 +24,6 @@ class Todo extends Component {
       .doc(todosId)
       .update({
         status
-      })
-      .then(() => {
-        console.log("Document successfully updated!");
       });
   };
 
@@ -36,7 +33,7 @@ class Todo extends Component {
     const title = picker.selectedOptions[0].innerText;
     let status = this.refs.status.innerText;
     let date = this.refs.date.value
-      ? new Date(this.refs.date.value).toLocaleDateString()
+      ? new Date(this.refs.date.value).getTime()
       : "";
     const userId = this.state.userId;
     if (date === "") {
@@ -44,16 +41,15 @@ class Todo extends Component {
     } else if (picker.selectedIndex === 0) {
       picker.style.color = "red";
       picker.selectedOptions[0].innerText = "Please Select a Task";
-    } else if(this.state.userId === ""){
-      return ;
+    } else if (this.state.userId === "") {
+      return;
     } else {
       db.collection("todos")
-        .add({title,userId,status,date})
+        .add({ title, userId, status, date })
         .then(docRef => {
           this.setState({
             todoId: 1
           });
-          console.log("Document written with ID: ", docRef.id);
           window.location.reload();
         })
         .catch(error => {
@@ -68,7 +64,6 @@ class Todo extends Component {
       .doc(todoId)
       .delete()
       .then(() => {
-        console.log("deleted");
         window.location.reload();
       })
       .catch(error => {
@@ -94,7 +89,7 @@ class Todo extends Component {
       this.refs.status1.style.backgroundColor = "#599EFD";
     }
   }
-  componentWillUpdate(){
+  componentWillUpdate() {
     if (this.state.status === "Done") {
       this.refs.status1.style.backgroundColor = "#03C977";
       this.refs.dropdown1.classList.add("invisible");
@@ -203,7 +198,9 @@ class Todo extends Component {
       db.collection("todos")
         .doc(this.props.url)
         .update({ endTime })
-        .then(() => this.setState({ endTime }));
+        .then(() => {
+          this.setState({ endTime });
+        });
     }
   };
   //! status dropdown
@@ -231,7 +228,6 @@ class Todo extends Component {
         [i].addEventListener("click", e => {
           const text = e.target.innerText;
           this.setState({ status: text });
-          console.log(this.state.status);
           if (this.state.status === "Done") {
             this.setState({
               confettiStart: true
@@ -250,10 +246,9 @@ class Todo extends Component {
               : new Date().getTime();
             db.collection("todos")
               .doc(this.props.todoId)
-              .update({timer})
+              .update({ timer })
               .then(() => {
-                window.location.reload();
-                console.log("Document successfully updated!");
+                this.props.forceUpdate();
               });
           } else if (this.state.status === "Working on it") {
             status_priority_wrapper.children[0].innerText = "Working on It";
@@ -269,8 +264,7 @@ class Todo extends Component {
                 timer
               })
               .then(() => {
-                window.location.reload();
-                console.log("Document successfully updated!");
+                this.props.forceUpdate();
               });
           } else if (text === "Not Started") {
             status_priority_wrapper.children[0].innerText = "Not Started";
@@ -385,7 +379,7 @@ class Todo extends Component {
         </td>
         <td>
           <span className="block mx-auto rounded-full h-6 w-6/7  bg-black overflow-hidden relative">
-            <div className="bg-purple-600 w-1/2 h-full z-10 relative"></div>
+            <div className="bg-blue-600 w-1/2 h-full z-10 relative"></div>
             <input
               type="date"
               ref="date"

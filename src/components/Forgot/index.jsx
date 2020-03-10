@@ -16,17 +16,15 @@ class Forgot extends Component {
 
     var user = firebase.auth().currentUser;
     var newPassword = this.state.password;
-console.log(user,newPassword,this.state.password)
     user
       .updatePassword(newPassword)
       .then(() => {
         // Update successful.
-        console.log("forgot done");
         this.props.history.push('/admin_panel')
       })
       .catch(error => {
         // An error happened.
-        console.log(error);
+        console.error(error);
       });
   };
   render() {

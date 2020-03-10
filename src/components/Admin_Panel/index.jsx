@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 //components
 import Todo from "./Table/todo";
-import firebase from "../../config/firebase"
+import firebase from "../../config/firebase";
 //firebase
-import  { db } from "../../config/firebase";
+import { db } from "../../config/firebase";
 
 //context
 import { AuthContext } from "../../context/AuthContext";
@@ -18,6 +18,11 @@ class index extends Component {
     comments: [],
     users: []
   };
+
+  //! for status not refresh page
+  force = ()=>{
+    this.forceUpdate()
+  }
 
   componentDidMount = () => {
     //! for getting all todos
@@ -62,6 +67,7 @@ class index extends Component {
           comments
         });
       });
+    //! for rendering comments from database
     db.collection("users")
       .get()
       .then(querySnapshot => {
@@ -78,19 +84,29 @@ class index extends Component {
   };
 
   //!dropdown for tasksvalues
-  showTasksValues = () =>
-    this.state.tasks.map((task, i) => (
+  showTasksValues = () => {
+    //! for sorting
+    let sortedTasks = this.state.tasks.sort((a, b) => {
+      return a.title.localeCompare(b.title);
+    });
+    return sortedTasks.map((task, i) => (
       <option value={task.title} key={i}>
         {task.title}
       </option>
     ));
+  };
 
   //! for new todo
   handleClick = () => {
     const newTodo = {
-      title: <select className="valuePicker" defaultValue={"select"}>
-        <option disabled value="select">Select Task</option>
-        {this.showTasksValues()}</select>,
+      title: (
+        <select className="valuePicker" defaultValue={"select"}>
+          <option disabled value="select">
+            Select Task
+          </option>
+          {this.showTasksValues()}
+        </select>
+      ),
       state: "Add",
       status: "Not Started",
       timer: ""
@@ -103,17 +119,25 @@ class index extends Component {
     this.state.todos.map((el, i) => {
       let date;
       if (el.date) {
-        let dateArray = el.date.split(" ").join("").split("/");
-        date = [dateArray[2],dateArray[0] >= 10 ? dateArray[0] : "0"+ dateArray[0]  , dateArray[1] >= 10 ? dateArray[1] : "0"+ dateArray[1]].join("-");
+        let dateArray = new Date(
+          el.date + new Date().getTimezoneOffset() * 60 * 1000
+        )
+          .toLocaleDateString()
+          .split("/");
+        date = [
+          dateArray[2],
+          dateArray[0] >= 10 ? dateArray[0] : "0" + dateArray[0],
+          dateArray[1] >= 10 ? dateArray[1] : "0" + dateArray[1]
+        ].join("-");
       }
       const commentsLength = this.state.comments.filter(
         comment => el.id === comment.todoId
       ).length;
       const user = this.state.users.find(user => user.id === el.userId) || {};
       const userId = user.id || "";
-      console.log(this.state.users, el.userId);
       return (
         <Todo
+        forceUpdate={this.force}
           key={i}
           title={<p> {el.title} </p>}
           commentsLength={commentsLength}
@@ -138,7 +162,6 @@ class index extends Component {
         .delete()
         .then(() => {
           window.location.reload();
-          console.log("deleted");
         })
         .catch(error => {
           console.error("Error removing document: ", error);
@@ -153,15 +176,14 @@ class index extends Component {
           <Link
             className="rounded px-8 ml-3 py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none"
             to="/"
-            onClick={()=>{
+            onClick={() => {
               firebase
                 .auth()
                 .signOut()
                 .then(() => {})
                 .catch(error => {
-                  // An error happened.
                   alert(error);
-                })
+                });
             }}
           >
             Sign Out
@@ -186,12 +208,11 @@ class index extends Component {
             to="/all_user"
             style={{
               marginRight: "10px",
-
               paddingTop: "10px"
             }}
             className="rounded px-4 py-2 text-center border border-purple-600 bg-yellow-600 text-white cursor-pointer outline-none"
           >
-            Manage People
+            Manage Team
           </Link>
           <Link
             to="/all_tasks"
@@ -227,7 +248,10 @@ class index extends Component {
           <tbody ref="tbody">{this.showTodos()}</tbody>
         </table>
         <div className="flex justify-end mb-4">
-          <Link className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8" to="/">
+          <Link
+            className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
+            to="/"
+          >
             Go Back
           </Link>
         </div>

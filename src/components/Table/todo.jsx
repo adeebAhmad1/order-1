@@ -30,15 +30,11 @@ class Todo extends Component {
   // ! update status function
   updateStatus = todosId => {
     let status = this.refs.status.innerText;
-    console.log(status);
     db.collection("todos")
       .doc(todosId)
       .update({
         status
       })
-      .then(() => {
-        console.log("Document successfully updated!");
-      });
   };
   componentWillUnmount() {
     window.removeEventListener("click", this.removeDropdown2);
@@ -50,7 +46,6 @@ class Todo extends Component {
   UNSAFE_componentWillReceiveProps () {
     var text = this.refs.status.textContent;    
     this.setState({ endTime: this.props.endTime,status:text });
-    this.state.status = text
     if (this.state.status === "Done") {
       this.refs.status_wrapper.style.backgroundColor = "#03C977";
       this.refs.dropdown1.classList.add("invisible");
@@ -101,7 +96,6 @@ class Todo extends Component {
     const timer = this.props.timer ? this.props.timer : new Date().getTime();
     this.setState({ iTimes: 1 });
     setInterval(() => {
-      console.log(this.props.commentsLength)
       const now = this.state.endTime
         ? this.state.endTime
         : new Date().getTime();
@@ -167,8 +161,7 @@ class Todo extends Component {
                 timer
               })
               .then(() => {
-                window.location.reload();
-                console.log("Document successfully updated!");
+                this.props.forceUpdate()
               });
             if (this.props.commentsLength === 0) {
               status_priority_wrapper.style.backgroundColor = "#E1445B";
@@ -180,15 +173,11 @@ class Todo extends Component {
             const timer = this.props.timer
               ? this.props.timer
               : new Date().getTime();
-            console.log(timer);
             db.collection("todos")
               .doc(this.props.todoId)
               .update({
                 timer
               })
-              .then(() => {
-                console.log("Document successfully updated!");
-              });
           } else if (this.state.status === "Not Started") {
             status_priority_wrapper.children[0].innerText = "Not Started";
             status_priority_wrapper.style.backgroundColor = "#599EFD";
@@ -225,7 +214,8 @@ class Todo extends Component {
             className="h-full bg-cover rounded-full mx-auto "
             style={{
               width: "40px",
-              backgroundImage: `url(${this.state.user.url || img})`
+              backgroundImage: `url(${this.state.user.url || img})`,
+              backgroundPosition: `center`
             }}
           ></div>
         </td>
@@ -271,13 +261,14 @@ class Todo extends Component {
             className="block mx-auto rounded-full h-6 w-6/7  bg-black overflow-hidden relative"
             style={{ zIndex: 0 }}
           >
-            <div className="bg-purple-600 w-1/2 h-full z-10 relative"></div>
+            <div className="bg-blue-600 w-1/2 h-full z-10 relative"></div>
             <input
               readOnly
               ref="date"
-              value={new Date(this.props.date).toDateString()}
+              value={new Date(this.props.date + new Date().getTimezoneOffset()*60*1000).toDateString()}
               className="text-center text-white  text-sm z-20 center bg-transparent"
             />
+            {console.log(new Date(this.props.date + new Date().getTimezoneOffset()*60*1000))}
           </span>
         </td>
         <td className="text-gray-600"> {this.state.time} </td>

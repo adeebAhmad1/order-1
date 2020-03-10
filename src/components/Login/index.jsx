@@ -25,7 +25,6 @@ class Login extends Component {
   }
   handleSubmit = e => {
     e.preventDefault();
-    console.log(this.state);
 
     firebase
       .auth()
@@ -38,7 +37,7 @@ class Login extends Component {
         // Handle Errors here.
         // var errorCode = error.code;
         // var errorMessage = error.message;
-        console.log(error);
+        console.error(error);
       });
   };
   render() {

@@ -7,8 +7,7 @@ import { db } from "../../../config/firebase";
 class AllTasks extends Component {
   state = {
     tasks: [],
-    taskIds: [],
-   
+    taskIds: []
   };
 
   componentDidMount = () => {
@@ -29,17 +28,18 @@ class AllTasks extends Component {
     db.collection("tasks")
       .doc(taskId)
       .delete()
-      .then(() => {
-        console.log("deleted");
-      })
       .catch(error => {
         console.error("Error removing document: ", error);
       });
   };
 
   showTasks = () => {
-    let tasks = this.state.tasks;
-    return tasks.map((task, i) => {
+    //! for sorting
+    let sortedTasks = this.state.tasks.sort((a, b) => {
+      console.log(a, b);
+      return a.title.localeCompare(b.title);
+    });
+    return sortedTasks.map((task, i) => {
       return (
         <tr key={i}>
           <td>{task.title}</td>

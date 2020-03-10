@@ -16,59 +16,71 @@ class Table extends Component {
   //! getting data from fatabase
   componentDidMount = () => {
     //! for todos
-    db.collection("todos").get().then(querySnapshot => {
-      let todos = [];
-      querySnapshot.forEach(doc => {
-        let todo = doc.data();
-        todo.id = doc.id;
-        todos.push(todo);
+    db.collection("todos")
+      .get()
+      .then(querySnapshot => {
+        let todos = [];
+        querySnapshot.forEach(doc => {
+          let todo = doc.data();
+          todo.id = doc.id;
+          todos.push(todo);
+        });
+        this.setState({
+          todos
+        });
       });
-      this.setState({
-        todos
-      });
-    });
 
     //! for users
-    db.collection("users").get().then(querySnapshot => {
-      let users = [];
-      querySnapshot.forEach(doc => {
-        let user = doc.data();
-        user.id = doc.id
-        users.push(user);
+    db.collection("users")
+      .get()
+      .then(querySnapshot => {
+        let users = [];
+        querySnapshot.forEach(doc => {
+          let user = doc.data();
+          user.id = doc.id;
+          users.push(user);
+        });
+        this.setState({
+          users
+        });
       });
-      this.setState({
-        users
-      });
-    });
     //! for rendering comments from database
-    db.collection("comments").get().then(querySnapshot => {
-      let comments = [];
-      querySnapshot.forEach(doc => {
-        let comment = doc.data();
-        comment.id = doc.id;
-        comments.push(comment);
+    db.collection("comments")
+      .get()
+      .then(querySnapshot => {
+        let comments = [];
+        querySnapshot.forEach(doc => {
+          let comment = doc.data();
+          comment.id = doc.id;
+          comments.push(comment);
+        });
+        comments = comments.filter(el => {
+          return el.todoId;
+        });
+        this.setState({
+          comments
+        });
       });
-      comments = comments.filter(el => {
-        return el.todoId;
-      });
-      this.setState({
-        comments
-      });
-    });
   };
 
   //! show todos from database
   showTodos = () => {
-    return this.state.todos.map((el, i) => {
+    //! for sorting
+    let sortedTodos = this.state.todos.sort((a, b) => {
+      console.log(a, b);
+      return a.title.localeCompare(b.title);
+    });
+
+    return sortedTodos.map((el, i) => {
       if (this.state.users.length > 0) {
         const commentsLength = this.state.comments.filter(comment => {
           return el.id === comment.todoId;
         }).length;
-        const user = this.state.users.find(user=> user.id === el.userId) || {};
+        const user = this.state.users.find(user => user.id === el.userId) || {};
         const userId = user.id || "";
-        console.log(userId)
         return (
           <Todo
+            forceUpdate={this.force}
             key={i}
             title={el.title}
             index={i}
@@ -77,7 +89,7 @@ class Table extends Component {
             commentsLength={commentsLength}
             url={el.id}
             timer={el.timer}
-            endTime = {el.endTime? el.endTime : ""}
+            endTime={el.endTime ? el.endTime : ""}
             todoId={el.id}
             userId={userId}
           />
@@ -97,7 +109,7 @@ class Table extends Component {
               <th width="35%" className="text-purple-600 text-xl text-left">
                 Tasks
               </th>
-              <th>People</th>
+              <th>Team</th>
               <th width="20%">Status</th>
               <th width="25%">Timeline</th>
               <th>Time Tracking</th>

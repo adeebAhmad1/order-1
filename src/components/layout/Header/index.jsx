@@ -11,7 +11,7 @@ class Header extends Component {
     return (
       <div className="bg-white">
         <div className="container px-3 py-8 flex justify-center items-center mx-auto">
-          <Link to="/">
+          <Link to="https://collateralmanagement.org/timeclock/">
             <img className="h-20" alt="logo" src={logo} />
           </Link>
         </div>

@@ -41,7 +41,6 @@ class Comments extends Component {
         date: new Date().getTime()
       })
       .then(docRef => {
-        console.log("Document written with ID: ", docRef.id);
         this.props.history.push("/");
         this.setState({ content: "" });
       })

@@ -42,7 +42,6 @@ class EditUser extends Component {
       })
       .then(() => {
         this.props.history.push("/all_user");
-        console.log("Document successfully updated!");
       });
   };
 
