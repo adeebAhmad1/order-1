@@ -12,7 +12,11 @@ class Comments extends Component {
     todo: {},
     name: ""
   };
-
+  removeDropDown = (e)=>{
+    if(e.target.classList.contains("dropdown2")) return;
+    console.log("Removed")
+    this.refs.dropdown.classList.remove("block")
+  }
   handleDropdown = () => {
     this.refs.dropdown.classList.toggle("block");
   };
@@ -49,7 +53,9 @@ class Comments extends Component {
       });
     }
   };
+  componentWillUnmount = ()=> window.removeEventListener("click",this.removeDropDown)
   componentDidMount() {
+    window.addEventListener("click",this.removeDropDown)
     //! for rendering user from database
     db.collection("users").onSnapshot(querySnapshot => {
       let users = [];
@@ -184,12 +190,13 @@ class Comments extends Component {
               Who is Commenting?
             </p>
             <div
+
               onClick={this.handleDropdown}
-              className="flex text-gray-500x my-4"
+              className="flex text-gray-500x my-4 dropdown2"
             >
               <div
                 ref="image"
-                className="h-full bg-cover rounded-full  bg-gray-300 relative pic-wrapper"
+                className="h-full bg-cover rounded-full  bg-gray-300 relative pic-wrapper dropdown2"
                 style={{
                   backgroundImage: `url(${img})`,
                   width: "40px",
@@ -204,7 +211,7 @@ class Comments extends Component {
                   {this.showUsers()}
                 </ul>
               </div>
-              <p className="ml-2 flex self-center" ref="name">
+              <p className="ml-2 flex self-center dropdown2" ref="name">
                 Select User
               </p>
             </div>

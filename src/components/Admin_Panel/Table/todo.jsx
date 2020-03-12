@@ -291,26 +291,12 @@ class Todo extends Component {
       <tr className="bg-gray-100 border-b border-gray-100">
         <td className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container">
           {this.props.title}
-          <Link
-            to={`/admin_panel/comments/${this.props.url}`}
-            className="relative chat-wrapper cursor-pointer"
-          >
-            <i
-              style={{
-                color: this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`
-              }}
-              className="text-3xl text-gray-500 chat-icon far fa-comment"
-            ></i>
-            <div
-              style={{
-                backgroundColor:
-                  this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`
-              }}
-              className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none"
-            >
+          {this.props.url ? <Link to={`/admin_panel/comments/${this.props.url}`} className="relative chat-wrapper cursor-pointer">
+            <i style={{color: this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`}} className="text-3xl text-gray-500 chat-icon far fa-comment"></i>
+            <div style={{backgroundColor: this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`}} className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none">
               {this.props.commentsLength}
             </div>
-          </Link>
+          </Link> : ""}
           <Confetti
             numberOfPieces={3000}
             recycle={false}
