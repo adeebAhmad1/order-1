@@ -96,7 +96,8 @@ class Comments extends Component {
         el => el.todoId === this.props.match.params.commentId
         );
         comments.sort((a,b)=>b.date-a.date)
-      this.setState({ comments })
+      this.setState({ comments });
+      this.refs.popup.style.right = "0"
     });
   }
   showUsers = () => {
@@ -127,10 +128,7 @@ class Comments extends Component {
       const user = this.state.users.find(el => el.id === comment.userId);
       if (user) {
         return (
-          <article
-            className="mt-10 p-6 border border-gary-600 rounded-lg"
-            key={i}
-          >
+          <article className="mt-10 p-6 border border-gary-600 rounded-lg" key={i}>
             <div className="flex justify-between items-center">
               <div  className="flex text-gray-500 hover:text-purple-600">
                 <div
@@ -141,21 +139,14 @@ class Comments extends Component {
                 ></div>
                 <p className="ml-2 flex self-center">{user.name}</p>
               </div>
-              <p className="select appearance-none py-1 pl-6 pr-8 outline-none text-gray-500 cursor-pointer">
-                {" "}
-                {new Date(comment.date).toLocaleTimeString()}{" "}
-                {new Date(comment.date).toDateString()}{" "}
-              </p>
+              <p className="select appearance-none py-1 pl-6 pr-8 outline-none text-gray-500 cursor-pointer">{new Date(comment.date).toLocaleTimeString()} {new Date(comment.date).toDateString()}</p>
             </div>
             <p className="text-base pt-6">{comment.content}</p>
           </article>
         );
       } else {
         return (
-          <article
-            className="mt-10 p-6 border border-gary-600 rounded-lg"
-            key={i}
-          ></article>
+          <article className="mt-10 p-6 border border-gary-600 rounded-lg" key={i}></article>
         );
       }
     });
@@ -166,54 +157,26 @@ class Comments extends Component {
   };
   render() {
     return (
-      <div className="fixed w-screen h-screen fixed top-0 left-0 z-50 bg-popup overflow-y-auto">
-        <div
-          className="center bg-white p-8 container rounded-lg center"
-          style={{ transform: `translate(-50%,0%)` }}
-        >
+      <div className="fixed w-screen h-screen fixed top-0 left-0 z-50 bg-popup overflow-y-auto" style={{overflowX:`hidden`}}>
+        <div ref="popup" className="center bg-white p-8 container rounded-lg center" style={{ transform: `translate(0%,0%)`,right: `-100%`, top: 0 , width: `50%`,height: `100%`,transition: `all 0.6s ease-in-out` ,left: `auto`}}>
           <div className="myDiv">
             <div className="personImg">
               <img src={this.state.todo.url} alt="" />
             </div>
             <div className="personTask">{this.state.todo.title}</div>
           </div>
-          <div className="flex justify-end mb-4">
-            <i
-              onClick={this.props.history.goBack}
-              className="fa fa-times text-lg cursor-pointer text-gray-700"
-              aria-hidden="true"
-              style={{ fontSize: "1.5em" }}
-            ></i>
+          <div className="flex justify-start mb-4">
+            <i onClick={this.props.history.goBack} className="fa fa-times text-lg cursor-pointer text-gray-700" aria-hidden="true" style={{ fontSize: "1.5em",zIndex: 100 }}></i>
           </div>
           <div className="mt-10 update-section" id="Update_section">
-            <p className="text-purple-600 text-xl text-left capitalize mr-6 font-bold text-xl">
-              Who is Commenting?
-            </p>
-            <div
-
-              onClick={this.handleDropdown}
-              className="flex text-gray-500x my-4 dropdown2"
-            >
-              <div
-                ref="image"
-                className="h-full bg-cover rounded-full  bg-gray-300 relative pic-wrapper dropdown2"
-                style={{
-                  backgroundImage: `url(${img})`,
-                  width: "40px",
-                  height: "40px"
-                }}
-              >
-                <ul
-                  ref="dropdown"
-                  className="absolute top-0 mt-12 shadow-xl -mr-2 left-0 w-48 bg-white dropdown z-50 capitalize hidden status_priority_dropdown rounded-lg"
-                  style={{ width: `17.5rem` }}
-                >
+            <p className="text-purple-600 text-xl text-left capitalize mr-6 font-bold text-xl">Posted By</p>
+            <div onClick={this.handleDropdown} className="flex text-gray-500x my-4 dropdown2">
+              <div ref="image" className="h-full bg-cover rounded-full  bg-gray-300 relative pic-wrapper dropdown2" style={{backgroundImage: `url(${img})`,width: "40px",height: "40px"}}>
+                <ul ref="dropdown" className="absolute top-0 mt-12 shadow-xl -mr-2 left-0 w-48 bg-white dropdown z-50 capitalize hidden status_priority_dropdown rounded-lg" style={{ width: `17.5rem` }}>
                   {this.showUsers()}
                 </ul>
               </div>
-              <p className="ml-2 flex self-center dropdown2" ref="name">
-                Select User
-              </p>
+              <p className="ml-2 flex self-center dropdown2" ref="name">Select User</p>
             </div>
             <form action="/" onSubmit={this.handleUpdate}>
               <textarea

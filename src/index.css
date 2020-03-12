@@ -72,12 +72,12 @@ code {
 
 /*!  for comments */
 .myDiv{
-  width:500px;
+  width:90%;
   position: absolute;
-right:5%
+  left: 5rem;
 }
 .personImg{
-  width:15%;
+  width:7%;
   float: left;
 
 }
@@ -85,9 +85,9 @@ right:5%
   border-radius: 50%;
 }
 .personTask{
-  width: 80%;
+  width: 93%;
   float: right;
-  padding-top: 25px;
+  padding-top: 10px;
   font-weight: bolder;
 }
 
