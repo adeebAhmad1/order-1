@@ -33,7 +33,7 @@ class App extends Component {
       <AuthContextProvider>
         <BrowserRouter>
           <div>
-
+            <Header />
             <Route exact path="/" component={Home} />
             <Route path="/home" component={Home} />
             <Route path="/home/comments/:commentId" component={Comments} />

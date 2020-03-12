@@ -19,11 +19,6 @@ class index extends Component {
     users: []
   };
 
-  //! for status not refresh page
-  force = ()=>{
-    this.forceUpdate()
-  }
-
   componentDidMount = () => {
     //! for getting all todos
     db.collection("todos")
@@ -36,6 +31,12 @@ class index extends Component {
           todo.id = doc.id;
           todoIds.push(doc.id);
           todos.push(todo);
+
+          //! for sorting
+           todos.sort((a, b) => {
+            // console.log(a, b);
+            return a.title.localeCompare(b.title);
+          });
         });
         this.setState({ todos, todoIds });
       });
@@ -86,10 +87,10 @@ class index extends Component {
   //!dropdown for tasksvalues
   showTasksValues = () => {
     //! for sorting
-    let sortedTasks = this.state.tasks.sort((a, b) => {
+    let sortedTasksValues = this.state.tasks.sort((a, b) => {
       return a.title.localeCompare(b.title);
     });
-    return sortedTasks.map((task, i) => (
+    return sortedTasksValues.map((task, i) => (
       <option value={task.title} key={i}>
         {task.title}
       </option>
@@ -115,8 +116,8 @@ class index extends Component {
   };
 
   //! for rendering all todos
-  showTodos = () =>
-    this.state.todos.map((el, i) => {
+  showTodos = () => {
+    return this.state.todos.map((el, i) => {
       let date;
       if (el.date) {
         let dateArray = new Date(
@@ -137,7 +138,6 @@ class index extends Component {
       const userId = user.id || "";
       return (
         <Todo
-        forceUpdate={this.force}
           key={i}
           title={<p> {el.title} </p>}
           commentsLength={commentsLength}
@@ -153,6 +153,7 @@ class index extends Component {
         />
       );
     });
+  };
 
   //!for deleting all todos
   deleteAll = todoIds => {
@@ -238,7 +239,7 @@ class index extends Component {
               <th width="35%" className="text-purple-600 text-xl text-left">
                 Tasks
               </th>
-              <th>People</th>
+              <th>Team</th>
               <th width="15%">Status</th>
               <th width="25%">Timeline</th>
               <th>Time Tracking</th>

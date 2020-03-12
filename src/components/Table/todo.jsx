@@ -46,6 +46,7 @@ class Todo extends Component {
   UNSAFE_componentWillReceiveProps () {
     var text = this.refs.status.textContent;    
     this.setState({ endTime: this.props.endTime,status:text });
+    this.state.status = text;
     if (this.state.status === "Done") {
       this.refs.status_wrapper.style.backgroundColor = "#03C977";
       this.refs.dropdown1.classList.add("invisible");
@@ -161,7 +162,7 @@ class Todo extends Component {
                 timer
               })
               .then(() => {
-                this.props.forceUpdate()
+                window.location.reload()
               });
             if (this.props.commentsLength === 0) {
               status_priority_wrapper.style.backgroundColor = "#E1445B";
@@ -177,7 +178,7 @@ class Todo extends Component {
               .doc(this.props.todoId)
               .update({
                 timer
-              })
+              }).then(()=> window.location.reload())
           } else if (this.state.status === "Not Started") {
             status_priority_wrapper.children[0].innerText = "Not Started";
             status_priority_wrapper.style.backgroundColor = "#599EFD";
@@ -258,7 +259,7 @@ class Todo extends Component {
         </td>
         <td>
           <span
-            className="block mx-auto rounded-full h-6 w-6/7  bg-black overflow-hidden relative"
+            className="block mx-auto rounded-full h-6 w-6/7  bg-blue-600 overflow-hidden relative"
             style={{ zIndex: 0 }}
           >
             <div className="bg-blue-600 w-1/2 h-full z-10 relative"></div>
@@ -268,7 +269,6 @@ class Todo extends Component {
               value={new Date(this.props.date + new Date().getTimezoneOffset()*60*1000).toDateString()}
               className="text-center text-white  text-sm z-20 center bg-transparent"
             />
-            {console.log(new Date(this.props.date + new Date().getTimezoneOffset()*60*1000))}
           </span>
         </td>
         <td className="text-gray-600"> {this.state.time} </td>

@@ -80,7 +80,6 @@ class Table extends Component {
         const userId = user.id || "";
         return (
           <Todo
-            forceUpdate={this.force}
             key={i}
             title={el.title}
             index={i}

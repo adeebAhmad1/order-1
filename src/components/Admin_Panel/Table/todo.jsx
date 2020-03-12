@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Confetti from "react-confetti";
 //firebase
 import { db } from "../../../config/firebase";
-import img from "../../../images/no_image.jpg";
+import Img from "../../../images/no_image.jpg";
 import { Link } from "react-router-dom";
 class Todo extends Component {
   state = {
@@ -120,7 +120,7 @@ class Todo extends Component {
         window.addEventListener("click", this.removeDropdown2);
         const user =
           this.state.users.find(el => el.id === this.state.userId) || {};
-        this.refs.images.style.backgroundImage = `url(${user.url || img})`;
+        this.refs.images.style.backgroundImage = `url(${user.url || Img})`;
       });
   }
   componentWillUnmount() {
@@ -248,7 +248,7 @@ class Todo extends Component {
               .doc(this.props.todoId)
               .update({ timer })
               .then(() => {
-                this.props.forceUpdate();
+                window.location.reload()
               });
           } else if (this.state.status === "Working on it") {
             status_priority_wrapper.children[0].innerText = "Working on It";
@@ -264,7 +264,7 @@ class Todo extends Component {
                 timer
               })
               .then(() => {
-                this.props.forceUpdate();
+                window.location.reload()
               });
           } else if (text === "Not Started") {
             status_priority_wrapper.children[0].innerText = "Not Started";
@@ -378,7 +378,7 @@ class Todo extends Component {
           </ul>
         </td>
         <td>
-          <span className="block mx-auto rounded-full h-6 w-6/7  bg-black overflow-hidden relative">
+          <span className="block mx-auto rounded-full h-6 w-6/7  bg-blue-600 overflow-hidden relative">
             <div className="bg-blue-600 w-1/2 h-full z-10 relative"></div>
             <input
               type="date"
