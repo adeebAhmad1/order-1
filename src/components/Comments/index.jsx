@@ -45,7 +45,7 @@ class Comments extends Component {
         date: new Date().getTime()
       })
       .then(docRef => {
-        this.props.history.push("/");
+        // this.props.history.push("/");
         this.setState({ content: "" });
       })
       .catch(error => {
@@ -158,7 +158,7 @@ class Comments extends Component {
   render() {
     return (
       <div className="fixed w-screen h-screen fixed top-0 left-0 z-50 bg-popup overflow-y-auto" style={{overflowX:`hidden`}}>
-        <div ref="popup" className="center bg-white p-8 container rounded-lg center" style={{ transform: `translate(0%,0%)`,right: `-100%`, top: 0 , width: `50%`,height: `100%`,transition: `all 0.6s ease-in-out` ,left: `auto`}}>
+        <div ref="popup" className="center bg-white p-8 container rounded-lg center" style={{ transform: `translate(0%,0%)`,right: `-100%`, top: 0 , width: `50%`,height: `max-content`,transition: `all 0.6s ease-in-out` ,left: `auto`}}>
           <div className="myDiv">
             <div className="personImg">
               <img src={this.state.todo.url} alt="" />
@@ -189,7 +189,7 @@ class Comments extends Component {
               ></textarea>
               <div className="flex justify-between items-center mt-4">
                 <button className="rounded px-8  py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none">
-                  Comment
+                 Add Comment
                 </button>
               </div>
             </form>

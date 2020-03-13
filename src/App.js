@@ -16,9 +16,11 @@ import Comments from "./components/Comments";
 import Admin_Panel from "./components/Admin_Panel";
 
 import Add_user from "./components/Admin_Panel/Table/New/Employe";
-import Add_Task from "./components/Admin_Panel/Table/New/AddTasks";
-import All_user from "./components/Admin_Panel/Table/Allusers";
 import Edit_user from "./components/Admin_Panel/Table/EditUser";
+import All_user from "./components/Admin_Panel/Table/Allusers";
+
+import Add_Task from "./components/Admin_Panel/Table/New/AddTasks";
+import Edit_task from "./components/Admin_Panel/Table/EditTask";
 import All_tasks from "./components/Admin_Panel/Table/AllTasks";
 
 //contexts
@@ -52,6 +54,7 @@ class App extends Component {
 
             <Route path="/all_tasks/add_task" component={Add_Task} />
             <Route path="/all_tasks" component={All_tasks} />
+            <Route path="/all_tasks/edit_task/:taskId" component={Edit_task} />
           </div>
         </BrowserRouter>
       </AuthContextProvider>

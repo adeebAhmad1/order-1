@@ -62,7 +62,7 @@ class Todo extends Component {
       this.refs.status_wrapper.style.backgroundColor = "#599EFD";
     }
   }
-  componentWillUpdate(){
+  UNSAFE_componentWillUpdate(){
     if (this.state.status === "Done") {
       this.refs.status_wrapper.style.backgroundColor = "#03C977";
     } else if (this.state.status === "Stuck") {

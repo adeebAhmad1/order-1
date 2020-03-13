@@ -72,22 +72,21 @@ code {
 
 /*!  for comments */
 .myDiv{
-  width:90%;
+  width: max-content !important;
   position: absolute;
-  left: 5rem;
+  right: 2rem
 }
 .personImg{
-  width:7%;
   float: left;
 
 }
 .personImg img{
   border-radius: 50%;
+  width: 35px;
 }
 .personTask{
-  width: 93%;
   float: right;
-  padding-top: 10px;
+  padding-top: 5px;
   font-weight: bolder;
 }
 

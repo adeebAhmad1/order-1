@@ -5,7 +5,7 @@ import Todo from "./Table/todo";
 import firebase from "../../config/firebase";
 //firebase
 import { db } from "../../config/firebase";
-
+import Img from "../../images/no_image.jpg"
 //context
 import { AuthContext } from "../../context/AuthContext";
 
@@ -97,6 +97,23 @@ class index extends Component {
     ));
   };
 
+  //? For Cloning the Existing Todos
+  cloneAll = ()=>{
+    //* Clone All Todos
+     const clonedTodos = this.state.todos.map(el=>{
+      el.status = "Not Started";
+      el.timer = null;
+      el.endTime = null;
+      el.id = "";
+      el.userId = "";
+      el.date = null;
+      el.state = "Add";
+      return el;
+    });
+
+    const todos = [...clonedTodos]
+    this.setState({todos});
+  }
   //! for new todo
   handleClick = () => {
     const newTodo = {
@@ -122,9 +139,7 @@ class index extends Component {
       if (el.date) {
         let dateArray = new Date(
           el.date + new Date().getTimezoneOffset() * 60 * 1000
-        )
-          .toLocaleDateString()
-          .split("/");
+        ).toLocaleDateString().split("/");
         date = [
           dateArray[2],
           dateArray[0] >= 10 ? dateArray[0] : "0" + dateArray[0],
@@ -150,6 +165,7 @@ class index extends Component {
           url={el.id}
           endTime={el.endTime}
           userId={userId}
+          userImg={user.url || Img}
         />
       );
     });
@@ -173,7 +189,6 @@ class index extends Component {
     return (
       <div className="container mx-auto pt-16">
         <div className="left  justify-end mb-6">
-          {" "}
           <Link
             className="rounded px-8 ml-3 py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none"
             to="/"
@@ -181,9 +196,8 @@ class index extends Component {
               firebase
                 .auth()
                 .signOut()
-                .then(() => {})
                 .catch(error => {
-                  alert(error);
+                  console.log(error);
                 });
             }}
           >
@@ -231,6 +245,13 @@ class index extends Component {
             onClick={() => this.deleteAll(this.state.todoIds)}
           >
             Delete All
+          </button>
+          <button
+            className="rounded px-4 py-2 text-center bg-blue-300 text-white cursor-pointer ml-3 outline-none"
+            id="clone_all_btn"
+            onClick={() => this.cloneAll(this.state.todoIds)}
+          >
+            Clone All
           </button>
         </div>
         <table className="w-full">

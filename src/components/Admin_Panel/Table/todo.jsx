@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import Confetti from "react-confetti";
 //firebase
 import { db } from "../../../config/firebase";
-import Img from "../../../images/no_image.jpg";
 import { Link } from "react-router-dom";
 class Todo extends Component {
   state = {
@@ -118,9 +117,6 @@ class Todo extends Component {
         });
         window.addEventListener("click", this.removeDropdown);
         window.addEventListener("click", this.removeDropdown2);
-        const user =
-          this.state.users.find(el => el.id === this.state.userId) || {};
-        this.refs.images.style.backgroundImage = `url(${user.url || Img})`;
       });
   }
   componentWillUnmount() {
@@ -248,7 +244,7 @@ class Todo extends Component {
               .doc(this.props.todoId)
               .update({ timer })
               .then(() => {
-                window.location.reload()
+                window.location.reload();
               });
           } else if (this.state.status === "Working on it") {
             status_priority_wrapper.children[0].innerText = "Working on It";
@@ -264,7 +260,7 @@ class Todo extends Component {
                 timer
               })
               .then(() => {
-                window.location.reload()
+                window.location.reload();
               });
           } else if (text === "Not Started") {
             status_priority_wrapper.children[0].innerText = "Not Started";
@@ -291,12 +287,22 @@ class Todo extends Component {
       <tr className="bg-gray-100 border-b border-gray-100">
         <td className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container">
           {this.props.title}
-          {this.props.url ? <Link to={`/admin_panel/comments/${this.props.url}`} className="relative chat-wrapper cursor-pointer">
-            <i style={{color: this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`}} className="text-3xl text-gray-500 chat-icon far fa-comment"></i>
-            <div style={{backgroundColor: this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`}} className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none">
-              {this.props.commentsLength}
-            </div>
-          </Link> : ""}
+          {this.props.url ? (
+            <Link to={`/admin_panel/comments/${this.props.url}`} className="relative chat-wrapper cursor-pointer">
+              <i style={{color: this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`}} className="text-3xl text-gray-500 chat-icon far fa-comment"></i>
+              <div
+                style={{
+                  backgroundColor:
+                    this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`
+                }}
+                className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none"
+              >
+                {this.props.commentsLength}
+              </div>
+            </Link>
+          ) : (
+            ""
+          )}
           <Confetti
             numberOfPieces={3000}
             recycle={false}
@@ -308,11 +314,13 @@ class Todo extends Component {
         <td style={{ position: "relative" }}>
           <div
             ref="images"
+            readOnly
             id="dropdown"
             className="h-full bg-cover rounded-full mx-auto"
             style={{
               width: "40px",
-              backgroundPosition: `center`
+              backgroundPosition: `center`,
+              backgroundImage: `url(${this.props.userImg})`
             }}
             onClick={this.showDropdown}
           ></div>
@@ -335,7 +343,10 @@ class Todo extends Component {
           </p>
           <ul
             ref="dropdown1"
-            className="absolute top-0 mt-12 shadow-xl -ml-8 left-0 w-48 bg-white dropdown z-50 hidden status_priority_dropdown"
+            className={
+              "absolute top-0 mt-12 shadow-xl -ml-8 left-0 w-48 bg-white dropdown z-50 hidden status_priority_dropdown" +
+              ""
+            }
             style={{ backgroundColor: `#fff` }}
           >
             {this.state.status === "Not Started" ? (
@@ -369,8 +380,9 @@ class Todo extends Component {
             <input
               type="date"
               ref="date"
-              defaultValue={this.props.date}
-              className="text-center text-white  text-sm z-20 center bg-transparent calenderShow"
+              readOnly={!!this.props.url}
+              defaultValue={this.props.date || ""}
+              className="text-center text-white text-sm z-20 center bg-transparent calenderShow"
               required
             />
           </span>

@@ -13,13 +13,16 @@ class Allusers extends Component {
   componentDidMount = () => {
     db.collection("users").onSnapshot(querySnapshot => {
       let users = [];
-      let userIds = [];
       querySnapshot.forEach(doc => {
         let user = doc.data();
-        userIds.push(doc.id);
+        user.id = doc.id
         users.push(user);
       });
-      this.setState({ users, userIds });
+      let sortedusers = users.sort((a, b) => {
+        return a.name.localeCompare(b.name);
+      });
+      let userIds = sortedusers.map(el=>el.id) || []
+      this.setState({ users:sortedusers, userIds });
     });
   };
 
@@ -35,15 +38,10 @@ class Allusers extends Component {
 
   //! rendering user from database
   showUsers = () => {
- 
+    //! for sorting
+    
 
- //! for sorting
- let sortedusers = this.state.users.sort((a, b) => {
-  return a.name.localeCompare(b.name);
-});
-
-
-    return sortedusers.map((user, i) => {
+    return this.state.users.map((user, i) => {
       return (
         <tr key={i}>
           <td>
@@ -92,6 +90,14 @@ class Allusers extends Component {
             Add user
           </button>
         </Link>
+        <div className="flex justify-end mb-4">
+          <Link
+            className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
+            to="/admin_panel"
+          >
+            Go Back
+          </Link>
+        </div>
         <table style={{ width: "100%" }}>
           <thead>
             <tr>
@@ -102,14 +108,6 @@ class Allusers extends Component {
           </thead>
           <tbody>{this.showUsers()}</tbody>
         </table>
-        <div className="flex justify-end mb-4">
-          <Link
-            className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
-            to="/admin_panel"
-          >
-            Go Back
-          </Link>
-        </div>
       </div>
     );
   }

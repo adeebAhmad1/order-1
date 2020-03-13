@@ -1,24 +1,27 @@
-import * as firebase from "firebase/app";
+import * as firebase from 'firebase/app';
 
 //firebase products
-import "firebase/auth";
-import "firebase/firestore";
+import "firebase/auth"
+import "firebase/firestore"
 // import 'firebase/databse'
 
+
 const firebaseConfig = {
-  apiKey: "AIzaSyAaJ3ebj8RX0yhVKwVo0V6RVDQ4ZF71BDc",
-  authDomain: "todo-3194d.firebaseapp.com",
-  databaseURL: "https://todo-3194d.firebaseio.com",
-  projectId: "todo-3194d",
-  storageBucket: "todo-3194d.appspot.com",
-  messagingSenderId: "916502017240",
-  appId: "1:916502017240:web:484cd28bccd5b3747813ad"
-};
+    apiKey: "AIzaSyB3ZP0ojgzpT_zqOiOlxtqcRSB8WAwJOmg",
+    authDomain: "todo-app-7b98f.firebaseapp.com",
+    databaseURL: "https://todo-app-7b98f.firebaseio.com",
+    projectId: "todo-app-7b98f",
+    storageBucket: "todo-app-7b98f.appspot.com",
+    messagingSenderId: "290957891144",
+    appId: "1:290957891144:web:69e363c2e87dd06df9aa7d"
+  };
 
-firebase.initializeApp(firebaseConfig);
+  firebase.initializeApp(firebaseConfig)
 
-var db = firebase.firestore();
+  var db = firebase.firestore()
 
-export { db };
 
-export default firebase;
+
+  export {db}
+
+  export default firebase
