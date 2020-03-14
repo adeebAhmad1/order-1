@@ -14,7 +14,8 @@ class Todo extends Component {
     iTimes: 0,
     confettiStart: false,
     time: ``,
-    user: {}
+    user: {},
+    colorState: []
   };
   stopTimer = () => {
     const endTime = this.state.endTime
@@ -34,7 +35,7 @@ class Todo extends Component {
       .doc(todosId)
       .update({
         status
-      })
+      });
   };
   componentWillUnmount() {
     window.removeEventListener("click", this.removeDropdown2);
@@ -43,9 +44,9 @@ class Todo extends Component {
     if (e.target.id === "dropdown1") return false;
     this.refs.dropdown1.classList.remove("block");
   };
-  UNSAFE_componentWillReceiveProps () {
-    var text = this.refs.status.textContent;    
-    this.setState({ endTime: this.props.endTime,status:text });
+  UNSAFE_componentWillReceiveProps() {
+    var text = this.refs.status.textContent;
+    this.setState({ endTime: this.props.endTime, status: text });
     this.state.status = text;
     if (this.state.status === "Done") {
       this.refs.status_wrapper.style.backgroundColor = "#03C977";
@@ -62,11 +63,11 @@ class Todo extends Component {
       this.refs.status_wrapper.style.backgroundColor = "#599EFD";
     }
   }
-  UNSAFE_componentWillUpdate(){
+  UNSAFE_componentWillUpdate() {
     if (this.state.status === "Done") {
       this.refs.status_wrapper.style.backgroundColor = "#03C977";
     } else if (this.state.status === "Stuck") {
-        this.refs.status_wrapper.style.backgroundColor = "#E1445B";
+      this.refs.status_wrapper.style.backgroundColor = "#E1445B";
     } else if (this.state.status === "Working on It") {
       this.refs.status_wrapper.style.backgroundColor = "#F7AE3C";
       if (this.state.iTimes === 0) this.updateTime();
@@ -74,9 +75,10 @@ class Todo extends Component {
       this.refs.status_wrapper.style.backgroundColor = "#599EFD";
     }
   }
-  //! getting users from fatabase
   componentDidMount = () => {
-    this.setState({commentsLength:this.props.commentsLength})
+    this.setState({ commentsLength: this.props.commentsLength });
+
+    //! getting users from fatabase
     db.collection("users")
       .get()
       .then(querySnapshot => {
@@ -92,9 +94,24 @@ class Todo extends Component {
       });
   };
 
-  //show timer for users
+  //! show timer for users
   updateTime = () => {
-    const timer = this.props.timer ? this.props.timer : new Date().getTime();
+    let timer;
+    if (this.props.timer) {
+      if (this.props.stuckTimer) {
+        if (this.props.stuckTimer > this.props.timer) {
+          timer = this.props.timer;
+        } else if (this.props.stuckTimer < this.props.timer) {
+          timer = this.props.stuckTimer;
+        }
+      } else {
+        timer = this.props.timer;
+      }
+    } else if (this.props.stuckTimer) {
+      timer = this.props.stuckTimer;
+    } else {
+      timer = new Date().getTime();
+    }
     this.setState({ iTimes: 1 });
     setInterval(() => {
       const now = this.state.endTime
@@ -106,14 +123,16 @@ class Todo extends Component {
       const remainingSeconds = seconds % 60;
       const hours = Math.floor(mins / 60);
       const remainingMins = mins % 60;
-      if(remainingMins >= 0 && remainingSeconds >= 0){
+      if (remainingMins >= 0 && remainingSeconds >= 0) {
         this.setState({
           time: `${hours < 10 ? "0" + hours : hours}:${
             remainingMins < 10 ? "0" + remainingMins : remainingMins
-          }:${remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds}`
+          }:${
+            remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds
+          }`
         });
-      } else{
-        this.setState({time: `00:00:00`})
+      } else {
+        this.setState({ time: `00:00:00` });
       }
     }, 1000);
   };
@@ -147,26 +166,23 @@ class Todo extends Component {
             });
             status_priority_wrapper.style.backgroundColor = "#48bb77";
             status_priority_wrapper.children[0].innerText = "Done";
-            this.updateTime()
+            this.updateTime();
             this.stopTimer();
           } else if (this.state.status === "Stuck") {
             status_priority_wrapper.children[0].innerText = "Stuck";
             status_priority_wrapper.style.backgroundColor = "#E1445B";
             this.updateTime();
-            const timer = this.props.timer
-              ? this.props.timer
+            const stuckTimer = this.props.stuckTimer
+              ? this.props.stuckTimer
               : new Date().getTime();
             db.collection("todos")
               .doc(this.props.todoId)
               .update({
-                timer
+                stuckTimer
               })
               .then(() => {
-                window.location.reload()
+                window.location.reload();
               });
-            if (this.props.commentsLength === 0) {
-              status_priority_wrapper.style.backgroundColor = "#E1445B";
-            }
           } else if (this.state.status === "Working on it") {
             status_priority_wrapper.children[0].innerText = "Working on It";
             status_priority_wrapper.style.backgroundColor = "#d69e2e";
@@ -178,7 +194,8 @@ class Todo extends Component {
               .doc(this.props.todoId)
               .update({
                 timer
-              }).then(()=> window.location.reload())
+              })
+              .then(() => window.location.reload());
           } else if (this.state.status === "Not Started") {
             status_priority_wrapper.children[0].innerText = "Not Started";
             status_priority_wrapper.style.backgroundColor = "#599EFD";
@@ -191,19 +208,12 @@ class Todo extends Component {
     this.setState({ id });
   };
   render() {
+    const isRead = this.props.commentReads.find(el=> el === false);
     return (
       <tr className="bg-gray-100 border-b border-gray-100">
         <td className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container">
           {this.props.title}
-          <Link
-            to={`/home/comments/${this.props.url}`}
-            className="relative chat-wrapper cursor-pointer"
-          >
-            <i style={{color: this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`}} className="text-3xl text-gray-500 chat-icon far fa-comment"></i>
-            <div  style={{backgroundColor: this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`}} className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none">
-              {(this.props.commentsLength)}
-            </div>
-          </Link>
+          <Link to={`/admin_panel/comments/${this.props.url}`} className="relative chat-wrapper cursor-pointer"><i style={{color: isRead === false ?( this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`) : `#a0aec0`}} className="text-3xl text-gray-500 chat-icon far fa-comment"></i><div style={{backgroundColor:  isRead === false ?( this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`) : `#a0aec0`}} className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none">{this.props.commentsLength}</div></Link>
           <Confetti
             numberOfPieces={1000}
             recycle={false}
@@ -266,7 +276,9 @@ class Todo extends Component {
             <input
               readOnly
               ref="date"
-              value={new Date(this.props.date + new Date().getTimezoneOffset()*60*1000).toDateString()}
+              value={new Date(
+                this.props.date + new Date().getTimezoneOffset() * 60 * 1000
+              ).toDateString()}
               className="text-center text-white  text-sm z-20 center bg-transparent"
             />
           </span>

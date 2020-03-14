@@ -12,11 +12,14 @@ class Comments extends Component {
     todo: {},
     name: ""
   };
-  removeDropDown = (e)=>{
-    if(e.target.classList.contains("dropdown2")) return;
-    console.log("Removed")
-    this.refs.dropdown.classList.remove("block")
-  }
+  removeDropDown = e => {
+    if (
+      e.target.classList.contains("dropdown2") &&
+      !e.target.classList.contains("status_priority_dropdown")
+    )
+      return;
+    this.refs.dropdown.classList.remove("block");
+  };
   handleDropdown = () => {
     this.refs.dropdown.classList.toggle("block");
   };
@@ -27,35 +30,81 @@ class Comments extends Component {
     this.setState({ todoId: this.props.match.params.commentId });
     this.refs.image.style.backgroundImage = `url(${user.url})`;
     this.refs.name.innerHTML = user.name;
-    this.setState({name:user.name})
+    this.setState({ name: user.name });
   };
   handleUpdate = e => {
     e.preventDefault();
-    if(this.state.name === ""){
+    if (this.state.name === "") {
       this.refs.name.innerHTML = "Please Select a User";
-      this.refs.name.style.color = "red"
-      return false
-    }
-    else{
+      this.refs.name.style.color = "red";
+      return false;
+    } else {
       db.collection("comments")
-      .add({
-        content: this.state.content,
-        userId: this.state.userId,
-        todoId: this.state.todoId,
-        date: new Date().getTime()
-      })
-      .then(docRef => {
-        // this.props.history.push("/");
-        this.setState({ content: "" });
-      })
-      .catch(error => {
-        console.error("Error adding document: ", error);
-      });
+        .add({
+          content: this.state.content,
+          userId: this.state.userId,
+          todoId: this.state.todoId,
+          date: new Date().getTime(),
+          read: false
+        })
+        .then(docRef => {
+          this.setState({ content: "" });
+          this.props.history.goBack();
+        })
+        .catch(error => {
+          console.error("Error adding document: ", error);
+        });
     }
   };
-  componentWillUnmount = ()=> window.removeEventListener("click",this.removeDropDown)
+
+  statusLog = () => {
+    let workingOnIt = this.state.todo.timer;
+    let endTime = this.state.todo.endTime;
+    let stuckTimer = this.state.todo.stuckTimer;
+    let timeOfDone = new Date(
+      endTime
+    ).toLocaleTimeString();
+    let timeOfworking = new Date(
+      workingOnIt
+    ).toLocaleTimeString();
+    let timeOfstuck = new Date(
+      stuckTimer
+    ).toLocaleTimeString();
+
+    //if three true
+    if(this.refs.statusLog){
+      if (workingOnIt && endTime && stuckTimer) {
+        this.refs.statusLog.innerHTML = `Working on it: ${timeOfworking}/Stuck: ${timeOfstuck} /Done: ${timeOfDone}`;
+      } else if (endTime && stuckTimer) {
+        this.refs.statusLog.innerHTML = `Stuck: ${timeOfstuck} /Done: ${timeOfDone}`;
+      } else if (workingOnIt && endTime) {
+        this.refs.statusLog.innerHTML = `Working on it: ${timeOfworking} /Done: ${timeOfDone}`;
+      } else if (workingOnIt && stuckTimer) {
+        this.refs.statusLog.innerHTML = `Working on it: ${timeOfworking}/Stuck: ${timeOfstuck}`;
+      } else if (endTime) {
+        this.refs.statusLog.innerHTML += `Done: ${timeOfDone}`;
+      } else if (stuckTimer) {
+        this.refs.statusLog.innerHTML += `Stuck: ${timeOfstuck}`;
+      } else if (workingOnIt) {
+        this.refs.statusLog.innerHTML += `Working on it : ${timeOfworking}`;
+      }
+    }
+  };
+
+  Read = commentId => {
+    let read = true;
+    db.collection("comments")
+      .doc(commentId)
+      .update({
+        read
+      });
+  };
+
+  componentWillUnmount = () =>
+    window.removeEventListener("click", this.removeDropDown);
   componentDidMount() {
-    window.addEventListener("click",this.removeDropDown)
+    window.addEventListener("click", this.removeDropDown);
+
     //! for rendering user from database
     db.collection("users").onSnapshot(querySnapshot => {
       let users = [];
@@ -82,6 +131,7 @@ class Comments extends Component {
         const userTodo = this.state.users.find(el => el.id === todo.userId);
         todo.url = userTodo.url || img;
         this.setState({ todo });
+        this.statusLog();
       });
     });
     //! for rendering comments from database
@@ -94,10 +144,10 @@ class Comments extends Component {
       });
       comments = comments.filter(
         el => el.todoId === this.props.match.params.commentId
-        );
-        comments.sort((a,b)=>b.date-a.date)
+      );
+      comments.sort((a, b) => b.date - a.date);
       this.setState({ comments });
-      this.refs.popup.style.right = "0"
+      if(this.refs.popup){this.refs.popup.style.right = "0";}
     });
   }
   showUsers = () => {
@@ -128,25 +178,44 @@ class Comments extends Component {
       const user = this.state.users.find(el => el.id === comment.userId);
       if (user) {
         return (
-          <article className="mt-10 p-6 border border-gary-600 rounded-lg" key={i}>
+          <article
+            className="mt-10 p-1 pl-2 border border-gary-600 rounded-lg"
+            key={i}
+          >
             <div className="flex justify-between items-center">
-              <div  className="flex text-gray-500 hover:text-purple-600">
-                <div
-                  className="h-12 w-12 bg-cover rounded-full mx-auto"
-                  style={{
-                    backgroundImage: `url(${user.url})`
-                  }}
-                ></div>
+              <div className="flex text-gray-500 hover:text-purple-600">
                 <p className="ml-2 flex self-center">{user.name}</p>
               </div>
-              <p className="select appearance-none py-1 pl-6 pr-8 outline-none text-gray-500 cursor-pointer">{new Date(comment.date).toLocaleTimeString()} {new Date(comment.date).toDateString()}</p>
+              <p className="select appearance-none py-1 pl-6 pr-2 outline-none text-gray-500 cursor-pointer">
+                {new Date(comment.date).toLocaleTimeString()}{" "}
+                {new Date(comment.date).toDateString()}
+              </p>
             </div>
-            <p className="text-base pt-6">{comment.content}</p>
+            <p className="text-base pt-1 pl-2">
+              {comment.content}
+
+              {!comment.read ? (
+                <i
+                  onClick={() => this.Read(comment.id)}
+                  style={{ float: "right" }}
+                  className=" text-2xl text-gray-500 fas fa-envelope "
+                ></i>
+              ) : (
+                <i
+                  style={{ float: "right" }}
+                  className="text-2xl  text-gray-500 fas fa-envelope-open "
+                ></i>
+              )}
+            </p>
+            <span></span>
           </article>
         );
       } else {
         return (
-          <article className="mt-10 p-6 border border-gary-600 rounded-lg" key={i}></article>
+          <article
+            className="mt-10 p-6 border border-gary-600 rounded-lg"
+            key={i}
+          ></article>
         );
       }
     });
@@ -157,26 +226,66 @@ class Comments extends Component {
   };
   render() {
     return (
-      <div className="fixed w-screen h-screen fixed top-0 left-0 z-50 bg-popup overflow-y-auto" style={{overflowX:`hidden`}}>
-        <div ref="popup" className="center bg-white p-8 container rounded-lg center" style={{ transform: `translate(0%,0%)`,right: `-100%`, top: 0 , width: `50%`,height: `max-content`,transition: `all 0.6s ease-in-out` ,left: `auto`}}>
+      <div
+        className="fixed w-screen h-screen fixed top-0 left-0 z-50 bg-popup overflow-y-auto"
+        style={{ overflowX: `hidden` }}
+      >
+        <div
+          ref="popup"
+          className="center bg-white p-8 container rounded-lg center"
+          style={{
+            transform: `translate(0%,0%)`,
+            right: `-100%`,
+            top: 0,
+            width: `50%`,
+            height: `max-content`,
+            transition: `all 0.6s ease-in-out`,
+            left: `auto`
+          }}
+        >
           <div className="myDiv">
             <div className="personImg">
-              <img src={this.state.todo.url} alt="" />
+              <img width={50} height={50} src={this.state.todo.url} alt="" />
             </div>
             <div className="personTask">{this.state.todo.title}</div>
+
+            <div ref="statusLog"></div>
           </div>
           <div className="flex justify-start mb-4">
-            <i onClick={this.props.history.goBack} className="fa fa-times text-lg cursor-pointer text-gray-700" aria-hidden="true" style={{ fontSize: "1.5em",zIndex: 100 }}></i>
+            <i
+              onClick={this.props.history.goBack}
+              className="fa fa-times text-lg cursor-pointer text-gray-700"
+              aria-hidden="true"
+              style={{ fontSize: "1.5em", zIndex: 100 }}
+            ></i>
           </div>
           <div className="mt-10 update-section" id="Update_section">
-            <p className="text-purple-600 text-xl text-left capitalize mr-6 font-bold text-xl">Posted By</p>
-            <div onClick={this.handleDropdown} className="flex text-gray-500x my-4 dropdown2">
-              <div ref="image" className="h-full bg-cover rounded-full  bg-gray-300 relative pic-wrapper dropdown2" style={{backgroundImage: `url(${img})`,width: "40px",height: "40px"}}>
-                <ul ref="dropdown" className="absolute top-0 mt-12 shadow-xl -mr-2 left-0 w-48 bg-white dropdown z-50 capitalize hidden status_priority_dropdown rounded-lg" style={{ width: `17.5rem` }}>
-                  {this.showUsers()}
-                </ul>
-              </div>
-              <p className="ml-2 flex self-center dropdown2" ref="name">Select User</p>
+            <p className="text-purple-600 text-xl text-left capitalize mr-6 font-bold text-xl">
+              Posted By
+            </p>
+            <div
+              onClick={this.handleDropdown}
+              className="flex text-gray-500x my-4 dropdown2"
+            >
+              <div
+                ref="image"
+                className="h-full bg-cover rounded-full  bg-gray-300 relative pic-wrapper dropdown2"
+                style={{
+                  backgroundImage: `url(${img})`,
+                  width: "40px",
+                  height: "40px"
+                }}
+              ></div>
+              <ul
+                ref="dropdown"
+                className="absolute top-0 mt-12 shadow-xl random -mr-2 left-0 w-48 bg-white dropdown z-50 capitalize hidden status_priority_dropdown rounded-lg"
+                style={{ width: `17.5rem`, marginTop: `190px` }}
+              >
+                {this.showUsers()}
+              </ul>
+              <p className="ml-2 flex self-center dropdown2" ref="name">
+                Select User
+              </p>
             </div>
             <form action="/" onSubmit={this.handleUpdate}>
               <textarea
@@ -189,7 +298,7 @@ class Comments extends Component {
               ></textarea>
               <div className="flex justify-between items-center mt-4">
                 <button className="rounded px-8  py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none">
-                 Add Comment
+                  Add Comment
                 </button>
               </div>
             </form>

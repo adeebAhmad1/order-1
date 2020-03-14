@@ -16,7 +16,9 @@ class index extends Component {
     todoIds: [],
     tasks: [],
     comments: [],
-    users: []
+    users: [],
+    clone: false,
+    clonedDate: null
   };
 
   componentDidMount = () => {
@@ -34,7 +36,6 @@ class index extends Component {
 
           //! for sorting
            todos.sort((a, b) => {
-            // console.log(a, b);
             return a.title.localeCompare(b.title);
           });
         });
@@ -53,8 +54,7 @@ class index extends Component {
       });
     //! for rendering comments from database
     db.collection("comments")
-      .get()
-      .then(querySnapshot => {
+      .onSnapshot(querySnapshot => {
         let comments = [];
         querySnapshot.forEach(doc => {
           let comment = doc.data();
@@ -99,26 +99,37 @@ class index extends Component {
 
   //? For Cloning the Existing Todos
   cloneAll = ()=>{
-    //* Clone All Todos
+    //* Clone All Todo
      const clonedTodos = this.state.todos.map(el=>{
       el.status = "Not Started";
-      el.timer = null;
-      el.endTime = null;
-      el.id = "";
+      el.timer = 0;
+      el.endTime = 1;
       el.userId = "";
       el.date = null;
-      el.state = "Add";
+      el.state = "";
+      el.clone = true
       return el;
     });
-
+    document.querySelectorAll(`input[type="date"]`).forEach(el=> {
+      el.value = ""
+      el.addEventListener("change",()=> {
+        document.querySelectorAll(`input[type="date"]`).forEach(el2=>{
+          el2.value = el.value
+        })
+      })
+    });
+    document.querySelectorAll("td .userId").forEach(el=> el.innerHTML = "")
+    this.setState({clone: true})
     const todos = [...clonedTodos]
     this.setState({todos});
-  }
+    console.log(this.state.todos)
+  };
+  cloneDate = (clonedDate)=>this.setState({clonedDate})
   //! for new todo
   handleClick = () => {
     const newTodo = {
       title: (
-        <select className="valuePicker" defaultValue={"select"}>
+        <select className="valuePicker" defaultValue="select">
           <option disabled value="select">
             Select Task
           </option>
@@ -127,7 +138,8 @@ class index extends Component {
       ),
       state: "Add",
       status: "Not Started",
-      timer: ""
+      timer: "",
+      stuckTimer: ""
     };
     this.setState({ todos: [...this.state.todos, newTodo] });
   };
@@ -146,18 +158,21 @@ class index extends Component {
           dateArray[1] >= 10 ? dateArray[1] : "0" + dateArray[1]
         ].join("-");
       }
-      const commentsLength = this.state.comments.filter(
+      const comments = this.state.comments.filter(
         comment => el.id === comment.todoId
-      ).length;
+      );
+      const commentsLength = comments.length;
+      const commentReads = comments.map(el=>el.read)
       const user = this.state.users.find(user => user.id === el.userId) || {};
       const userId = user.id || "";
       return (
         <Todo
           key={i}
-          title={<p> {el.title} </p>}
+          title={<p className="title">{el.title}</p>}
           commentsLength={commentsLength}
           status={el.status}
           index={i}
+          stuckTimer={el.stuckTimer}
           state={el.state ? el.state : "Delete"}
           date={date}
           todoId={el.id}
@@ -166,6 +181,10 @@ class index extends Component {
           endTime={el.endTime}
           userId={userId}
           userImg={user.url || Img}
+          userName = {user.name}
+          clone={el.clone || undefined}
+          cloneDate= {this.cloneDate}
+          commentReads={commentReads}
         />
       );
     });
@@ -251,7 +270,7 @@ class index extends Component {
             id="clone_all_btn"
             onClick={() => this.cloneAll(this.state.todoIds)}
           >
-            Clone All
+            Clone
           </button>
         </div>
         <table className="w-full">
@@ -264,7 +283,7 @@ class index extends Component {
               <th width="15%">Status</th>
               <th width="25%">Timeline</th>
               <th>Time Tracking</th>
-              <th>Delete</th>
+              <th>Tools</th>
             </tr>
           </thead>
           <tbody ref="tbody">{this.showTodos()}</tbody>
@@ -276,6 +295,30 @@ class index extends Component {
           >
             Go Back
           </Link>
+          {this.state.clone ? <button onClick={() => {
+            const getArray = (value)=> Array.from(document.querySelectorAll(value));
+            const titles = getArray("td .title");
+            const userIds = getArray("td .userId");
+            const statuses = getArray('td .status');
+            const dates = getArray('td input[type="date"]');
+            const isDatePresent = dates.find(el=> el.value === "")
+            const newTodos = titles.map((el,i)=>{
+              return {title: el.textContent,
+                userId: userIds[i].textContent,
+                status: statuses[i].textContent,
+                date: new Date(dates[i].value).getTime()
+              }
+            });
+            const isUserPresent = newTodos.find(el=> el.userId === "");
+            if(isUserPresent) return alert('Please Select All Users');
+            if(isDatePresent) return alert('Please Select All Dates');
+            newTodos.forEach(todo=>{
+              db.collection('todos').add(todo)
+            })
+            this.deleteAll(this.state.todoIds)
+          }} className="rounded px-4 py-2 text-center bg-green-600 border border-purple-600 ml-3 text-white cursor-pointer justify-between outline-none mt-8">
+            Clone All
+          </button> : ""}
         </div>
       </div>
     );

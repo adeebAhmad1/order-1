@@ -10,7 +10,8 @@ class Table extends Component {
   state = {
     users: [],
     todos: [],
-    comments: []
+    comments: [],
+    readComment: []
   };
 
   //! getting data from fatabase
@@ -67,15 +68,16 @@ class Table extends Component {
   showTodos = () => {
     //! for sorting
     let sortedTodos = this.state.todos.sort((a, b) => {
-      console.log(a, b);
       return a.title.localeCompare(b.title);
     });
 
     return sortedTodos.map((el, i) => {
       if (this.state.users.length > 0) {
-        const commentsLength = this.state.comments.filter(comment => {
+        const comments = this.state.comments.filter(comment => {
           return el.id === comment.todoId;
-        }).length;
+        });
+        const commentsLength = comments.length;
+        const commentReads = comments.map(el=>el.read)
         const user = this.state.users.find(user => user.id === el.userId) || {};
         const userId = user.id || "";
         return (
@@ -91,6 +93,7 @@ class Table extends Component {
             endTime={el.endTime ? el.endTime : ""}
             todoId={el.id}
             userId={userId}
+            commentReads={commentReads}
           />
         );
       } else {
@@ -102,6 +105,7 @@ class Table extends Component {
   render() {
     return (
       <div>
+        {console.log(this.state.readComments)}
         <table className="w-full">
           <thead>
             <tr>
