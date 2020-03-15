@@ -252,8 +252,9 @@ class Comments extends Component {
             <div ref="statusLog" style={{
               position: `absolute`, 
               width: `150%`,
-              left: `-35px`,
-              bottom: `-35px`
+              left: `-80px`,
+              bottom: `-35px`,
+              textAlign: `center`
             }}></div>
           </div>
           <div className="flex justify-start mb-4">
