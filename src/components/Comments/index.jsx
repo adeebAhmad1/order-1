@@ -245,11 +245,16 @@ class Comments extends Component {
         >
           <div className="myDiv">
             <div className="personImg">
-              <img width={50} height={50} src={this.state.todo.url} alt="" />
+              <img style={{height:`40px`,width:`40px`}} src={this.state.todo.url} alt={this.state.name} />
             </div>
             <div className="personTask">{this.state.todo.title}</div>
 
-            <div ref="statusLog"></div>
+            <div ref="statusLog" style={{
+              position: `absolute`, 
+              width: `150%`,
+              left: `-35px`,
+              bottom: `-35px`
+            }}></div>
           </div>
           <div className="flex justify-start mb-4">
             <i

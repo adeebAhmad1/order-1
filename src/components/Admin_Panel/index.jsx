@@ -289,12 +289,16 @@ class index extends Component {
           <tbody ref="tbody">{this.showTodos()}</tbody>
         </table>
         <div className="flex justify-end mb-4">
-          <Link
+          {}
+          {this.state.clone ? <button onClick={()=> window.location.reload()} className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8">
+            Go Back
+          </button> : <Link
             className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
             to="/"
+            
           >
             Go Back
-          </Link>
+          </Link>}
           {this.state.clone ? <button onClick={() => {
             const getArray = (value)=> Array.from(document.querySelectorAll(value));
             const titles = getArray("td .title");

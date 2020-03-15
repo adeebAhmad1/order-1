@@ -257,14 +257,8 @@ class Todo extends Component {
               <span className="w-4 h-4 rounded-full bg-green-600 block mr-3"></span>
               <p>Done</p>
             </li>
-            <li className="border-b border-gray-300 text-yellow-600 py-3 flex flex-start items-center px-4">
-              <span className="w-4 h-4 rounded-full bg-yellow-600 block mr-3"></span>
-              <p>Working on it</p>
-            </li>
-            <li className="border-b border-gray-300 text-red-500 py-3 flex flex-start items-center px-4">
-              <span className="w-4 h-4 rounded-full bg-red-500 block mr-3"></span>
-              <p>Stuck</p>
-            </li>
+            {this.state.status === "Working on It" ? "" : <li className="select1 border-b border-gray-300 text-yellow-600 py-3 flex flex-start items-center px-4"><span className="w-4 h-4 rounded-full bg-yellow-600 block mr-3"></span><p>Working on it</p></li>}
+            {this.state.status === "Stuck" ? "" : <li className="select1 border-b border-gray-300 text-red-500 py-3 flex flex-start items-center px-4"><span className="w-4 h-4 rounded-full bg-red-500 block mr-3"></span><p>Stuck</p></li>}
           </ul>
         </td>
         <td>
