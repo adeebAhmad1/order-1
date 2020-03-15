@@ -120,8 +120,7 @@ class Todo extends Component {
           users,
           userId: this.props.userId
         });
-        this.setState({activeUser: this.state.users.find(el=> el.id === this.props.userId) || {}});
-        this.setState({activeUser: this.props.clone ? {} : this.state.activeUser});
+        if(this.props.clone) this.setState({activeUser: this.state.users.find(el=> el.id === this.props.userId) || {}});
         window.addEventListener("click", this.removeDropdown);
         window.addEventListener("click", this.removeDropdown2);
       });
@@ -298,7 +297,7 @@ class Todo extends Component {
     console.log(userId)
     this.setState({ userId });
     const user = this.state.users.find(el => el.id === userId);
-    this.setState({activeUser: user});
+    if(this.props.clone) this.setState({activeUser: user});
     this.refs.images.style.backgroundImage = `url(${user.url})`;
   };
   render() {
@@ -330,7 +329,7 @@ class Todo extends Component {
             onClick={this.showDropdown}
           >
             <div className="userId hidden">{ 
-              this.state.userId || this.state.activeUser.id
+              this.state.activeUser.id
             }</div>
           </div>
           <ul
