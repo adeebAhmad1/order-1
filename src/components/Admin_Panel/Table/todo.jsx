@@ -13,7 +13,8 @@ class Todo extends Component {
     confettiStart: false,
     status: "Not Started",
     endTime: ``,
-    name: ""
+    name: "",
+    activeUser: {}
   };
 
   // ! update status function
@@ -91,6 +92,7 @@ class Todo extends Component {
     }
   }
   componentWillUpdate() {
+    console.log(this.state.userId)
     if (this.state.status === "Done") {
       this.refs.status1.style.backgroundColor = "#03C977";
       this.refs.dropdown1.classList.add("invisible");
@@ -118,6 +120,8 @@ class Todo extends Component {
           users,
           userId: this.props.userId
         });
+        this.setState({activeUser: this.state.users.find(el=> el.id === this.props.userId) || {}});
+        this.setState({activeUser: this.props.clone ? {} : this.state.activeUser});
         window.addEventListener("click", this.removeDropdown);
         window.addEventListener("click", this.removeDropdown2);
       });
@@ -131,12 +135,7 @@ class Todo extends Component {
     let users = this.state.users;
     return users.map((user, i) => {
       return (
-        <li
-          key={i}
-          onClick={this.onSelect}
-          className="border-b border-gray-300 text-green-600 h-12 flex flex-start items-center px-4 cursor-pointer"
-          data-userid={user.id}
-        >
+        <li key={i} onClick={this.onSelect} className="border-b border-gray-300 text-green-600 h-12 flex flex-start items-center px-4 cursor-pointer" data-userid={user.id}>
           <span
             className=" rounded-full bg-cover block"
             style={{
@@ -296,8 +295,10 @@ class Todo extends Component {
   //! user select
   onSelect = e => {
     const userId = e.target.dataset.userid || e.target.parentNode.dataset.userid || e.target.parentNode.parentNode.dataset.userid;
-    this.setState({ userId });    
+    console.log(userId)
+    this.setState({ userId });
     const user = this.state.users.find(el => el.id === userId);
+    this.setState({activeUser: user});
     this.refs.images.style.backgroundImage = `url(${user.url})`;
   };
   render() {
@@ -328,7 +329,9 @@ class Todo extends Component {
             }}
             onClick={this.showDropdown}
           >
-            <div className="userId hidden">{ this.state.userId }</div>
+            <div className="userId hidden">{ 
+              this.state.userId || this.state.activeUser.id
+            }</div>
           </div>
           <ul
             ref="dropdown"
@@ -352,17 +355,7 @@ class Todo extends Component {
             className="absolute top-0 mt-12 shadow-xl -ml-8 left-0 w-48 bg-white dropdown z-50 hidden status_priority_dropdown"
             style={{ backgroundColor: `#fff` }}
           >
-            {this.state.status === "Not Started" ? (
-              <li className="select1 border-b border-gray-300 text-green-600 py-3 flex flex-start items-center px-4">
-                <span
-                  style={{ backgroundColor: "#599EFD" }}
-                  className="w-4 h-4 rounded-full block mr-3"
-                ></span>
-                <p>Not Started</p>
-              </li>
-            ) : (
-              ""
-            )}
+            {this.state.status === "Not Started" ? (<li className="select1 border-b border-gray-300 text-green-600 py-3 flex flex-start items-center px-4"><span style={{ backgroundColor: "#599EFD" }} className="w-4 h-4 rounded-full block mr-3"></span><p>Not Started</p></li>) : ("")}
             <li className="select1 border-b border-gray-300 text-green-600 py-3 flex flex-start items-center px-4">
               <span className="w-4 h-4 rounded-full bg-green-600 block mr-3"></span>
               <p>Done</p>
