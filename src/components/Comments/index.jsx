@@ -251,8 +251,8 @@ class Comments extends Component {
 
             <div ref="statusLog" style={{
               position: `absolute`, 
-              width: `150%`,
-              left: `-80px`,
+              width: `450px`,
+              left: `-250px`,
               bottom: `-35px`,
               textAlign: `center`
             }}></div>
