@@ -25,39 +25,47 @@ import All_tasks from "./components/Admin_Panel/Table/AllTasks";
 
 //contexts
 import AuthContextProvider from "./context/AuthContext";
-
+import DataContextProvider from "./context/DataContext";
 //css
 import "./App.css";
 
 class App extends Component {
   render() {
     return (
-      <AuthContextProvider>
-        <BrowserRouter>
-          <div>
-            <Header />
-            <Route exact path="/" component={Home} />
-            <Route path="/home" component={Home} />
-            <Route path="/home/comments/:commentId" component={Comments} />
+      <DataContextProvider>
+        <AuthContextProvider>
+          <BrowserRouter>
+            <div>
+              <Header />
+              <Route exact path="/" component={Home} />
+              <Route path="/home" component={Home} />
+              <Route path="/home/comments/:commentId" component={Comments} />
 
-            <Route exact path="/admin-login" component={Login} />
-            <Route exact path="/admin_forgot" component={Forgot} />
-            <Route path="/admin_panel" component={Admin_Panel} />
-            <Route
-              path="/admin_panel/comments/:commentId"
-              component={Comments}
-            />
+              <Route exact path="/admin-login" component={Login} />
+              <Route exact path="/admin_forgot" component={Forgot} />
+              <Route path="/admin_panel" component={Admin_Panel} />
+              <Route
+                path="/admin_panel/comments/:commentId"
+                component={Comments}
+              />
 
-            <Route path="/all_user/add_user" component={Add_user} />
-            <Route path="/all_user" component={All_user} />
-            <Route path="/all_users/edit_user/:userId" component={Edit_user} />
+              <Route path="/all_user/add_user" component={Add_user} />
+              <Route path="/all_user" component={All_user} />
+              <Route
+                path="/all_users/edit_user/:userId"
+                component={Edit_user}
+              />
 
-            <Route path="/all_tasks/add_task" component={Add_Task} />
-            <Route path="/all_tasks" component={All_tasks} />
-            <Route path="/all_tasks/edit_task/:taskId" component={Edit_task} />
-          </div>
-        </BrowserRouter>
-      </AuthContextProvider>
+              <Route path="/all_tasks/add_task" component={Add_Task} />
+              <Route path="/all_tasks" component={All_tasks} />
+              <Route
+                path="/all_tasks/edit_task/:taskId"
+                component={Edit_task}
+              />
+            </div>
+          </BrowserRouter>
+        </AuthContextProvider>
+      </DataContextProvider>
     );
   }
 }

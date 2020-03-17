@@ -61,38 +61,40 @@ class Comments extends Component {
     let workingOnIt = this.state.todo.timer;
     let endTime = this.state.todo.endTime;
     let stuckTimer = this.state.todo.stuckTimer;
-    let timeOfDone = new Date(
-      endTime
-    ).toLocaleTimeString();
-    let timeOfworking = new Date(
-      workingOnIt
-    ).toLocaleTimeString();
-    let timeOfstuck = new Date(
-      stuckTimer
-    ).toLocaleTimeString();
+    let timeOfDone = new Date(endTime).toLocaleTimeString();
+    let timeOfworking = new Date(workingOnIt).toLocaleTimeString();
+    let timeOfstuck = new Date(stuckTimer).toLocaleTimeString();
 
-    //if three true
-    if(this.refs.statusLog){
+    //! if three true
+    if (this.refs.statusLog) {
       if (workingOnIt && endTime && stuckTimer) {
-        this.refs.statusLog.innerHTML = `Working on it: ${timeOfworking}/Stuck: ${timeOfstuck} /Done: ${timeOfDone}`;
+        this.refs.statusLog.innerHTML = `<b>Working on it:</b> ${timeOfworking} | <b>Stuck:</b> ${timeOfstuck} | <b>Done:</b> ${timeOfDone}`;
       } else if (endTime && stuckTimer) {
-        this.refs.statusLog.innerHTML = `Stuck: ${timeOfstuck} /Done: ${timeOfDone}`;
+        this.refs.statusLog.innerHTML = `<b>Stuck:</b> ${timeOfstuck} | <b>Done:</b> ${timeOfDone}`;
       } else if (workingOnIt && endTime) {
-        this.refs.statusLog.innerHTML = `Working on it: ${timeOfworking} /Done: ${timeOfDone}`;
+        this.refs.statusLog.innerHTML = `<b>Working on it:</b> ${timeOfworking} | <b>Done:</b> ${timeOfDone}`;
       } else if (workingOnIt && stuckTimer) {
-        this.refs.statusLog.innerHTML = `Working on it: ${timeOfworking}/Stuck: ${timeOfstuck}`;
+        this.refs.statusLog.innerHTML = `<b>Working on it:</b> ${timeOfworking} | <b>Stuck:</b> ${timeOfstuck}`;
       } else if (endTime) {
-        this.refs.statusLog.innerHTML += `Done: ${timeOfDone}`;
+        this.refs.statusLog.innerHTML += `<b>Done:</b> ${timeOfDone}`;
       } else if (stuckTimer) {
-        this.refs.statusLog.innerHTML += `Stuck: ${timeOfstuck}`;
+        this.refs.statusLog.innerHTML += `<b>Stuck:</b> ${timeOfstuck}`;
       } else if (workingOnIt) {
-        this.refs.statusLog.innerHTML += `Working on it : ${timeOfworking}`;
+        this.refs.statusLog.innerHTML += `<b>Working on it:</b> : ${timeOfworking}`;
       }
     }
   };
 
   Read = commentId => {
     let read = true;
+    db.collection("comments")
+      .doc(commentId)
+      .update({
+        read
+      });
+  };
+  unRead = commentId => {
+    let read = false;
     db.collection("comments")
       .doc(commentId)
       .update({
@@ -147,7 +149,9 @@ class Comments extends Component {
       );
       comments.sort((a, b) => b.date - a.date);
       this.setState({ comments });
-      if(this.refs.popup){this.refs.popup.style.right = "0";}
+      if (this.refs.popup) {
+        this.refs.popup.style.right = "0";
+      }
     });
   }
   showUsers = () => {
@@ -179,12 +183,13 @@ class Comments extends Component {
       if (user) {
         return (
           <article
+            // style={{backgroundColor:'#f8f8f8'}}
             className="mt-10 p-1 pl-2 border border-gary-600 rounded-lg"
             key={i}
           >
             <div className="flex justify-between items-center">
               <div className="flex text-gray-500 hover:text-purple-600">
-                <p className="ml-2 flex self-center">{user.name}</p>
+                <p className="ml-2 flex self-center ">{user.name}</p>
               </div>
               <p className="select appearance-none py-1 pl-6 pr-2 outline-none text-gray-500 cursor-pointer">
                 {new Date(comment.date).toLocaleTimeString()}{" "}
@@ -198,12 +203,13 @@ class Comments extends Component {
                 <i
                   onClick={() => this.Read(comment.id)}
                   style={{ float: "right" }}
-                  className=" text-2xl text-gray-500 fas fa-envelope "
+                  className=" text-2xl text-black-500 fas fa-envelope "
                 ></i>
               ) : (
                 <i
+                  onClick={() => this.unRead(comment.id)}
                   style={{ float: "right" }}
-                  className="text-2xl  text-gray-500 fas fa-envelope-open "
+                  className="text-2xl text-white  fas fa-envelope-open "
                 ></i>
               )}
             </p>
@@ -245,17 +251,25 @@ class Comments extends Component {
         >
           <div className="myDiv">
             <div className="personImg">
-              <img style={{height:`40px`,width:`40px`}} src={this.state.todo.url} alt={this.state.name} />
+              <img
+                style={{ height: `40px`, width: `40px` }}
+                src={this.state.todo.url}
+                alt={this.state.name}
+              />
             </div>
             <div className="personTask">{this.state.todo.title}</div>
 
-            <div ref="statusLog" style={{
-              position: `absolute`, 
-              width: `450px`,
-              left: `-250px`,
-              bottom: `-35px`,
-              textAlign: `center`
-            }}></div>
+            <div
+              ref="statusLog"
+              style={{
+                position: `absolute`,
+                width: `450px`,
+                left: `-300px`,
+                bottom: `-35px`,
+                textAlign: `center`,
+                fontSize: "14px"
+              }}
+            ></div>
           </div>
           <div className="flex justify-start mb-4">
             <i
@@ -266,9 +280,9 @@ class Comments extends Component {
             ></i>
           </div>
           <div className="mt-10 update-section" id="Update_section">
-            <p className="text-purple-600 text-xl text-left capitalize mr-6 font-bold text-xl">
+            {/* <p className="text-purple-600 text-xl text-left capitalize mr-6 font-bold text-xl">
               Posted By
-            </p>
+            </p> */}
             <div
               onClick={this.handleDropdown}
               className="flex text-gray-500x my-4 dropdown2"

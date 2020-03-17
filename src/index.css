@@ -1,17 +1,17 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
-.dropdown1{
+.dropdown1 {
   display: none;
   position: absolute;
   top: 90%;
@@ -22,40 +22,40 @@ code {
   box-shadow: 0 10px 20px #000;
   padding-top: 10px;
 }
-.dropdown1 span{
+.dropdown1 span {
   display: inline-block;
 }
-.block{
+.block {
   display: block !important;
 }
-.user{
+.user {
   width: 100%;
-  height:90px;
+  height: 90px;
   margin-bottom: 5px;
 }
 
-.outer{
+.outer {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100vh;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
 }
-.inner{
+.inner {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%, -50%);
   background-color: #fff;
-  padding: 3rem ;
+  padding: 3rem;
   border-radius: 10px;
 }
-.inner div{
+.inner div {
   margin: 40px;
   /* text-align: center; */
 }
-.invisible{
+.invisible {
   display: none;
   opacity: 0;
   visibility: hidden;
@@ -65,41 +65,39 @@ code {
   border-bottom: 3px solid #ddd;
   padding-left: 10px;
 }
-.inner button{
+.inner button {
   margin: 0 auto;
 }
 
-
 /*!  for comments */
-.myDiv{
+.myDiv {
   width: max-content !important;
   position: absolute;
-  right: 2rem
+  right: 2rem;
 }
-.personImg{
+.personImg {
   float: left;
-
 }
-.personImg img{
+.personImg img {
   border-radius: 50%;
   width: 35px;
 }
-.personTask{
+.personTask {
   float: right;
   padding-top: 5px;
   font-weight: bolder;
 }
 
-.calenderShow::-webkit-calendar-picker-indicator{
+.calenderShow::-webkit-calendar-picker-indicator {
   width: 100%;
   height: 100%;
   position: absolute;
-  top:0;
+  top: 0;
   left: 0;
   color: transparent;
   background-color: transparent;
 }
-.calenderShow{
+.calenderShow {
   position: relative;
 }
 
@@ -112,7 +110,11 @@ code {
   right: -5%;
 }
 
-table .dropdown0::before{
+table .dropdown0::before {
   right: auto;
   left: 10% !important;
+}
+/*! for enevolpe */
+.fa-envelope-open::before {
+  text-shadow: 0 0 15px #000;
 }

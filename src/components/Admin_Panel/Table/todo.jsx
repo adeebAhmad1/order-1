@@ -9,7 +9,7 @@ class Todo extends Component {
     id: null,
     users: [],
     iTimes: 0,
-    time: `00:00:00`,
+    time: ``,
     confettiStart: false,
     status: "Not Started",
     endTime: ``,
@@ -72,9 +72,13 @@ class Todo extends Component {
   };
   componentWillReceiveProps(props) {
     this.forceUpdate();
-    this.refs.status.textContent = props.status
+    this.refs.status.textContent = props.status;
     var text = this.refs.status.textContent;
-    this.setState({ status: text , endTime: props.endTime,userId: props.userId || this.state.userId});
+    this.setState({
+      status: text,
+      endTime: props.endTime,
+      userId: props.userId || this.state.userId
+    });
     if (this.state.status === "Done") {
       this.refs.status1.style.backgroundColor = "#03C977";
       this.refs.dropdown1.classList.add("invisible");
@@ -92,7 +96,7 @@ class Todo extends Component {
     }
   }
   componentWillUpdate() {
-    console.log(this.state.userId)
+    console.log(this.state.userId);
     if (this.state.status === "Done") {
       this.refs.status1.style.backgroundColor = "#03C977";
       this.refs.dropdown1.classList.add("invisible");
@@ -120,7 +124,11 @@ class Todo extends Component {
           users,
           userId: this.props.userId
         });
-        if(this.props.clone) this.setState({activeUser: this.state.users.find(el=> el.id === this.props.userId) || {}});
+        if (this.props.clone)
+          this.setState({
+            activeUser:
+              this.state.users.find(el => el.id === this.props.userId) || {}
+          });
         window.addEventListener("click", this.removeDropdown);
         window.addEventListener("click", this.removeDropdown2);
       });
@@ -134,7 +142,12 @@ class Todo extends Component {
     let users = this.state.users;
     return users.map((user, i) => {
       return (
-        <li key={i} onClick={this.onSelect} className="border-b border-gray-300 text-green-600 h-12 flex flex-start items-center px-4 cursor-pointer" data-userid={user.id}>
+        <li
+          key={i}
+          onClick={this.onSelect}
+          className="border-b border-gray-300 text-green-600 h-12 flex flex-start items-center px-4 cursor-pointer"
+          data-userid={user.id}
+        >
           <span
             className=" rounded-full bg-cover block"
             style={{
@@ -155,11 +168,11 @@ class Todo extends Component {
   };
   removeDropdown = e => {
     if (e.target.id === "dropdown") return false;
-    if(this.refs.dropdown) this.refs.dropdown.classList.remove("block");
+    if (this.refs.dropdown) this.refs.dropdown.classList.remove("block");
   };
   removeDropdown2 = e => {
     if (e.target.id === "dropdown1") return false;
-    if(this.refs.dropdown1) this.refs.dropdown1.classList.remove("block");
+    if (this.refs.dropdown1) this.refs.dropdown1.classList.remove("block");
   };
   updateTime = () => {
     let timer;
@@ -200,6 +213,9 @@ class Todo extends Component {
       } else {
         this.setState({ time: `00:00:00` });
       }
+      if (this.props.clone) {
+        this.setState({ time: `` });
+      }
     }, 1000);
   };
   stopTimer = () => {
@@ -215,7 +231,7 @@ class Todo extends Component {
         });
     }
   };
-  
+
   //! status dropdown
   handleDropdown = id => {
     const status_priority_dropdown = document.querySelectorAll(
@@ -293,20 +309,62 @@ class Todo extends Component {
   };
   //! user select
   onSelect = e => {
-    const userId = e.target.dataset.userid || e.target.parentNode.dataset.userid || e.target.parentNode.parentNode.dataset.userid;
-    console.log(userId)
+    const userId =
+      e.target.dataset.userid ||
+      e.target.parentNode.dataset.userid ||
+      e.target.parentNode.parentNode.dataset.userid;
+    console.log(userId);
     this.setState({ userId });
     const user = this.state.users.find(el => el.id === userId);
-    if(this.props.clone) this.setState({activeUser: user});
+    if (this.props.clone) this.setState({ activeUser: user });
     this.refs.images.style.backgroundImage = `url(${user.url})`;
   };
   render() {
-    const isRead = this.props.commentReads.find(el=> el === false);
+    const isRead = this.props.commentReads.find(el => el === false);
     return (
       <tr className="bg-gray-100 border-b border-gray-100">
-        <td className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container" ref="title">
+        <td
+          className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container"
+          ref="title"
+        >
           {this.props.title}
-          {!this.props.clone ? (this.props.url ? (<Link to={`/admin_panel/comments/${this.props.url}`} className="relative chat-wrapper cursor-pointer"><i style={{color: isRead === false ?( this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`) : `#a0aec0`}} className="text-3xl text-gray-500 chat-icon far fa-comment"></i><div style={{backgroundColor:  isRead === false ?( this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`) : `#a0aec0`}} className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none">{this.props.commentsLength}</div></Link>) : ("")) : ""}
+          {!this.props.clone ? (
+            this.props.url ? (
+              <Link
+                to={`/admin_panel/comments/${this.props.url}`}
+                className="relative chat-wrapper cursor-pointer"
+              >
+                <i
+                  style={{
+                    color:
+                      isRead === false
+                        ? this.props.commentsLength > 0
+                          ? `#2b6cb0`
+                          : `#a0aec0`
+                        : `#a0aec0`
+                  }}
+                  className="text-3xl text-gray-500 chat-icon far fa-comment"
+                ></i>
+                <div
+                  style={{
+                    backgroundColor:
+                      isRead === false
+                        ? this.props.commentsLength > 0
+                          ? `#2b6cb0`
+                          : `#a0aec0`
+                        : `#a0aec0`
+                  }}
+                  className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none"
+                >
+                  {this.props.commentsLength}
+                </div>
+              </Link>
+            ) : (
+              ""
+            )
+          ) : (
+            ""
+          )}
           <Confetti
             numberOfPieces={3000}
             recycle={false}
@@ -328,9 +386,7 @@ class Todo extends Component {
             }}
             onClick={this.showDropdown}
           >
-            <div className="userId hidden">{ 
-              this.state.activeUser.id
-            }</div>
+            <div className="userId hidden">{this.state.activeUser.id}</div>
           </div>
           <ul
             ref="dropdown"
@@ -354,13 +410,37 @@ class Todo extends Component {
             className="absolute top-0 mt-12 shadow-xl -ml-8 left-0 w-48 bg-white dropdown z-50 hidden status_priority_dropdown"
             style={{ backgroundColor: `#fff` }}
           >
-            {this.state.status === "Not Started" ? (<li className="select1 border-b border-gray-300 text-green-600 py-3 flex flex-start items-center px-4"><span style={{ backgroundColor: "#599EFD" }} className="w-4 h-4 rounded-full block mr-3"></span><p>Not Started</p></li>) : ("")}
+            {this.state.status === "Not Started" ? (
+              <li className="select1 border-b border-gray-300 text-green-600 py-3 flex flex-start items-center px-4">
+                <span
+                  style={{ backgroundColor: "#599EFD" }}
+                  className="w-4 h-4 rounded-full block mr-3"
+                ></span>
+                <p>Not Started</p>
+              </li>
+            ) : (
+              ""
+            )}
             <li className="select1 border-b border-gray-300 text-green-600 py-3 flex flex-start items-center px-4">
               <span className="w-4 h-4 rounded-full bg-green-600 block mr-3"></span>
               <p>Done</p>
             </li>
-            {this.state.status === "Working on It" ? "" : <li className="select1 border-b border-gray-300 text-yellow-600 py-3 flex flex-start items-center px-4"><span className="w-4 h-4 rounded-full bg-yellow-600 block mr-3"></span><p>Working on it</p></li>}
-            {this.state.status === "Stuck" ? "" : <li className="select1 border-b border-gray-300 text-red-500 py-3 flex flex-start items-center px-4"><span className="w-4 h-4 rounded-full bg-red-500 block mr-3"></span><p>Stuck</p></li>}
+            {this.state.status === "Working on It" ? (
+              ""
+            ) : (
+              <li className="select1 border-b border-gray-300 text-yellow-600 py-3 flex flex-start items-center px-4">
+                <span className="w-4 h-4 rounded-full bg-yellow-600 block mr-3"></span>
+                <p>Working on it</p>
+              </li>
+            )}
+            {this.state.status === "Stuck" ? (
+              ""
+            ) : (
+              <li className="select1 border-b border-gray-300 text-red-500 py-3 flex flex-start items-center px-4">
+                <span className="w-4 h-4 rounded-full bg-red-500 block mr-3"></span>
+                <p>Stuck</p>
+              </li>
+            )}
           </ul>
         </td>
         <td>
@@ -371,27 +451,37 @@ class Todo extends Component {
               ref="date"
               readOnly={this.props.clone ? false : !!this.props.url}
               defaultValue={this.props.date}
-              className={`text-center text-white text-sm z-20 center bg-transparent calenderShow ${this.props.clone ? "cloneDate" : ""}`}
+              className={`text-center text-white text-sm z-20 center bg-transparent calenderShow ${
+                this.props.clone ? "cloneDate" : ""
+              }`}
               required
-              onChange={(e)=> this.props.clone ? this.props.cloneDate(e.target.value) : ""}
+              onChange={e =>
+                this.props.clone ? this.props.cloneDate(e.target.value) : ""
+              }
             />
           </span>
         </td>
-        <td className="text-gray-600"> {this.state.time} </td>
+        <td className="text-gray-600 " ref="timer">
+          {" "}
+          {this.state.time}{" "}
+        </td>
         <td>
-          {!this.props.clone ? <button
-            onClick={e => {
-              if (e.target.innerText === "Add") {
-                this.add()
-              }
-              else if (e.target.innerText === "Delete"){
-                this.deleteOne(this.props.todoId);
-              }
-            }}
-            className="rounded px-4 py-2 text-center bg-red-800 text-white cursor-pointer ml-3 outline-none"
-          >
-            {this.props.state}
-          </button> : ""}
+          {!this.props.clone ? (
+            <button
+              onClick={e => {
+                if (e.target.innerText === "Add") {
+                  this.add();
+                } else if (e.target.innerText === "Delete") {
+                  this.deleteOne(this.props.todoId);
+                }
+              }}
+              className="rounded px-4 py-2 text-center bg-red-800 text-white cursor-pointer ml-3 outline-none"
+            >
+              {this.props.state}
+            </button>
+          ) : (
+            ""
+          )}
         </td>
       </tr>
     );

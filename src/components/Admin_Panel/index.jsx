@@ -122,7 +122,7 @@ class index extends Component {
     this.setState({clone: true})
     const todos = [...clonedTodos]
     this.setState({todos});
-    console.log(this.state.todos)
+    // document.querySelectorAll('timer').forEach(el => el.innerHTML = "")
   };
   cloneDate = (clonedDate)=>this.setState({clonedDate})
   //! for new todo
