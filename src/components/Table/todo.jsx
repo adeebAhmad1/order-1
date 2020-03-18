@@ -28,6 +28,11 @@ class Todo extends Component {
         .then(() => this.setState({ endTime }));
     }
   };
+
+
+
+
+
   // ! update status function
   updateStatus = todosId => {
     let status = this.refs.status.innerText;
@@ -56,7 +61,7 @@ class Todo extends Component {
     } else if (this.state.status === "Stuck") {
       this.refs.status_wrapper.style.backgroundColor = "#E1445B";
       if (this.state.iTimes === 0) this.updateTime();
-    } else if (this.state.status === "Working on It") {
+    } else if (this.state.status === "Working on it") {
       this.refs.status_wrapper.style.backgroundColor = "#F7AE3C";
       if (this.state.iTimes === 0) this.updateTime();
     } else if (this.state.status === "Not Started") {
@@ -68,7 +73,7 @@ class Todo extends Component {
       this.refs.status_wrapper.style.backgroundColor = "#03C977";
     } else if (this.state.status === "Stuck") {
       this.refs.status_wrapper.style.backgroundColor = "#E1445B";
-    } else if (this.state.status === "Working on It") {
+    } else if (this.state.status === "Working on it") {
       this.refs.status_wrapper.style.backgroundColor = "#F7AE3C";
       if (this.state.iTimes === 0) this.updateTime();
     } else if (this.state.status === "Not Started") {
@@ -184,7 +189,7 @@ class Todo extends Component {
                 window.location.reload();
               });
           } else if (this.state.status === "Working on it") {
-            status_priority_wrapper.children[0].innerText = "Working on It";
+            status_priority_wrapper.children[0].innerText = "Working on it";
             status_priority_wrapper.style.backgroundColor = "#d69e2e";
             this.updateTime();
             const timer = this.props.timer
@@ -208,12 +213,40 @@ class Todo extends Component {
     this.setState({ id });
   };
   render() {
-    const isRead = this.props.commentReads.find(el=> el === false);
+    const isRead = this.props.commentReads.find(el => el === false);
     return (
       <tr className="bg-gray-100 border-b border-gray-100">
         <td className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container">
           {this.props.title}
-          <Link to={`/admin_panel/comments/${this.props.url}`} className="relative chat-wrapper cursor-pointer"><i style={{color: isRead === false ?( this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`) : `#a0aec0`}} className="text-3xl text-gray-500 chat-icon far fa-comment"></i><div style={{backgroundColor:  isRead === false ?( this.props.commentsLength > 0 ? `#2b6cb0` : `#a0aec0`) : `#a0aec0`}} className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none">{this.props.commentsLength}</div></Link>
+          <Link
+            to={`/admin_panel/comments/${this.props.url}`}
+            className="relative chat-wrapper cursor-pointer"
+          >
+            <i
+              style={{
+                color:
+                  isRead === false
+                    ? this.props.commentsLength > 0
+                      ? `#2b6cb0`
+                      : `#a0aec0`
+                    : `#a0aec0`
+              }}
+              className="text-3xl text-gray-500 chat-icon far fa-comment"
+            ></i>
+            <div
+              style={{
+                backgroundColor:
+                  isRead === false
+                    ? this.props.commentsLength > 0
+                      ? `#2b6cb0`
+                      : `#a0aec0`
+                    : `#a0aec0`
+              }}
+              className="w-4 h-4 rounded-full text-xs bg-gray-500 text-white absolute bottom-0 right-0 pointer-events-none"
+            >
+              {this.props.commentsLength}
+            </div>
+          </Link>
           <Confetti
             numberOfPieces={1000}
             recycle={false}
@@ -253,12 +286,27 @@ class Todo extends Component {
             ) : (
               ""
             )}
+
+            {this.state.status === "Working on it" ? (
+              ""
+            ) : (
+              <li className="select1 border-b border-gray-300 text-yellow-600 py-3 flex flex-start items-center px-4">
+                <span className="w-4 h-4 rounded-full bg-yellow-600 block mr-3"></span>
+                <p>Working on it</p>
+              </li>
+            )}
+            {this.state.status === "Stuck" ? (
+              ""
+            ) : (
+              <li className="select1 border-b border-gray-300 text-red-500 py-3 flex flex-start items-center px-4">
+                <span className="w-4 h-4 rounded-full bg-red-500 block mr-3"></span>
+                <p>Stuck</p>
+              </li>
+            )}
             <li className="border-b border-gray-300 text-green-600 py-3 flex flex-start items-center px-4">
               <span className="w-4 h-4 rounded-full bg-green-600 block mr-3"></span>
               <p>Done</p>
             </li>
-            {this.state.status === "Working on It" ? "" : <li className="select1 border-b border-gray-300 text-yellow-600 py-3 flex flex-start items-center px-4"><span className="w-4 h-4 rounded-full bg-yellow-600 block mr-3"></span><p>Working on it</p></li>}
-            {this.state.status === "Stuck" ? "" : <li className="select1 border-b border-gray-300 text-red-500 py-3 flex flex-start items-center px-4"><span className="w-4 h-4 rounded-full bg-red-500 block mr-3"></span><p>Stuck</p></li>}
           </ul>
         </td>
         <td>

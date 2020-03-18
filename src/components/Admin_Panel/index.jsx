@@ -42,10 +42,10 @@ class index extends Component {
         todos.sort((a, b) => {
           return a.title.localeCompare(b.title);
         });
-        todos.sort((a,b)=>{
-          return b.date - a.date
-        })
-        this.setState({ todos, todoIds: todos.map(el=> el.id) });
+        todos.sort((a, b) => {
+          return b.date - a.date;
+        });
+        this.setState({ todos, todoIds: todos.map(el => el.id) });
         var group = {};
         this.state.todos.forEach(el => {
           const date = new Date(el.date).toDateString();
@@ -156,38 +156,44 @@ class index extends Component {
       stuckTimer: ""
     };
     this.setState({ todos: [...this.state.todos, newTodo] });
-    this.setState({group: {...this.state.group,New: [newTodo]}});
-    setTimeout(()=>console.log(this.state.group),1000)
+    this.setState({ group: { ...this.state.group ,  New: [newTodo] } });
   };
 
   showTables = () => {
     const dates = Object.keys(this.state.group);
     const todos = Object.values(this.state.group);
-    return dates.map((el,i) => {
-      return <Collapsible key={i}
-        content={
-          <table className="w-full">
-            <thead>
-              <tr>
-                <th width="35%" className="text-purple-600 text-xl text-left">Tasks</th>
-                <th>Team</th>
-                <th width="15%">Status</th>
-                <th width="25%">Timeline</th>
-                <th>Time Tracking</th>
-                <th>Tools</th>
-              </tr>
-            </thead>
-            <tbody ref="tbody">{this.showTodos(todos[i])}</tbody>
-          </table>
-        }
-        i={i}
-        active={todos[i][0].state === "Add" ? true : false}
-        date={el}
-      />
+    return dates.map((el, i) => {
+      const length = todos[i].length;
+      return (
+        <Collapsible
+          length={length}
+          key={i}
+          content={
+            <table className="w-full">
+              <thead>
+                <tr>
+                  <th width="35%" className="text-purple-600 text-xl text-left">
+                    Tasks
+                  </th>
+                  <th>Team</th>
+                  <th width="15%">Status</th>
+                  <th width="25%">Timeline</th>
+                  <th>Time Tracking</th>
+                  <th>Tools</th>
+                </tr>
+              </thead>
+              <tbody ref="tbody">{this.showTodos(todos[i],i)}</tbody>
+            </table>
+          }
+          i={i}
+          active={todos[i][0].state === "Add" ? true : false}
+          date={el}
+        />
+      );
     });
   };
   //! for rendering all todos
-  showTodos = (todos) => {
+  showTodos = (todos,arrI) => {
     return todos.map((el, i) => {
       let date;
       if (el.date) {
@@ -216,6 +222,7 @@ class index extends Component {
           commentsLength={commentsLength}
           status={el.status}
           index={i}
+          arrI={arrI}
           stuckTimer={el.stuckTimer}
           state={el.state ? el.state : "Delete"}
           date={date}
