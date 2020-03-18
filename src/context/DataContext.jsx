@@ -7,28 +7,50 @@ class DataContextProvider extends Component {
     todos: [],
     users: [],
     comments: [],
-    tasks: []
+    tasks: [],
+    isLoading: true
   }
   componentDidMount(){
-    this.getFromDB("todos");
-    this.getFromDB("users");
-    this.getFromDB("comments");
-    this.getFromDB("tesks");
-  }
-  getFromDB = (value)=>{
-    db.collection(value).get().then(querySnapshot=>{
+    db.collection("users").onSnapshot(querySnapshot=>{
       const elements = []
       querySnapshot.forEach(doc=>{
         const el = doc.data();
         el.id = doc.id;
         elements.push(el);
-      })
-      this.setState({[value]: elements});
-    })
+      });
+      this.setState({users: elements});
+      db.collection("tasks").onSnapshot(querySnapshot=>{
+        const elements = []
+        querySnapshot.forEach(doc=>{
+          const el = doc.data();
+          el.id = doc.id;
+          elements.push(el);
+        });
+        this.setState({tasks: elements});
+        db.collection("todos").onSnapshot(querySnapshot=>{
+          const elements = [];
+          querySnapshot.forEach(doc=>{
+            const el = doc.data();
+            el.id = doc.id;
+            elements.push(el);
+          });
+          this.setState({todos: elements});
+          db.collection("comments").onSnapshot(querySnapshot=>{
+            const elements = []
+            querySnapshot.forEach(doc=>{
+              const el = doc.data();
+              el.id = doc.id;
+              elements.push(el);
+            });
+            this.setState({comments: elements,isLoading: false});
+          });
+        });
+      });
+    });
   }
   render () {
     return (
-      <DataContext.Provider>
+      <DataContext.Provider value={this.state}>
         {this.props.children}
       </DataContext.Provider>
     )

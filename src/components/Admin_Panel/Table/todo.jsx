@@ -96,7 +96,6 @@ class Todo extends Component {
     }
   }
   componentWillUpdate() {
-    console.log(this.state.userId);
     if (this.state.status === "Done") {
       this.refs.status1.style.backgroundColor = "#03C977";
       this.refs.dropdown1.classList.add("invisible");
@@ -313,7 +312,6 @@ class Todo extends Component {
       e.target.dataset.userid ||
       e.target.parentNode.dataset.userid ||
       e.target.parentNode.parentNode.dataset.userid;
-    console.log(userId);
     this.setState({ userId });
     const user = this.state.users.find(el => el.id === userId);
     if (this.props.clone) this.setState({ activeUser: user });
@@ -390,7 +388,7 @@ class Todo extends Component {
           </div>
           <ul
             ref="dropdown"
-            className="absolute top-0 mt-12 shadow-xl -mr-2 left-0 w-48 bg-white dropdown z-50 capitalize hidden status_priority_dropdown rounded-lg dropdown0"
+            className={ `absolute top-0 mt-12 shadow-xl -mr-2 left-0 w-48 bg-white dropdown z-50 capitalize hidden status_priority_dropdown rounded-lg dropdown0 ${this.props.state === "Add" || this.props.clone ? "" : "invisible"}`}
             style={{ width: `17.5rem` }}
           >
             {this.showUsers()}

@@ -5,9 +5,10 @@ import Todo from "./Table/todo";
 import firebase from "../../config/firebase";
 //firebase
 import { db } from "../../config/firebase";
-import Img from "../../images/no_image.jpg"
+import Img from "../../images/no_image.jpg";
 //context
 import { AuthContext } from "../../context/AuthContext";
+import Collapsible from "../utils/Collapsible";
 
 class index extends Component {
   static contextType = AuthContext;
@@ -18,7 +19,9 @@ class index extends Component {
     comments: [],
     users: [],
     clone: false,
-    clonedDate: null
+    clonedDate: null,
+    group: {},
+    isOpened: false
   };
 
   componentDidMount = () => {
@@ -35,11 +38,24 @@ class index extends Component {
           todos.push(todo);
 
           //! for sorting
-           todos.sort((a, b) => {
-            return a.title.localeCompare(b.title);
-          });
         });
-        this.setState({ todos, todoIds });
+        todos.sort((a, b) => {
+          return a.title.localeCompare(b.title);
+        });
+        todos.sort((a,b)=>{
+          return b.date - a.date
+        })
+        this.setState({ todos, todoIds: todos.map(el=> el.id) });
+        var group = {};
+        this.state.todos.forEach(el => {
+          const date = new Date(el.date).toDateString();
+          if (date in group) {
+            group[date].push(el);
+          } else {
+            group[date] = new Array(el);
+          }
+        });
+        this.setState({ group });
       });
     //! getting tasks from fatabase
     db.collection("tasks")
@@ -53,21 +69,20 @@ class index extends Component {
         this.setState({ tasks });
       });
     //! for rendering comments from database
-    db.collection("comments")
-      .onSnapshot(querySnapshot => {
-        let comments = [];
-        querySnapshot.forEach(doc => {
-          let comment = doc.data();
-          comment.id = doc.id;
-          comments.push(comment);
-        });
-        comments = comments.filter(el => {
-          return el.todoId;
-        });
-        this.setState({
-          comments
-        });
+    db.collection("comments").onSnapshot(querySnapshot => {
+      let comments = [];
+      querySnapshot.forEach(doc => {
+        let comment = doc.data();
+        comment.id = doc.id;
+        comments.push(comment);
       });
+      comments = comments.filter(el => {
+        return el.todoId;
+      });
+      this.setState({
+        comments
+      });
+    });
     //! for rendering comments from database
     db.collection("users")
       .get()
@@ -98,33 +113,32 @@ class index extends Component {
   };
 
   //? For Cloning the Existing Todos
-  cloneAll = ()=>{
+  cloneAll = () => {
     //* Clone All Todo
-     const clonedTodos = this.state.todos.map(el=>{
+    const clonedTodos = this.state.todos.map(el => {
       el.status = "Not Started";
       el.timer = 0;
       el.endTime = 1;
       el.userId = "";
       el.date = null;
       el.state = "";
-      el.clone = true
+      el.clone = true;
       return el;
     });
-    document.querySelectorAll(`input[type="date"]`).forEach(el=> {
-      el.value = ""
-      el.addEventListener("change",()=> {
-        document.querySelectorAll(`input[type="date"]`).forEach(el2=>{
-          el2.value = el.value
-        })
-      })
+    document.querySelectorAll(`input[type="date"]`).forEach(el => {
+      el.value = "";
+      el.addEventListener("change", () => {
+        document.querySelectorAll(`input[type="date"]`).forEach(el2 => {
+          el2.value = el.value;
+        });
+      });
     });
-    document.querySelectorAll("td .userId").forEach(el=> el.innerHTML = "")
-    this.setState({clone: true})
-    const todos = [...clonedTodos]
-    this.setState({todos});
-    // document.querySelectorAll('timer').forEach(el => el.innerHTML = "")
+    document.querySelectorAll("td .userId").forEach(el => (el.innerHTML = ""));
+    this.setState({ clone: true });
+    const todos = [...clonedTodos];
+    this.setState({ todos });
   };
-  cloneDate = (clonedDate)=>this.setState({clonedDate})
+  cloneDate = clonedDate => this.setState({ clonedDate });
   //! for new todo
   handleClick = () => {
     const newTodo = {
@@ -142,16 +156,46 @@ class index extends Component {
       stuckTimer: ""
     };
     this.setState({ todos: [...this.state.todos, newTodo] });
+    this.setState({group: {...this.state.group,New: [newTodo]}});
+    setTimeout(()=>console.log(this.state.group),1000)
   };
 
+  showTables = () => {
+    const dates = Object.keys(this.state.group);
+    const todos = Object.values(this.state.group);
+    return dates.map((el,i) => {
+      return <Collapsible key={i}
+        content={
+          <table className="w-full">
+            <thead>
+              <tr>
+                <th width="35%" className="text-purple-600 text-xl text-left">Tasks</th>
+                <th>Team</th>
+                <th width="15%">Status</th>
+                <th width="25%">Timeline</th>
+                <th>Time Tracking</th>
+                <th>Tools</th>
+              </tr>
+            </thead>
+            <tbody ref="tbody">{this.showTodos(todos[i])}</tbody>
+          </table>
+        }
+        i={i}
+        active={todos[i][0].state === "Add" ? true : false}
+        date={el}
+      />
+    });
+  };
   //! for rendering all todos
-  showTodos = () => {
-    return this.state.todos.map((el, i) => {
+  showTodos = (todos) => {
+    return todos.map((el, i) => {
       let date;
       if (el.date) {
         let dateArray = new Date(
           el.date + new Date().getTimezoneOffset() * 60 * 1000
-        ).toLocaleDateString().split("/");
+        )
+          .toLocaleDateString()
+          .split("/");
         date = [
           dateArray[2],
           dateArray[0] >= 10 ? dateArray[0] : "0" + dateArray[0],
@@ -162,7 +206,7 @@ class index extends Component {
         comment => el.id === comment.todoId
       );
       const commentsLength = comments.length;
-      const commentReads = comments.map(el=>el.read)
+      const commentReads = comments.map(el => el.read);
       const user = this.state.users.find(user => user.id === el.userId) || {};
       const userId = user.id || "";
       return (
@@ -181,9 +225,9 @@ class index extends Component {
           endTime={el.endTime}
           userId={userId}
           userImg={user.url || Img}
-          userName = {user.name}
+          userName={user.name}
           clone={el.clone || undefined}
-          cloneDate= {this.cloneDate}
+          cloneDate={this.cloneDate}
           commentReads={commentReads}
         />
       );
@@ -273,53 +317,56 @@ class index extends Component {
             Clone
           </button>
         </div>
-        <table className="w-full">
-          <thead>
-            <tr>
-              <th width="35%" className="text-purple-600 text-xl text-left">
-                Tasks
-              </th>
-              <th>Team</th>
-              <th width="15%">Status</th>
-              <th width="25%">Timeline</th>
-              <th>Time Tracking</th>
-              <th>Tools</th>
-            </tr>
-          </thead>
-          <tbody ref="tbody">{this.showTodos()}</tbody>
-        </table>
+        {this.showTables()}
         <div className="flex justify-end mb-4">
-          {}
-          {this.state.clone ? <button onClick={()=> window.location.reload()} className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8">
-            Go Back
-          </button> : <Link className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8" to="/"
-          >
-            Go Back
-          </Link>}
-          {this.state.clone ? <button onClick={() => {
-            const getArray = (value)=> Array.from(document.querySelectorAll(value));
-            const titles = getArray("td .title");
-            const userIds = getArray("td .userId");
-            const statuses = getArray('td .status');
-            const dates = getArray('td input[type="date"]');
-            const isDatePresent = dates.find(el=> el.value === "")
-            const newTodos = titles.map((el,i)=>{
-              return {title: el.textContent,
-                userId: userIds[i].textContent,
-                status: statuses[i].textContent,
-                date: new Date(dates[i].value).getTime()
-              }
-            });
-            const isUserPresent = newTodos.find(el=> el.userId === "");
-            if(isUserPresent) return alert('Please Select All Users');
-            if(isDatePresent) return alert('Please Select All Dates');
-            newTodos.forEach(todo=>{
-              db.collection('todos').add(todo)
-            })
-            this.deleteAll(this.state.todoIds)
-          }} className="rounded px-4 py-2 text-center bg-green-600 border border-purple-600 ml-3 text-white cursor-pointer justify-between outline-none mt-8">
-            Clone All
-          </button> : ""}
+          {this.state.clone ? (
+            <button
+              onClick={() => window.location.reload()}
+              className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
+            >
+              Go Back
+            </button>
+          ) : (
+            <Link
+              className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
+              to="/"
+            >
+              Go Back
+            </Link>
+          )}
+          {this.state.clone ? (
+            <button
+              onClick={() => {
+                const getArray = value =>
+                  Array.from(document.querySelectorAll(value));
+                const titles = getArray("td .title");
+                const userIds = getArray("td .userId");
+                const statuses = getArray("td .status");
+                const dates = getArray('td input[type="date"]');
+                const isDatePresent = dates.find(el => el.value === "");
+                const newTodos = titles.map((el, i) => {
+                  return {
+                    title: el.textContent,
+                    userId: userIds[i].textContent,
+                    status: statuses[i].textContent,
+                    date: new Date(dates[i].value).getTime()
+                  };
+                });
+                const isUserPresent = newTodos.find(el => el.userId === "");
+                if (isUserPresent) return alert("Please Select All Users");
+                if (isDatePresent) return alert("Please Select All Dates");
+                newTodos.forEach(todo => {
+                  db.collection("todos").add(todo);
+                });
+                this.deleteAll(this.state.todoIds);
+              }}
+              className="rounded px-4 py-2 text-center bg-green-600 border border-purple-600 ml-3 text-white cursor-pointer justify-between outline-none mt-8"
+            >
+              Clone All
+            </button>
+          ) : (
+            ""
+          )}
         </div>
       </div>
     );

@@ -25,14 +25,12 @@ import All_tasks from "./components/Admin_Panel/Table/AllTasks";
 
 //contexts
 import AuthContextProvider from "./context/AuthContext";
-import DataContextProvider from "./context/DataContext";
 //css
 import "./App.css";
 
 class App extends Component {
   render() {
     return (
-      <DataContextProvider>
         <AuthContextProvider>
           <BrowserRouter>
             <div>
@@ -65,7 +63,6 @@ class App extends Component {
             </div>
           </BrowserRouter>
         </AuthContextProvider>
-      </DataContextProvider>
     );
   }
 }
