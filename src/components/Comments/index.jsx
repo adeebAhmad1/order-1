@@ -49,7 +49,10 @@ class Comments extends Component {
         })
         .then(docRef => {
           this.setState({ content: "" });
-          this.props.history.goBack();
+          this.refs.popup.style.right = "-100%"
+          setTimeout(() => {
+            this.props.history.goBack();
+          }, 800);
         })
         .catch(error => {
           console.error("Error adding document: ", error);
@@ -58,21 +61,6 @@ class Comments extends Component {
   };
 
   statusLog = () => {
-    // let time = this.state.todo.time;
-    // let ms = 0;
-    // if (time) {
-    //   ms =
-    //     Number(time.split(":")[0]) * 60 * 60 * 1000 +
-    //     Number(time.split(":")[1]) * 60 * 1000 +
-    //     Number(time.split(":")[2]) * 1000;
-    // }
-    // let newTime = workingOnIt + ms;
-    // if (newTime > workingOnIt) {
-    //   workingOnIt = newTime;
-    // }
-    // if (newTime > stuckTimer) {
-    //   stuckTimer = newTime;
-    // }
     let workingOnIt = this.state.todo.timer;
     let stuckTimer = this.state.todo.stuckTimer;
     let endTime = this.state.todo.endTime;

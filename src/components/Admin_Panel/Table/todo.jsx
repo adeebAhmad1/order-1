@@ -206,18 +206,12 @@ class Todo extends Component {
     } else {
       timer = new Date().getTime();
     }
-    if (this.props.arrI === 1 && this.props.status !== "Done")
-      console.log(timer, this.props.status);
     this.setState({ iTimes: 1 });
     setInterval(() => {
       const now = this.state.endTime
         ? this.state.endTime
         : new Date().getTime();
-      if (this.props.arrI === 1 && this.props.status !== "Done")
-        console.log(now, this.state.endTime);
       const remainingTime = now - timer;
-      if (this.props.arrI === 1 && this.props.status !== "Done")
-        console.log(remainingTime);
 
       const seconds = Math.floor(remainingTime / 1000);
       const mins = Math.floor(seconds / 60);
@@ -265,7 +259,6 @@ class Todo extends Component {
     all_dropdowns.forEach(el=>{
       el.style.display = "none";
       el.classList.remove("block")
-      console.log(el)
     })
     status_priority_dropdown[id].classList.toggle("block");
     const status_priority_wrapper = document.querySelector(
@@ -493,7 +486,7 @@ class Todo extends Component {
             />
           </span>
         </td>
-        <td className="text-gray-600 " ref="timer">
+        <td className="text-gray-600 timer" ref="timer">
           {" "}
           {this.state.time}{" "}
         </td>
