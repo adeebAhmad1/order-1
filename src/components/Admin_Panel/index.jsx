@@ -118,7 +118,8 @@ class index extends Component {
   //? For Cloning the Existing Todos
   cloneAll = () => {
     //* Clone All Todo
-    const clonedTodos = this.state.todos.map(el => {
+    const datedTodos = Object.values(this.state.group);
+    const clonedTodos = datedTodos[0].map(el => {
       el.status = "Not Started";
       el.timer = 0;
       el.endTime = 1;
@@ -128,15 +129,15 @@ class index extends Component {
       el.clone = true;
       return el;
     });
-    document.querySelectorAll(`input[type="date"]`).forEach(el => {
+    document.querySelector("#panel-0").querySelectorAll(`input[type="date"]`).forEach(el => {
       el.value = "";
       el.addEventListener("change", () => {
-        document.querySelectorAll(`input[type="date"]`).forEach(el2 => {
+        document.querySelector("#panel-0").querySelectorAll(`input[type="date"]`).forEach(el2 => {
           el2.value = el.value;
         });
       });
     });
-    document.querySelectorAll("td .userId").forEach(el => (el.innerHTML = ""));
+    document.querySelector("#panel-0").querySelectorAll("td .userId").forEach(el => (el.innerHTML = ""));
     this.setState({ clone: true });
     const todos = [...clonedTodos];
     this.setState({ todos });
@@ -158,8 +159,8 @@ class index extends Component {
       timer: "",
       stuckTimer: ""
     };
-    this.setState({ todos: [newTodo ,...this.state.todos ],add: true });
-    this.setState({ group: { New: [newTodo] , ...this.state.group } });
+    this.setState({ todos: [ ...this.state.todos , newTodo ],add: true });
+    this.setState({ group: { ...this.state.group , New: [newTodo] } });
   };
 
   showTables = () => {
@@ -354,8 +355,7 @@ class index extends Component {
           {this.state.clone ? (
             <button
               onClick={() => {
-                const getArray = value =>
-                  Array.from(document.querySelectorAll(value));
+                const getArray = value => Array.from(document.querySelector("#panel-0").querySelectorAll(value));
                 const titles = getArray("td .title");
                 const userIds = getArray("td .userId");
                 const statuses = getArray("td .status");
@@ -375,7 +375,9 @@ class index extends Component {
                 newTodos.forEach(todo => {
                   db.collection("todos").add(todo);
                 });
-                this.deleteAll(this.state.todoIds);
+                const ids = Object.values(this.state.group)[0].map(el=>el.id);
+                console.log(ids)
+                this.deleteAll(ids);
               }}
               className="rounded px-4 py-2 text-center bg-green-600 border border-purple-600 ml-3 text-white cursor-pointer justify-between outline-none mt-8"
             >
