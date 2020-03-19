@@ -138,7 +138,7 @@ class Todo extends Component {
     }, 1000);
   };
   //status dropdown
-  handleDropdown = (id,arrI) => {
+  handleDropdown = (id, arrI) => {
     const status_priority_dropdown = document.querySelectorAll(
       `#panel-${arrI} .status_priority_wrapper > .status_priority_dropdown`
     );
@@ -188,13 +188,15 @@ class Todo extends Component {
             this.refs.status.innerText = "Working on it";
             status_priority_wrapper.style.backgroundColor = "#d69e2e";
             this.updateTime();
+            let time = this.state.time;
             const timer = this.props.timer
               ? this.props.timer
               : new Date().getTime();
             db.collection("todos")
               .doc(this.props.todoId)
               .update({
-                timer
+                timer,
+                time
               })
               .then(() => window.location.reload());
           } else if (this.state.status === "Not Started") {
@@ -263,7 +265,7 @@ class Todo extends Component {
         <td
           ref="status_wrapper"
           className={`bg-green-500 text-white relative cursor-pointer status_priority_wrapper status_priority_wrapper${this.props.index}`}
-          onClick={() => this.handleDropdown(this.props.index,this.props.arrI)}
+          onClick={() => this.handleDropdown(this.props.index, this.props.arrI)}
         >
           <p ref="status" id="dropdown1">
             {this.props.status}

@@ -190,15 +190,18 @@ class Todo extends Component {
     } else {
       timer = new Date().getTime();
     }
-    if(this.props.arrI === 1 && this.props.status !== "Done") console.log(timer,this.props.status);
+    if (this.props.arrI === 1 && this.props.status !== "Done")
+      console.log(timer, this.props.status);
     this.setState({ iTimes: 1 });
     setInterval(() => {
       const now = this.state.endTime
         ? this.state.endTime
         : new Date().getTime();
-      if(this.props.arrI === 1 && this.props.status !== "Done") console.log(now,this.state.endTime);
+      if (this.props.arrI === 1 && this.props.status !== "Done")
+        console.log(now, this.state.endTime);
       const remainingTime = now - timer;
-      if(this.props.arrI === 1 && this.props.status !== "Done") console.log(remainingTime);
+      if (this.props.arrI === 1 && this.props.status !== "Done")
+        console.log(remainingTime);
 
       const seconds = Math.floor(remainingTime / 1000);
       const mins = Math.floor(seconds / 60);
@@ -236,7 +239,7 @@ class Todo extends Component {
   };
 
   //! status dropdown
-  handleDropdown = (id,arrI) => {
+  handleDropdown = (id, arrI) => {
     const status_priority_dropdown = document.querySelectorAll(
       `#panel-${arrI} .status_priority_wrapper > .status_priority_dropdown`
     );
@@ -288,19 +291,19 @@ class Todo extends Component {
             this.refs.status.innerText = "Working on it";
             status_priority_wrapper.style.backgroundColor = "#F7AE3C";
             this.updateTime();
-            let time = this.state.time
+            let time = this.state.time;
             const timer = this.props.timer
               ? this.props.timer
               : new Date().getTime();
             db.collection("todos")
               .doc(this.props.todoId)
               .update({
-                timer,time
+                timer,
+                time
               })
               .then(() => {
                 window.location.reload();
               });
-            
           } else if (text === "Not Started") {
             this.refs.status.innerText = "Not Started";
             status_priority_wrapper.style.backgroundColor = "royalblue";
@@ -395,7 +398,9 @@ class Todo extends Component {
           </div>
           <ul
             ref="dropdown"
-            className={ `absolute top-0 mt-12 shadow-xl -mr-2 left-0 w-48 bg-white dropdown z-50 capitalize hidden status_priority_dropdown rounded-lg dropdown0 ${this.props.state === "Add" || this.props.clone ? "" : "invisible"}`}
+            className={`absolute top-0 mt-12 shadow-xl -mr-2 left-0 w-48 bg-white dropdown z-50 capitalize hidden status_priority_dropdown rounded-lg dropdown0 ${
+              this.props.state === "Add" || this.props.clone ? "" : "invisible"
+            }`}
             style={{ width: `17.5rem` }}
           >
             {this.showUsers()}
@@ -405,7 +410,7 @@ class Todo extends Component {
           ref="status1"
           style={{ backgroundColor: "#599EF1" }}
           className={`text-white relative cursor-pointer status_priority_wrapper status_priority_wrapper${this.props.index}`}
-          onClick={() => this.handleDropdown(this.props.index,this.props.arrI)}
+          onClick={() => this.handleDropdown(this.props.index, this.props.arrI)}
         >
           <p ref="status" className="status" id="dropdown1">
             {this.props.status}
@@ -426,7 +431,7 @@ class Todo extends Component {
             ) : (
               ""
             )}
-           
+
             {this.state.status === "Working on it" ? (
               ""
             ) : (
@@ -443,7 +448,7 @@ class Todo extends Component {
                 <p>Stuck</p>
               </li>
             )}
-             <li className="select1 border-b border-gray-300 text-green-600 py-2 flex flex-start items-center px-4">
+            <li className="select1 border-b border-gray-300 text-green-600 py-2 flex flex-start items-center px-4">
               <span className="w-4 h-4 rounded-full bg-green-600 block mr-3"></span>
               <p>Done</p>
             </li>

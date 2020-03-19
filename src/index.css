@@ -137,7 +137,7 @@ table .dropdown0::before {
   font-size: 13px;
   transition: 0.4s;
   outline: none !important;
-  margin-top: 20px;
+  margin-top: 10px;
   border-radius: 10px;
 }
 

@@ -1,68 +1,37 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+{*****last******
+6.“Clone” button should be modified to only clone within a Timeline Date and “Delete All” button should delete all tasks Regardless of Timeline date.
+Cloning functionality needs to be updated so that previous employee image, Status, Comments, Timeline and Time Tracking NO LONGER get deleted.
+When cloning, previous Timeline date and all its data get grouped collapsed bellow. When Admin enters the new single Timeline date that will apply to ALL “Timeline”, it will keeps all task names, puts gray default employee images for all the Team so admin can select each of them, RESET all comments, RESET all time tracking, and all new task status should be Not Started.
+*****last******}
 
-## Available Scripts
+{*****done*****
+BUG1: Fix when status is selected from “Working on It” to Working on it”.
+BUG2: Time log does not get logged both time when “Working on it” status gets logged more than once. Example: Working on it, Stuck, Working on it, Done.
+BUG3: When selecting a user for comments, drop down should appear when you click on gray image and not when you hover over mouse.
+BUG4: After Admin logs in and tasks have been assigned, nothing should happen when Admin clicks on Team picture or Timeline UNLESS Cloning.
 
-In the project directory, you can run:
+1. Same grid size and font size as Monday.com so it displays more tasks within a page without having to scroll down.
+4. Status should be from top to bottom in this order: Not Started, Working on it, Stuck, Done.
+5. All tasks and data should be grouped by Timeline Date and collapsed below to keep a log for reference. They should be sorted by most recent on the top to oldest date at the bottom. Most current date should always be expanded by default instead of collapsed. All previous Timeline dates should be collapsed and display Total Items and comments.
+a.Also, collapse bar, should look exactly like monday.com.
+c.There should be a small separation between each date.(margin)
+f.Color of the collapse bar should be the same color as attachment.
+g.Tasks column should be the same color as attachment.
+h.White color around Team images should be same color as attachment.
+i.White color around blue Timeline should be same color as attachment.
+j.white color in Time Tracking column should be same color as attachment.
+*******done******}
 
-### `npm start`
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+{******now*******
 
-### `npm run build`
+e.When Admin clicks on "Add Task", add task section should be moved from the bottom of the page, to the top of the page. (SEE ATTACHMENT)
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+******now*******}
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify

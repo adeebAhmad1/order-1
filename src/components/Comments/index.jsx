@@ -60,10 +60,15 @@ class Comments extends Component {
   statusLog = () => {
     let workingOnIt = this.state.todo.timer;
     let time = this.state.todo.time;
-    let ms =
-      Number(time.split(":")[0]) * 60 * 60 * 1000 +
-      Number(time.split(":")[1]) * 60 * 1000 +
-      Number(time.split(":")[2]) * 1000;
+    let ms = 0;
+    console.log(time);
+    if (time) {
+      ms =
+        Number(time.split(":")[0]) * 60 * 60 * 1000 +
+        Number(time.split(":")[1]) * 60 * 1000 +
+        Number(time.split(":")[2]) * 1000;
+    }
+
     let newTime = workingOnIt + ms;
     if (newTime > workingOnIt) {
       workingOnIt = newTime;
@@ -71,7 +76,7 @@ class Comments extends Component {
     let endTime = this.state.todo.endTime;
     let stuckTimer = this.state.todo.stuckTimer;
     let timeOfDone = new Date(endTime).toLocaleTimeString();
-    let timeOfworking = new Date(workingOnIt).toLocaleTimeString();  
+    let timeOfworking = new Date(workingOnIt).toLocaleTimeString();
     let timeOfstuck = new Date(stuckTimer).toLocaleTimeString();
     if (this.refs.statusLog) {
       if (workingOnIt && endTime && stuckTimer) {
