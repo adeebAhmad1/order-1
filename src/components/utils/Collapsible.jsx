@@ -39,8 +39,8 @@ class Collapsible extends Component {
             className="absolute"
             style={{
               top: `50%`,
-              right: `10%`,
-              transform: `translate(10%,-50%)`
+              right: `5%`,
+              transform: `translate(5%,-50%)`
             }}
           >
             {this.props.length} Items &nbsp;

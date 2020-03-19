@@ -129,14 +129,16 @@ table .dropdown0::before {
   background-color: #eee;
   color: #444;
   cursor: pointer;
-  padding: 18px;
+  padding: 13px;
   width: 100%;
   border: none;
   text-align: left;
   outline: none;
-  font-size: 15px;
+  font-size: 13px;
   transition: 0.4s;
   outline: none !important;
+  margin-top: 20px;
+  border-radius: 10px;
 }
 
 .active, .accordion:hover {

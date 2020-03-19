@@ -48,7 +48,7 @@ class index extends Component {
         this.setState({ todos, todoIds: todos.map(el => el.id) });
         var group = {};
         this.state.todos.forEach(el => {
-          const date = new Date(el.date).toDateString();
+          const date = new Date(el.date + new Date().getTimezoneOffset()*60*1000).toDateString();
           if (date in group) {
             group[date].push(el);
           } else {

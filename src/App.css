@@ -636,10 +636,11 @@
   table, th, td {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
+    /* padding-top: 0.25rem;
+    padding-bottom: 0.25rem; */
     text-align: center;
-    height: 3rem;
+    height: 2rem;
+    font-size: 14px
   }
   
   th {
@@ -648,6 +649,7 @@
   }
   
   td {
+    height: 100%;
     border-width: 1px;
     border-collapse: collapse;
   }

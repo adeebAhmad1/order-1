@@ -198,6 +198,8 @@ class Todo extends Component {
         : new Date().getTime();
       if(this.props.arrI === 1 && this.props.status !== "Done") console.log(now,this.state.endTime);
       const remainingTime = now - timer;
+      if(this.props.arrI === 1 && this.props.status !== "Done") console.log(remainingTime);
+
       const seconds = Math.floor(remainingTime / 1000);
       const mins = Math.floor(seconds / 60);
       const remainingSeconds = seconds % 60;
@@ -235,7 +237,6 @@ class Todo extends Component {
 
   //! status dropdown
   handleDropdown = (id,arrI) => {
-    console.log(id,arrI)
     const status_priority_dropdown = document.querySelectorAll(
       `#panel-${arrI} .status_priority_wrapper > .status_priority_dropdown`
     );
@@ -325,7 +326,7 @@ class Todo extends Component {
   render() {
     const isRead = this.props.commentReads.find(el => el === false);
     return (
-      <tr className="bg-gray-100 border-b border-gray-100">
+      <tr className="bg-white border-b border-gray-100">
         <td
           className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container"
           ref="title"
@@ -383,7 +384,8 @@ class Todo extends Component {
             id="dropdown"
             className="h-full bg-cover rounded-full mx-auto"
             style={{
-              width: "40px",
+              width: "30px",
+              height: `30px`,
               backgroundPosition: `center`,
               backgroundImage: `url(${this.props.userImg})`
             }}
@@ -414,7 +416,7 @@ class Todo extends Component {
             style={{ backgroundColor: `#fff` }}
           >
             {this.state.status === "Not Started" ? (
-              <li className="select1 border-b border-gray-300 text-green-600 py-3 flex flex-start items-center px-4">
+              <li className="select1 border-b border-gray-300 text-green-600 py-2 flex flex-start items-center px-4">
                 <span
                   style={{ backgroundColor: "#599EFD" }}
                   className="w-4 h-4 rounded-full block mr-3"
@@ -428,7 +430,7 @@ class Todo extends Component {
             {this.state.status === "Working on it" ? (
               ""
             ) : (
-              <li className="select1 border-b border-gray-300 text-yellow-600 py-3 flex flex-start items-center px-4">
+              <li className="select1 border-b border-gray-300 text-yellow-600 py-2 flex flex-start items-center px-4">
                 <span className="w-4 h-4 rounded-full bg-yellow-600 block mr-3"></span>
                 <p>Working on it</p>
               </li>
@@ -436,19 +438,19 @@ class Todo extends Component {
             {this.state.status === "Stuck" ? (
               ""
             ) : (
-              <li className="select1 border-b border-gray-300 text-red-500 py-3 flex flex-start items-center px-4">
+              <li className="select1 border-b border-gray-300 text-red-500 py-2 flex flex-start items-center px-4">
                 <span className="w-4 h-4 rounded-full bg-red-500 block mr-3"></span>
                 <p>Stuck</p>
               </li>
             )}
-             <li className="select1 border-b border-gray-300 text-green-600 py-3 flex flex-start items-center px-4">
+             <li className="select1 border-b border-gray-300 text-green-600 py-2 flex flex-start items-center px-4">
               <span className="w-4 h-4 rounded-full bg-green-600 block mr-3"></span>
               <p>Done</p>
             </li>
           </ul>
         </td>
         <td>
-          <span className="block mx-auto rounded-full h-6 w-6/7  bg-blue-600 overflow-hidden relative">
+          <span className="block mx-auto rounded-full h-5 w-6/7  bg-blue-600 overflow-hidden relative">
             <div className="bg-blue-600 w-1/2 h-full z-10 relative"></div>
             <input
               type="date"

@@ -5,13 +5,15 @@ import { db } from "../../config/firebase";
 
 //components
 import Todo from "./todo";
+import Collapsible from "../utils/Collapsible";
 
 class Table extends Component {
   state = {
     users: [],
     todos: [],
     comments: [],
-    readComment: []
+    readComment: [],
+    group: {}
   };
 
   //! getting data from fatabase
@@ -26,9 +28,23 @@ class Table extends Component {
           todo.id = doc.id;
           todos.push(todo);
         });
-        this.setState({
-          todos
+        todos.sort((a, b) => {
+          return a.title.localeCompare(b.title);
         });
+        todos.sort((a, b) => {
+          return b.date - a.date;
+        });
+        this.setState({todos});
+        const group = {};
+        this.state.todos.forEach(el => {
+          const date = new Date(el.date + new Date().getTimezoneOffset()*60*1000).toDateString();
+          if (date in group) {
+            group[date].push(el);
+          } else {
+            group[date] = new Array(el);
+          }
+        });
+        this.setState({ group });
       });
 
     //! for users
@@ -63,15 +79,43 @@ class Table extends Component {
         });
       });
   };
+  
+  showTables = () => {
+    const dates = Object.keys(this.state.group);
+    const todos = Object.values(this.state.group);
+    return dates.map((el, i) => {
+      const length = todos[i].length;
+      return (
+        <Collapsible
+          length={length}
+          key={i}
+          content={
+            <table className="w-full">
+              <thead>
+                <tr>
+                  <th width="35%" className="text-purple-600 text-xl text-left">
+                    Tasks
+                  </th>
+                  <th>Team</th>
+                  <th width="15%">Status</th>
+                  <th width="25%">Timeline</th>
+                  <th>Time Tracking</th>
+                </tr>
+              </thead>
+              <tbody ref="tbody">{this.showTodos(todos[i],i)}</tbody>
+            </table>
+          }
+          i={i}
+          date={el}
+        />
+      );
+    });
+  };
+
 
   //! show todos from database
-  showTodos = () => {
-    //! for sorting
-    let sortedTodos = this.state.todos.sort((a, b) => {
-      return a.title.localeCompare(b.title);
-    });
-
-    return sortedTodos.map((el, i) => {
+  showTodos = (todos,arrayIndex) => {
+    return todos.map((el, i) => {
       if (this.state.users.length > 0) {
         const comments = this.state.comments.filter(comment => {
           return el.id === comment.todoId;
@@ -89,6 +133,7 @@ class Table extends Component {
             date={el.date}
             commentsLength={commentsLength}
             url={el.id}
+            arrI={arrayIndex}
             timer={el.timer}
             endTime={el.endTime ? el.endTime : ""}
             todoId={el.id}
@@ -104,22 +149,8 @@ class Table extends Component {
 
   render() {
     return (
-      <div>
-        {console.log(this.state.readComments)}
-        <table className="w-full">
-          <thead>
-            <tr>
-              <th width="35%" className="text-purple-600 text-xl text-left">
-                Tasks
-              </th>
-              <th>Team</th>
-              <th width="20%">Status</th>
-              <th width="25%">Timeline</th>
-              <th>Time Tracking</th>
-            </tr>
-          </thead>
-          <tbody>{this.showTodos()}</tbody>
-        </table>
+      <div style={{marginTop: `30px`}}>
+        {this.showTables()}
       </div>
     );
   }
