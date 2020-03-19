@@ -58,23 +58,24 @@ class Comments extends Component {
   };
 
   statusLog = () => {
+    // let time = this.state.todo.time;
+    // let ms = 0;
+    // if (time) {
+    //   ms =
+    //     Number(time.split(":")[0]) * 60 * 60 * 1000 +
+    //     Number(time.split(":")[1]) * 60 * 1000 +
+    //     Number(time.split(":")[2]) * 1000;
+    // }
+    // let newTime = workingOnIt + ms;
+    // if (newTime > workingOnIt) {
+    //   workingOnIt = newTime;
+    // }
+    // if (newTime > stuckTimer) {
+    //   stuckTimer = newTime;
+    // }
     let workingOnIt = this.state.todo.timer;
-    let time = this.state.todo.time;
-    let ms = 0;
-    console.log(time);
-    if (time) {
-      ms =
-        Number(time.split(":")[0]) * 60 * 60 * 1000 +
-        Number(time.split(":")[1]) * 60 * 1000 +
-        Number(time.split(":")[2]) * 1000;
-    }
-
-    let newTime = workingOnIt + ms;
-    if (newTime > workingOnIt) {
-      workingOnIt = newTime;
-    }
-    let endTime = this.state.todo.endTime;
     let stuckTimer = this.state.todo.stuckTimer;
+    let endTime = this.state.todo.endTime;
     let timeOfDone = new Date(endTime).toLocaleTimeString();
     let timeOfworking = new Date(workingOnIt).toLocaleTimeString();
     let timeOfstuck = new Date(stuckTimer).toLocaleTimeString();
@@ -92,7 +93,7 @@ class Comments extends Component {
       } else if (stuckTimer) {
         this.refs.statusLog.innerHTML += `<b>Stuck:</b> ${timeOfstuck}`;
       } else if (workingOnIt) {
-        this.refs.statusLog.innerHTML += `<b>Working on it:</b> : ${timeOfworking}`;
+        this.refs.statusLog.innerHTML += `<b>Working on it:</b>  ${timeOfworking}`;
       }
     }
   };
@@ -211,13 +212,15 @@ class Comments extends Component {
               {comment.content}
 
               {!comment.read ? (
-                <i
+                <i 
+                title="Click here to mark comment read"
                   onClick={() => this.Read(comment.id)}
                   style={{ float: "right" }}
                   className=" text-2xl text-black-500 fas fa-envelope "
                 ></i>
               ) : (
                 <i
+                title="Click here to mark comment unread"
                   onClick={() => this.unRead(comment.id)}
                   style={{ float: "right" }}
                   className="text-2xl text-white  fas fa-envelope-open "
@@ -284,7 +287,12 @@ class Comments extends Component {
           </div>
           <div className="flex justify-start mb-4">
             <i
-              onClick={this.props.history.goBack}
+              onClick={()=>{
+                this.refs.popup.style.right = "-100%"
+                setTimeout(() => {
+                  this.props.history.goBack()
+                }, 800);
+              }}
               className="fa fa-times text-lg cursor-pointer text-gray-700"
               aria-hidden="true"
               style={{ fontSize: "1.5em", zIndex: 100 }}

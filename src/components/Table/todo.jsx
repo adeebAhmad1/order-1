@@ -91,7 +91,18 @@ class Todo extends Component {
         });
         window.addEventListener("click", this.removeDropdown2);
         const user = users.find(el => el.id === this.props.userId) || {};
-        this.setState({ users, user });
+        this.setState({ users, user , status: this.props.status });
+        if (this.state.status === "Done") {
+          this.refs.status_wrapper.style.backgroundColor = "#03C977";
+          this.refs.dropdown1.classList.add("invisible");
+        } else if (this.state.status === "Stuck") {
+          this.refs.status_wrapper.style.backgroundColor = "#E1445B";
+        } else if (this.state.status === "Working on it") {
+          this.refs.status_wrapper.style.backgroundColor = "#F7AE3C";
+        } else if (this.state.status === "Not Started") {
+          this.refs.dropdown1.classList.remove("invisible");
+          this.refs.status_wrapper.style.backgroundColor = "#599EFD";
+        }
       });
   };
 
@@ -188,15 +199,14 @@ class Todo extends Component {
             this.refs.status.innerText = "Working on it";
             status_priority_wrapper.style.backgroundColor = "#d69e2e";
             this.updateTime();
-            let time = this.state.time;
+            // let time = this.state.time;
             const timer = this.props.timer
               ? this.props.timer
               : new Date().getTime();
             db.collection("todos")
               .doc(this.props.todoId)
               .update({
-                timer,
-                time
+                timer
               })
               .then(() => window.location.reload());
           } else if (this.state.status === "Not Started") {
@@ -213,11 +223,15 @@ class Todo extends Component {
   render() {
     const isRead = this.props.commentReads.find(el => el === false);
     return (
-      <tr className="bg-gray-100 border-b border-gray-100">
-        <td className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container">
+      <tr className="bg-gray-100 border-b border-gray-100" 
+      style={{backgroundColor:'#f5f6f8'}}
+      >
+        <td 
+          style={{backgroundColor:'#f5f6f8'}}
+        className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container">
           {this.props.title}
           <Link
-            to={`/admin_panel/comments/${this.props.url}`}
+            to={`/home/comments/${this.props.url}`}
             className="relative chat-wrapper cursor-pointer"
           >
             <i
@@ -255,8 +269,8 @@ class Todo extends Component {
           <div
             className="h-full bg-cover rounded-full mx-auto "
             style={{
-              width: "30px",
-              height: `30px`,
+              width: "35px",
+              height: `35px`,
               backgroundImage: `url(${this.state.user.url || img})`,
               backgroundPosition: `center`
             }}

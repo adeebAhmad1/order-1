@@ -20,6 +20,16 @@ g.Tasks column should be the same color as attachment.
 h.White color around Team images should be same color as attachment.
 i.White color around blue Timeline should be same color as attachment.
 j.white color in Time Tracking column should be same color as attachment.
+
+BUG5: ONLY when current status is “Working on it” “Working on it” time log, in comment has two colons::
+BUG6: Sometime when you click from Manage Tasks or Manage Team page “Go Back” button, all tasks turn Blue regardless of status name. Admin has to refresh for Status color to go back to normal. Same thing happens when Admin clicks on Sign Out button.
+BUG9: When employee click on comment, and keeps /admin_panel in URL it gives employee access to Admin page.
+BUG10: Background image shows admin buttons for employees when adding a comment.
+BUG7: Team images should be a bigger. There is a lot of space around the picture thatcould be used to maximize employee images.
+BUG8: Mouse cursor should change when you hover with your mouse over envelope image and should say “Click here to mark comment unread” or “Click here to mark comment read”.
+BUG11: When comment is added or when user clicks on the X, pop up should slide back and then exit.
+BUG12: When Admin clicks on “Add Task” and the clicks on “Go Back” button, it should redirect to /admin_panel
+BUG13: When you click on a Task Status and then click on a different Task Status, it keeps the previous task status option open.
 *******done******}
 
 
@@ -31,7 +41,6 @@ j.white color in Time Tracking column should be same color as attachment.
 e.When Admin clicks on "Add Task", add task section should be moved from the bottom of the page, to the top of the page. (SEE ATTACHMENT)
 
 ******now*******}
-
 
 
 

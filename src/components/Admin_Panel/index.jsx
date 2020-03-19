@@ -21,7 +21,8 @@ class index extends Component {
     clone: false,
     clonedDate: null,
     group: {},
-    isOpened: false
+    isOpened: false,
+    add: false
   };
 
   componentDidMount = () => {
@@ -48,7 +49,9 @@ class index extends Component {
         this.setState({ todos, todoIds: todos.map(el => el.id) });
         var group = {};
         this.state.todos.forEach(el => {
-          const date = new Date(el.date + new Date().getTimezoneOffset()*60*1000).toDateString();
+          const date = new Date(
+            el.date + new Date().getTimezoneOffset() * 60 * 1000
+          ).toDateString();
           if (date in group) {
             group[date].push(el);
           } else {
@@ -155,8 +158,8 @@ class index extends Component {
       timer: "",
       stuckTimer: ""
     };
-    this.setState({ todos: [...this.state.todos, newTodo] });
-    this.setState({ group: { ...this.state.group ,  New: [newTodo] } });
+    this.setState({ todos: [newTodo ,...this.state.todos ],add: true });
+    this.setState({ group: { New: [newTodo] , ...this.state.group } });
   };
 
   showTables = () => {
@@ -182,7 +185,7 @@ class index extends Component {
                   <th>Tools</th>
                 </tr>
               </thead>
-              <tbody ref="tbody">{this.showTodos(todos[i],i)}</tbody>
+              <tbody ref="tbody">{this.showTodos(todos[i], i)}</tbody>
             </table>
           }
           i={i}
@@ -193,7 +196,7 @@ class index extends Component {
     });
   };
   //! for rendering all todos
-  showTodos = (todos,arrI) => {
+  showTodos = (todos, arrI) => {
     return todos.map((el, i) => {
       let date;
       if (el.date) {
@@ -333,13 +336,20 @@ class index extends Component {
             >
               Go Back
             </button>
-          ) : (
-            <Link
-              className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
-              to="/"
-            >
-              Go Back
-            </Link>
+          ) :  (
+            this.state.add 
+            ?  <button
+            onClick={() => window.location.reload()}
+            className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
+          >
+            Go Back
+          </button> 
+            : <Link
+            className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
+            to="/"
+          >
+            Go Back
+          </Link>
           )}
           {this.state.clone ? (
             <button

@@ -121,8 +121,20 @@ class Todo extends Component {
         });
         this.setState({
           users,
-          userId: this.props.userId
+          userId: this.props.userId,
+          status: this.props.status
         });
+        if (this.state.status === "Done") {
+          this.refs.status1.style.backgroundColor = "#03C977";
+          this.refs.dropdown1.classList.add("invisible");
+        } else if (this.state.status === "Stuck") {
+          this.refs.status1.style.backgroundColor = "#E1445B";
+        } else if (this.state.status === "Working on it") {
+          this.refs.status1.style.backgroundColor = "#F7AE3C";
+        } else if (this.state.status === "Not Started") {
+          this.refs.dropdown1.classList.remove("invisible");
+          this.refs.status1.style.backgroundColor = "#599EFD";
+        }
         if (this.props.clone)
           this.setState({
             activeUser:
@@ -243,13 +255,15 @@ class Todo extends Component {
     const status_priority_dropdown = document.querySelectorAll(
       `#panel-${arrI} .status_priority_wrapper > .status_priority_dropdown`
     );
-    if (this.state.id !== id) {
-      for (let i = 0; i < status_priority_dropdown.length; i++) {
-        status_priority_dropdown[i].style.display = "none";
-      }
-    }
+    const all_dropdowns = document.querySelectorAll(
+      `.status_priority_wrapper > .status_priority_dropdown`
+    );
+    all_dropdowns.forEach(el=>{
+      el.style.display = "none";
+      el.classList.remove("block")
+      console.log(el)
+    })
     status_priority_dropdown[id].classList.toggle("block");
-
     const status_priority_wrapper = document.querySelector(
       `#panel-${arrI} .status_priority_wrapper${id}`
     );
@@ -275,6 +289,7 @@ class Todo extends Component {
           } else if (this.state.status === "Stuck") {
             this.refs.status.innerText = "Stuck";
             status_priority_wrapper.style.backgroundColor = "#E1445B";
+            // let time = this.state.time;
             this.updateTime();
             const stuckTimer = this.props.stuckTimer
               ? this.props.stuckTimer
@@ -291,15 +306,14 @@ class Todo extends Component {
             this.refs.status.innerText = "Working on it";
             status_priority_wrapper.style.backgroundColor = "#F7AE3C";
             this.updateTime();
-            let time = this.state.time;
+            // let time = this.state.time;
             const timer = this.props.timer
               ? this.props.timer
               : new Date().getTime();
             db.collection("todos")
               .doc(this.props.todoId)
               .update({
-                timer,
-                time
+                timer
               })
               .then(() => {
                 window.location.reload();
@@ -329,8 +343,11 @@ class Todo extends Component {
   render() {
     const isRead = this.props.commentReads.find(el => el === false);
     return (
-      <tr className="bg-white border-b border-gray-100">
+      <tr className="bg-white border-b border-gray-100"
+      style={{backgroundColor:'#f5f6f8'}}
+      >
         <td
+          style={{backgroundColor:'#f5f6f8'}}
           className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container"
           ref="title"
         >
@@ -387,8 +404,8 @@ class Todo extends Component {
             id="dropdown"
             className="h-full bg-cover rounded-full mx-auto"
             style={{
-              width: "30px",
-              height: `30px`,
+              width: "35px",
+              height: `35px`,
               backgroundPosition: `center`,
               backgroundImage: `url(${this.props.userImg})`
             }}
