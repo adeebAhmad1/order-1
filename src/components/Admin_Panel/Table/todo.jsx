@@ -127,10 +127,14 @@ class Todo extends Component {
         if (this.state.status === "Done") {
           this.refs.status1.style.backgroundColor = "#03C977";
           this.refs.dropdown1.classList.add("invisible");
+          this.updateTime();
+          this.stopTimer();
         } else if (this.state.status === "Stuck") {
+          if (this.state.iTimes === 0) this.updateTime();
           this.refs.status1.style.backgroundColor = "#E1445B";
         } else if (this.state.status === "Working on it") {
           this.refs.status1.style.backgroundColor = "#F7AE3C";
+          if (this.state.iTimes === 0) this.updateTime();
         } else if (this.state.status === "Not Started") {
           this.refs.dropdown1.classList.remove("invisible");
           this.refs.status1.style.backgroundColor = "#599EFD";
