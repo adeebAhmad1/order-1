@@ -8,7 +8,6 @@ const colorArray = [
   "#B34D4D",
   "#80B300",
   "#809900",
-  
   "#6680B3",
   "#66991A",
   "#CCFF1A",
@@ -38,9 +37,10 @@ const colorArray = [
   "#6666FF"
 ];
 class Collapsible extends Component {
-  state={
-    total: 0
-  }
+  state = {
+    total: 0,
+    stuck: 0
+  };
   componentDidMount() {
     this.refs.accordion.addEventListener("click", () => {
       const panel = this.refs.panel;
@@ -60,7 +60,15 @@ class Collapsible extends Component {
           .split(",")
           .join("+")
       );
-      this.setState({total})
+      this.setState({ total });
+    }, 500);
+    let stuck;
+    setInterval(() => {
+      const totalArr = Array.from(
+        document.querySelectorAll(`#panel-${this.props.i} .status`)
+      ).filter(el => el.textContent ==="Stuck");
+      stuck = totalArr.length;
+      this.setState({ stuck });
     }, 500);
   }
   render() {
@@ -82,11 +90,12 @@ class Collapsible extends Component {
             }}
           >
             {this.props.length} Items &nbsp;
-            {this.state.total} Comments
+            {this.state.total} Comments &nbsp;
+            {this.state.stuck} Stuck
           </div>
         </button>
         <div
-          className={`panel  ${this.props.active ? "activePanel" : ""}`}
+          className={`panel ${this.props.active ? "activePanel" : ""}`}
           ref="panel"
           id={`panel-${this.props.i}`}
         >

@@ -9,7 +9,6 @@ import Img from "../../images/no_image.jpg";
 //context
 import { AuthContext } from "../../context/AuthContext";
 import Collapsible from "../utils/Collapsible";
-import Login from "../Login";
 
 class Index extends Component {
   static contextType = AuthContext;
@@ -23,7 +22,52 @@ class Index extends Component {
     clonedDate: null,
     group: {},
     isOpened: false,
-    add: false
+    add: false,
+    activeUser: {}
+  };
+
+  //! for showing users in dropdown
+  showUsers = () => {
+    return this.state.users.map((user, i) => {
+      return (
+        <li
+          key={i}
+          onClick={this.onSelect}
+          className="border-b border-gray-300 text-green-600 h-12 flex flex-start items-center px-4 cursor-pointer"
+          data-userid={user.id}
+        >
+          <span
+            className=" rounded-full bg-cover block"
+            style={{
+              backgroundImage: `url(${user.url})`,
+              width: "30px",
+              height: "30px"
+            }}
+          ></span>
+          <p className="ml-3">{user.name}</p>
+        </li>
+      );
+    });
+  };
+
+  //! show dropdown for users
+  showDropdown = () => {
+    this.refs.dropdown.classList.toggle("block");
+  };
+  removeDropdown = e => {
+    if (e.target.id === "dropdown") return false;
+    if (this.refs.dropdown) this.refs.dropdown.classList.remove("block");
+  };
+  //! user select
+  onSelect = e => {
+    const userId =
+      e.target.dataset.userid ||
+      e.target.parentNode.dataset.userid ||
+      e.target.parentNode.parentNode.dataset.userid;
+    this.setState({ userId });
+    const user = this.state.users.find(el => el.id === userId);
+    this.setState({ activeUser: user });
+    this.refs.images.style.backgroundImage = `url(${user.url})`;
   };
 
   componentDidMount = () => {
@@ -90,9 +134,8 @@ class Index extends Component {
           user.id = doc.id;
           users.push(user);
         });
-        this.setState({
-          users
-        });
+        this.setState({ users });
+        window.addEventListener("click", this.removeDropdown);
       });
   };
 
@@ -123,15 +166,24 @@ class Index extends Component {
       el.clone = true;
       return el;
     });
-    document.querySelector("#panel-0").querySelectorAll(`input[type="date"]`).forEach(el => {
-      el.value = "";
-      el.addEventListener("change", () => {
-        document.querySelector("#panel-0").querySelectorAll(`input[type="date"]`).forEach(el2 => {
-          el2.value = el.value;
+    document
+      .querySelector("#panel-0")
+      .querySelectorAll(`input[type="date"]`)
+      .forEach(el => {
+        el.value = "";
+        el.addEventListener("change", () => {
+          document
+            .querySelector("#panel-0")
+            .querySelectorAll(`input[type="date"]`)
+            .forEach(el2 => {
+              el2.value = el.value;
+            });
         });
       });
-    });
-    document.querySelector("#panel-0").querySelectorAll("td .userId").forEach(el => (el.innerHTML = ""));
+    document
+      .querySelector("#panel-0")
+      .querySelectorAll("td .userId")
+      .forEach(el => (el.innerHTML = ""));
     this.setState({ clone: true });
     const todos = [...clonedTodos];
     this.setState({ todos });
@@ -139,6 +191,11 @@ class Index extends Component {
   cloneDate = clonedDate => this.setState({ clonedDate });
   //! for new todo
   handleClick = () => {
+    this.setState({
+      add: true
+    });
+  };
+  showNewTodo = () => {
     const newTodo = {
       title: (
         <select className="valuePicker" defaultValue="select">
@@ -153,10 +210,90 @@ class Index extends Component {
       timer: "",
       stuckTimer: ""
     };
-    this.setState({ todos: [ ...this.state.todos , newTodo ],add: true });
-    this.setState({ group: { ...this.state.group , New: [newTodo] } });
+    return (
+      <table className="w-full">
+        <thead>
+          <tr>
+            <th width="50%" className="text-purple-600 text-xl text-left">
+              Tasks
+            </th>
+            <th>Team</th>
+            <th width="15%">Status</th>
+            <th width="20%">Timeline</th>
+            <th width="15%">Time Tracking</th>
+            <th>Tools</th>
+          </tr>
+        </thead>
+        <tbody ref="tbody">
+          <tr
+            className="bg-white border-b border-gray-100"
+            style={{ backgroundColor: "#f5f6f8" }}
+          >
+            <td
+              style={{ backgroundColor: "#f5f6f8" }}
+              className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container"
+              ref="title"
+            >
+              {newTodo.title}
+            </td>
+            <td style={{ position: "relative" }}>
+              <div
+                ref="images"
+                readOnly
+                id="dropdown"
+                className="h-full bg-cover rounded-full mx-auto"
+                style={{
+                  width: "35px",
+                  height: `35px`,
+                  backgroundPosition: `center`,
+                  backgroundImage: `url(${Img})`
+                }}
+                onClick={this.showDropdown}
+              >
+                <div className="userId hidden">{this.state.activeUser.id}</div>
+              </div>
+              <ul
+                ref="dropdown"
+                className={`absolute top-0 mt-12 shadow-xl -mr-2 left-0 w-48 bg-white dropdown z-50 capitalize hidden status_priority_dropdown rounded-lg dropdown0`}
+                style={{ width: `17.5rem` }}
+              >
+                {this.showUsers()}
+              </ul>
+            </td>
+            <td
+              ref="status1"
+              style={{ backgroundColor: "#599EF1" }}
+              className={`text-white relative cursor-pointer status_priority_wrapper status_priority_wrapper${this.props.index}`}
+            >
+              <p ref="status" className="status" id="dropdown1">
+                {newTodo.status}
+              </p>
+            </td>
+            <td>
+              <span className="block mx-auto rounded-full h-5 w-6/7  bg-blue-600 overflow-hidden relative">
+                <div className="bg-blue-600 w-1/2 h-full z-10 relative"></div>
+                <input
+                  type="date"
+                  ref="date"
+                  className={`text-center text-white text-sm z-20 center bg-transparent calenderShow`}
+                  required
+                />
+              </span>
+            </td>
+            <td className="text-gray-600 timer" ref="timer"></td>
+            <td>
+              <button
+                onClick={this.add}
+                className="rounded px-4 py-2 text-center bg-red-800 text-white cursor-pointer ml-3 outline-none"
+              >
+                {newTodo.state}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
   };
-
   showTables = () => {
     const dates = Object.keys(this.state.group);
     const todos = Object.values(this.state.group);
@@ -190,6 +327,9 @@ class Index extends Component {
       );
     });
   };
+  componentWillUnmount() {
+    window.removeEventListener("click", this.removeDropdown);
+  }
   //! for rendering all todos
   showTodos = (todos, arrI) => {
     return todos.map((el, i) => {
@@ -238,7 +378,32 @@ class Index extends Component {
       );
     });
   };
-
+  add = () => {
+    let picker = document.querySelector(".valuePicker");
+    const title = picker.selectedOptions[0].innerText;
+    let status = this.refs.status.innerText;
+    let date = this.refs.date.value
+      ? new Date(this.refs.date.value).getTime()
+      : "";
+    const userId = this.state.userId;
+    if (date === "") {
+      this.refs.date.style.color = "red";
+    } else if (picker.selectedIndex === 0) {
+      picker.style.color = "red";
+      picker.selectedOptions[0].innerText = "Please Select a Task";
+    } else if (this.state.userId === "") {
+      return;
+    } else {
+      db.collection("todos")
+        .add({ title, userId, status, date })
+        .then(() => {
+          this.setState({todoId: 1});
+          window.location.reload();
+        }).catch(error => {
+          console.error("Error adding document: ", error);
+        });
+    }
+  };
   //!for deleting all todos
   deleteAll = todoIds => {
     todoIds.forEach(el => {
@@ -319,9 +484,19 @@ class Index extends Component {
             id="clone_all_btn"
             onClick={() => this.cloneAll(this.state.todoIds)}
           >
-            Clone
+            Clone All
           </button>
         </div>
+        {this.state.add ? (
+          <Collapsible
+            date="New Todo"
+            active={true}
+            i={-1}
+            content={this.showNewTodo()}
+          />
+        ) : (
+          ""
+        )}
         {this.showTables()}
         <div className="flex justify-end mb-4">
           {this.state.clone ? (
@@ -331,25 +506,28 @@ class Index extends Component {
             >
               Go Back
             </button>
-          ) :  (
-            this.state.add 
-            ?  <button
-            onClick={() => window.location.reload()}
-            className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
-          >
-            Go Back
-          </button> 
-            : <Link
-            className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
-            to="/"
-          >
-            Go Back
-          </Link>
+          ) : this.state.add ? (
+            <button
+              onClick={() => window.location.reload()}
+              className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
+            >
+              Go Back
+            </button>
+          ) : (
+            <Link
+              className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
+              to="/"
+            >
+              Go Back
+            </Link>
           )}
           {this.state.clone ? (
             <button
               onClick={() => {
-                const getArray = value => Array.from(document.querySelector("#panel-0").querySelectorAll(value));
+                const getArray = value =>
+                  Array.from(
+                    document.querySelector("#panel-0").querySelectorAll(value)
+                  );
                 const titles = getArray("td .title");
                 const userIds = getArray("td .userId");
                 const statuses = getArray("td .status");
@@ -367,14 +545,16 @@ class Index extends Component {
                 if (isUserPresent) return alert("Please Select All Users");
                 if (isDatePresent) return alert("Please Select All Dates");
                 newTodos.forEach(todo => {
-                  db.collection("todos").add(todo).then(()=>{
-                    window.location.reload()
-                  });
+                  db.collection("todos")
+                    .add(todo)
+                    .then(() => {
+                      window.location.reload();
+                    });
                 });
               }}
               className="rounded px-4 py-2 text-center bg-green-600 border border-purple-600 ml-3 text-white cursor-pointer justify-between outline-none mt-8"
             >
-              Clone All
+              Clone 
             </button>
           ) : (
             ""
@@ -387,15 +567,15 @@ class Index extends Component {
 
 class Table extends Component {
   static contextType = AuthContext;
-  componentDidMount(){
+  componentDidMount() {
     setTimeout(() => {
-      if(!this.context.isAuthenticated ){
-        this.props.history.push("/admin-login")
+      if (!this.context.isAuthenticated) {
+        this.props.history.push("/admin-login");
       }
-    }, 5000);
+    }, 7000);
   }
-  render(){
-    return this.context.isAuthenticated ? <Index /> : <div></div>
+  render() {
+    return this.context.isAuthenticated ? <Index /> : <div></div>;
   }
 }
 

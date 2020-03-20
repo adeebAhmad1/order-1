@@ -22,40 +22,7 @@ class Todo extends Component {
     let status = this.refs.status.innerText;
     db.collection("todos")
       .doc(todosId)
-      .update({
-        status
-      });
-  };
-
-  //! handle submit for adding todo
-  add = () => {
-    let picker = document.querySelector(".valuePicker");
-    const title = picker.selectedOptions[0].innerText;
-    let status = this.refs.status.innerText;
-    let date = this.refs.date.value
-      ? new Date(this.refs.date.value).getTime()
-      : "";
-    const userId = this.state.userId;
-    if (date === "") {
-      this.refs.date.style.color = "red";
-    } else if (picker.selectedIndex === 0) {
-      picker.style.color = "red";
-      picker.selectedOptions[0].innerText = "Please Select a Task";
-    } else if (this.state.userId === "") {
-      return;
-    } else {
-      db.collection("todos")
-        .add({ title, userId, status, date })
-        .then(docRef => {
-          this.setState({
-            todoId: 1
-          });
-          window.location.reload();
-        })
-        .catch(error => {
-          console.error("Error adding document: ", error);
-        });
-    }
+      .update({ status });
   };
 
   //! handle submit for deleting todo
@@ -229,6 +196,7 @@ class Todo extends Component {
       } else {
         this.setState({ time: `00:00:00` });
       }
+
       if (this.props.clone) {
         this.setState({ time: `` });
       }
@@ -256,10 +224,10 @@ class Todo extends Component {
     const all_dropdowns = document.querySelectorAll(
       `.status_priority_wrapper > .status_priority_dropdown`
     );
-    all_dropdowns.forEach(el=>{
+    all_dropdowns.forEach(el => {
       el.style.display = "none";
-      el.classList.remove("block")
-    })
+      el.classList.remove("block");
+    });
     status_priority_dropdown[id].classList.toggle("block");
     const status_priority_wrapper = document.querySelector(
       `#panel-${arrI} .status_priority_wrapper${id}`
@@ -286,7 +254,6 @@ class Todo extends Component {
           } else if (this.state.status === "Stuck") {
             this.refs.status.innerText = "Stuck";
             status_priority_wrapper.style.backgroundColor = "#E1445B";
-            // let time = this.state.time;
             this.updateTime();
             const stuckTimer = this.props.stuckTimer
               ? this.props.stuckTimer
@@ -340,11 +307,12 @@ class Todo extends Component {
   render() {
     const isRead = this.props.commentReads.find(el => el === false);
     return (
-      <tr className="bg-white border-b border-gray-100"
-      style={{backgroundColor:'#f5f6f8'}}
+      <tr
+        className="bg-white border-b border-gray-100"
+        style={{ backgroundColor: "#f5f6f8" }}
       >
         <td
-          style={{backgroundColor:'#f5f6f8'}}
+          style={{ backgroundColor: "#f5f6f8" }}
           className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container"
           ref="title"
         >
@@ -469,8 +437,16 @@ class Todo extends Component {
           </ul>
         </td>
         <td>
-          <span className="block mx-auto rounded-full h-5 w-6/7  bg-blue-600 overflow-hidden relative">
-            <div className="bg-blue-600 w-1/2 h-full z-10 relative"></div>
+          <span
+            style={{ backgroundColor: this.props.stuckTimer ? "#E1445B" : "" }}
+            className="block mx-auto rounded-full h-5 w-6/7  bg-blue-600 overflow-hidden relative"
+          >
+            <div
+              style={{
+                backgroundColor: this.props.stuckTimer ? "#E1445B" : ""
+              }}
+              className="bg-blue-600 w-1/2 h-full z-10 relative"
+            ></div>
             <input
               type="date"
               ref="date"
@@ -493,13 +469,7 @@ class Todo extends Component {
         <td>
           {!this.props.clone ? (
             <button
-              onClick={e => {
-                if (e.target.innerText === "Add") {
-                  this.add();
-                } else if (e.target.innerText === "Delete") {
-                  this.deleteOne(this.props.todoId);
-                }
-              }}
+              onClick={e => this.deleteOne(this.props.todoId)}
               className="rounded px-4 py-2 text-center bg-red-800 text-white cursor-pointer ml-3 outline-none"
             >
               {this.props.state}

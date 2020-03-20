@@ -34,7 +34,6 @@ class EditTask extends Component {
   handleSubmit = (taskId, e) => {
     e.preventDefault();
     let title = this.state.title;
-    console.log(title)
     db.collection("tasks")
       .doc(taskId)
       .update({
