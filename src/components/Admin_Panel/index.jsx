@@ -373,11 +373,10 @@ class index extends Component {
                 if (isUserPresent) return alert("Please Select All Users");
                 if (isDatePresent) return alert("Please Select All Dates");
                 newTodos.forEach(todo => {
-                  db.collection("todos").add(todo);
+                  db.collection("todos").add(todo).then(()=>{
+                    window.location.reload()
+                  });
                 });
-                const ids = Object.values(this.state.group)[0].map(el=>el.id);
-                console.log(ids)
-                this.deleteAll(ids);
               }}
               className="rounded px-4 py-2 text-center bg-green-600 border border-purple-600 ml-3 text-white cursor-pointer justify-between outline-none mt-8"
             >
