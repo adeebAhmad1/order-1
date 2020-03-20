@@ -93,12 +93,12 @@ class Table extends Component {
             <table className="w-full">
               <thead>
                 <tr>
-                  <th width="35%" className="text-purple-600 text-xl text-left">
+                  <th width="50%" className="text-purple-600 text-xl text-left">
                     Tasks
                   </th>
                   <th>Team</th>
                   <th width="15%">Status</th>
-                  <th width="25%">Timeline</th>
+                  <th width="20%">Timeline</th>
                   <th>Time Tracking</th>
                 </tr>
               </thead>

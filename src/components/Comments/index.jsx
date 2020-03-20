@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { db } from "../../config/firebase";
 import img from "../../images/no_image.jpg";
+
 class Comments extends Component {
   state = {
     comments: [],
@@ -49,7 +50,7 @@ class Comments extends Component {
         })
         .then(docRef => {
           this.setState({ content: "" });
-          this.refs.popup.style.right = "-100%"
+          this.refs.popup.style.right = "-100%";
           setTimeout(() => {
             this.props.history.goBack();
           }, 800);
@@ -184,37 +185,37 @@ class Comments extends Component {
       if (user) {
         return (
           <article
-            className="mt-10 p-1 pl-2 border border-gary-600 rounded-lg"
+            ref="comment1"
+            className="p-1 pl-2  border     bg-blue-200"
             key={i}
+            style={{ backgroundColor: comment.read ? "white" : "#ADD8E6" }}
           >
-            <div className="flex justify-between items-center">
-              <div className="flex text-gray-500 hover:text-purple-600">
-                <p className="ml-2 flex self-center ">{user.name}</p>
-              </div>
-              <p className="select appearance-none py-1 pl-6 pr-2 outline-none text-gray-500 cursor-pointer">
-                {new Date(comment.date).toLocaleTimeString()}{" "}
-                {new Date(comment.date).toDateString()}
-              </p>
-            </div>
-            <p className="text-base pt-1 pl-2">
+            <div className="text-base pt-1 pl-3">
               {comment.content}
-
               {!comment.read ? (
-                <i 
-                title="Click here to mark comment read"
+                <i
+                  title="Click here to mark comment read"
                   onClick={() => this.Read(comment.id)}
                   style={{ float: "right" }}
                   className=" text-2xl text-black-500 fas fa-envelope "
                 ></i>
               ) : (
                 <i
-                title="Click here to mark comment unread"
+                  title="Click here to mark comment unread"
                   onClick={() => this.unRead(comment.id)}
                   style={{ float: "right" }}
                   className="text-2xl text-white  fas fa-envelope-open "
                 ></i>
               )}
-            </p>
+              <p
+                className="ml-1 flex  text-gray-500 hover:text-purple-600"
+                style={{ color: "grey", fontSize: "12px" }}
+              >
+                Posted By {user.name} on{" "}
+                {new Date(comment.date).toLocaleTimeString()}{" "}
+                {new Date(comment.date).toDateString()}
+              </p>
+            </div>
             <span></span>
           </article>
         );
@@ -275,10 +276,10 @@ class Comments extends Component {
           </div>
           <div className="flex justify-start mb-4">
             <i
-              onClick={()=>{
-                this.refs.popup.style.right = "-100%"
+              onClick={() => {
+                this.refs.popup.style.right = "-100%";
                 setTimeout(() => {
-                  this.props.history.goBack()
+                  this.props.history.goBack();
                 }, 800);
               }}
               className="fa fa-times text-lg cursor-pointer text-gray-700"
@@ -287,9 +288,6 @@ class Comments extends Component {
             ></i>
           </div>
           <div className="mt-10 update-section" id="Update_section">
-            {/* <p className="text-purple-600 text-xl text-left capitalize mr-6 font-bold text-xl">
-              Posted By
-            </p> */}
             <div
               onClick={this.handleDropdown}
               className="flex text-gray-500x my-4 dropdown2"

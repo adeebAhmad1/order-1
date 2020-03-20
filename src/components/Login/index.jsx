@@ -2,9 +2,6 @@ import React, { Component } from "react";
 import firebase from "../../config/firebase";
 import { AuthContext } from "../../context/AuthContext";
 
-
-
-
 class Login extends Component {
   static contextType = AuthContext;
   state = {
@@ -16,23 +13,23 @@ class Login extends Component {
     this.setState({ [event.target.name]: event.target.value });
   };
   componentDidMount() {
-    firebase
-      .auth()
-      .signOut()
-      .then(() => {})
-      .catch(error => {
-      });
+    if (this.props.location) {
+      firebase
+        .auth()
+        .signOut()
+        .then(() => {})
+        .catch(error => {});
+    }
   }
   handleSubmit = e => {
     e.preventDefault();
 
     firebase
       .auth()
-      .signInWithEmailAndPassword(this.state.email, this.state.password).then( () => {
-        this.props.history.push('/admin_panel')
-      }
-
-      )
+      .signInWithEmailAndPassword(this.state.email, this.state.password)
+      .then(() => {
+        this.props.history.push("/admin_panel");
+      })
       .catch(error => {
         // Handle Errors here.
         // var errorCode = error.code;
@@ -50,7 +47,7 @@ class Login extends Component {
           <h1 className="text-lg text-purple-600 mb-12 text-center font-bold text-3xl">
             Login
           </h1>
-        
+
           <form onSubmit={this.handleSubmit}>
             <input
               className="shadow w-full text-md mb-6 p-3"
@@ -73,7 +70,8 @@ class Login extends Component {
             <button
               className="px-5 py-2 text-md bg-purple-600 text-white mr-0 ml-auto rounded-lg outline-none"
               id="login_btn"
-            >Submit
+            >
+              Submit
             </button>
           </form>
         </div>
