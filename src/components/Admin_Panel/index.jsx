@@ -32,21 +32,14 @@ class Index extends Component {
       .get()
       .then(querySnapshot => {
         let todos = [];
-        const todoIds = [];
         querySnapshot.forEach(doc => {
           let todo = doc.data();
           todo.id = doc.id;
-          todoIds.push(doc.id);
           todos.push(todo);
-
-          //! for sorting
         });
-        todos.sort((a, b) => {
-          return a.title.localeCompare(b.title);
-        });
-        todos.sort((a, b) => {
-          return b.date - a.date;
-        });
+        //! for sorting
+        todos.sort((a, b) => a.title.localeCompare(b.title));
+        todos.sort((a, b) => b.date - a.date);
         this.setState({ todos, todoIds: todos.map(el => el.id) });
         var group = {};
         this.state.todos.forEach(el => {
@@ -393,9 +386,16 @@ class Index extends Component {
 }
 
 class Table extends Component {
-  static contextType = AuthContext
+  static contextType = AuthContext;
+  componentDidMount(){
+    setTimeout(() => {
+      if(!this.context.isAuthenticated ){
+        this.props.history.push("/admin-login")
+      }
+    }, 3000);
+  }
   render(){
-    return this.context.isAuthenticated ? <Index /> : <Login />
+    return this.context.isAuthenticated ? <Index /> : <div></div>
   }
 }
 

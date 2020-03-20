@@ -71,6 +71,7 @@ class Todo extends Component {
       });
   };
   componentWillReceiveProps(props) {
+    console.log(props)
     this.forceUpdate();
     this.refs.status.textContent = props.status;
     var text = this.refs.status.textContent;
