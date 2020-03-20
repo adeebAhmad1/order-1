@@ -9,8 +9,9 @@ import Img from "../../images/no_image.jpg";
 //context
 import { AuthContext } from "../../context/AuthContext";
 import Collapsible from "../utils/Collapsible";
+import Login from "../Login";
 
-class index extends Component {
+class Index extends Component {
   static contextType = AuthContext;
   state = {
     todos: [],
@@ -391,4 +392,11 @@ class index extends Component {
   }
 }
 
-export default index;
+class Table extends Component {
+  static contextType = AuthContext
+  render(){
+    return this.context.isAuthenticated ? <Index /> : <Login />
+  }
+}
+
+export default Table;
