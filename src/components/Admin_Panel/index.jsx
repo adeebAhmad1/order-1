@@ -392,7 +392,7 @@ class Table extends Component {
       if(!this.context.isAuthenticated ){
         this.props.history.push("/admin-login")
       }
-    }, 3000);
+    }, 5000);
   }
   render(){
     return this.context.isAuthenticated ? <Index /> : <div></div>
