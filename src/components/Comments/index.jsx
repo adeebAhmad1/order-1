@@ -89,6 +89,8 @@ class Comments extends Component {
 
   Read = commentId => {
     let read = true;
+    // this.refs.comment1.classList.remove("bg-blue-200");
+    // this.refs.comment1.classList.add("bg-white");
     db.collection("comments")
       .doc(commentId)
       .update({
@@ -96,6 +98,8 @@ class Comments extends Component {
       });
   };
   unRead = commentId => {
+    // this.refs.comment1.classList.add("bg-blue-200");
+    // this.refs.comment1.classList.remove("bg-white");
     let read = false;
     db.collection("comments")
       .doc(commentId)

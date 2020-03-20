@@ -36,13 +36,13 @@ class App extends Component {
         <BrowserRouter>
           <div>
             <Header />
-            <Route exact path="/" component={Home} />
+            <Route exact path="/" component={Home}  />
             <Route path="/home" component={Home} />
             <Route path="/home/comments/:commentId" component={Comments} />
 
             <Route exact path="/admin-login" component={Login} />
             <Route exact path="/admin_forgot" component={Forgot} />
-            <Route path="/admin_panel" component={Admin_Panel} />
+            <Route path="/admin_panel" component={Admin_Panel}  />
             <Route
               path="/admin_panel/comments/:commentId"
               component={Comments}

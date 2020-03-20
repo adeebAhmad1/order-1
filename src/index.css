@@ -126,7 +126,7 @@ table .dropdown0::before {
 }
 
 .accordion {
-  background-color: #eee;
+  background-color: #f5f6f8;
   color: #444;
   cursor: pointer;
   padding: 13px;
@@ -142,7 +142,7 @@ table .dropdown0::before {
 }
 
 .active, .accordion:hover {
-  background-color: #ccc;
+  background-color: #f5f6f8;
 }
 
 .activePanel{
