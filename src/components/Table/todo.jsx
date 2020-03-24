@@ -91,7 +91,7 @@ class Todo extends Component {
         });
         window.addEventListener("click", this.removeDropdown2);
         const user = users.find(el => el.id === this.props.userId) || {};
-        this.setState({ users, user , status: this.props.status });
+        this.setState({ users, user, status: this.props.status });
         if (this.state.status === "Done") {
           this.refs.status_wrapper.style.backgroundColor = "#03C977";
           this.refs.dropdown1.classList.add("invisible");
@@ -114,16 +114,16 @@ class Todo extends Component {
     let timer;
     if (this.props.timer) {
       if (this.props.stuckTimer) {
-        if (this.props.stuckTimer > this.props.timer) {
-          timer = this.props.timer;
-        } else if (this.props.stuckTimer < this.props.timer) {
-          timer = this.props.stuckTimer;
+        if (this.props.stuckTimer[0] > this.props.timer[0]) {
+          timer = this.props.timer[0];
+        } else if (this.props.stuckTimer[0] < this.props.timer[0]) {
+          timer = this.props.stuckTimer[0];
         }
       } else {
-        timer = this.props.timer;
+        timer = this.props.timer[0];
       }
     } else if (this.props.stuckTimer) {
-      timer = this.props.stuckTimer;
+      timer = this.props.stuckTimer[0];
     } else {
       timer = new Date().getTime();
     }
@@ -187,9 +187,16 @@ class Todo extends Component {
             this.refs.status.innerText = "Stuck";
             status_priority_wrapper.style.backgroundColor = "#E1445B";
             this.updateTime();
-            const stuckTimer = this.props.stuckTimer
-              ? this.props.stuckTimer
-              : new Date().getTime();
+            let stuckTimer;
+            if (this.props.stuckTimer) {
+              if (this.props.stuckTimer.length > 0) {
+                stuckTimer = [...this.props.stuckTimer, new Date().getTime()];
+              } else {
+                stuckTimer = [new Date().getTime()];
+              }
+            } else {
+              stuckTimer = [new Date().getTime()];
+            }
             db.collection("todos")
               .doc(this.props.todoId)
               .update({
@@ -202,10 +209,16 @@ class Todo extends Component {
             this.refs.status.innerText = "Working on it";
             status_priority_wrapper.style.backgroundColor = "#d69e2e";
             this.updateTime();
-            // let time = this.state.time;
-            const timer = this.props.timer
-              ? this.props.timer
-              : new Date().getTime();
+            let timer;
+            if (this.props.timer) {
+              if (this.props.timer.length > 0) {
+                timer = [...this.props.timer, new Date().getTime()];
+              } else {
+                timer = [new Date().getTime()];
+              }
+            } else {
+              timer = [new Date().getTime()];
+            }
             db.collection("todos")
               .doc(this.props.todoId)
               .update({
@@ -226,12 +239,14 @@ class Todo extends Component {
   render() {
     const isRead = this.props.commentReads.find(el => el === false);
     return (
-      <tr className="bg-gray-100 border-b border-gray-100" 
-      style={{backgroundColor:'#f5f6f8'}}
+      <tr
+        className="bg-gray-100 border-b border-gray-100"
+        style={{ backgroundColor: "#f5f6f8" }}
       >
-        <td 
-          style={{backgroundColor:'#f5f6f8'}}
-        className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container">
+        <td
+          style={{ backgroundColor: "#f5f6f8" }}
+          className="bg-gray-300 text-purple-600 flex border-0 border-b-1 border-purple-600 border-l-8 flex justify-between items-center chat-container"
+        >
           {this.props.title}
           <Link
             to={`/home/comments/${this.props.url}`}
@@ -284,7 +299,7 @@ class Todo extends Component {
           className={`bg-green-500 text-white relative cursor-pointer status_priority_wrapper status_priority_wrapper${this.props.index}`}
           onClick={() => this.handleDropdown(this.props.index, this.props.arrI)}
         >
-          <p ref="status" id="dropdown1">
+          <p ref="status" id="dropdown1" className="status">
             {this.props.status}
           </p>
           <ul
@@ -327,10 +342,19 @@ class Todo extends Component {
         </td>
         <td>
           <span
-            className="block mx-auto rounded-full h-5 w-6/7  bg-blue-600 overflow-hidden relative"
-            style={{ zIndex: 0 }}
+            style={{
+              zIndex: 0,
+              backgroundColor: this.props.stuckTimer ? "#E1445B" : ""
+            }}
+            className="block mx-auto rounded-full h-5 w-6/7  bg-blue-600 overflow-hidden relative timeline"
           >
-            <div className="bg-blue-600 w-1/2 h-full z-10 relative"></div>
+            <div
+              style={{
+                backgroundColor: this.props.stuckTimer ? "#E1445B" : ""
+              }}
+              className="bg-blue-600 w-1/2 h-full z-10 relative"
+            ></div>
+            {console.log(this.props.stuckTimer)}
             <input
               readOnly
               ref="date"

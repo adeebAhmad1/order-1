@@ -139,6 +139,7 @@ class Table extends Component {
             todoId={el.id}
             userId={userId}
             commentReads={commentReads}
+            stuckTimer={el.stuckTimer}
           />
         );
       } else {

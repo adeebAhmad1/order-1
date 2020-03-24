@@ -46,8 +46,10 @@ class Collapsible extends Component {
       const panel = this.refs.panel;
       panel.classList.toggle("activePanel");
     });
-    if (this.refs.accordion.textContent !== "New") {
-      document.querySelector("#panel-0").classList.add("activePanel");
+    if(document.querySelector("#panel-0")){
+      if (this.refs.accordion.textContent !== "New") {
+        document.querySelector("#panel-0").classList.add("activePanel");
+      }
     }
     let total;
     setInterval(() => {
@@ -65,8 +67,8 @@ class Collapsible extends Component {
     let stuck;
     setInterval(() => {
       const totalArr = Array.from(
-        document.querySelectorAll(`#panel-${this.props.i} .status`)
-      ).filter(el => el.textContent ==="Stuck");
+        document.querySelectorAll(`#panel-${this.props.i} .timeline`)
+      ).filter(el => el.style.backgroundColor === "rgb(225, 68, 91)")
       stuck = totalArr.length;
       this.setState({ stuck });
     }, 500);

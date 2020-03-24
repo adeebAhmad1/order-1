@@ -62,29 +62,61 @@ class Comments extends Component {
   };
 
   statusLog = () => {
-    let workingOnIt = this.state.todo.timer;
-    let stuckTimer = this.state.todo.stuckTimer;
+    let workingOnIt = this.state.todo.timer || [];
+    let stuckTimer = this.state.todo.stuckTimer || [];
     let endTime = this.state.todo.endTime;
-    let timeOfDone = new Date(endTime).toLocaleTimeString();
-    let timeOfworking = new Date(workingOnIt).toLocaleTimeString();
-    let timeOfstuck = new Date(stuckTimer).toLocaleTimeString();
-    if (this.refs.statusLog) {
-      if (workingOnIt && endTime && stuckTimer) {
-        this.refs.statusLog.innerHTML = `<b>Working on it:</b> ${timeOfworking} | <b>Stuck:</b> ${timeOfstuck} | <b>Done:</b> ${timeOfDone}`;
-      } else if (endTime && stuckTimer) {
-        this.refs.statusLog.innerHTML = `<b>Stuck:</b> ${timeOfstuck} | <b>Done:</b> ${timeOfDone}`;
-      } else if (workingOnIt && endTime) {
-        this.refs.statusLog.innerHTML = `<b>Working on it:</b> ${timeOfworking} | <b>Done:</b> ${timeOfDone}`;
-      } else if (workingOnIt && stuckTimer) {
-        this.refs.statusLog.innerHTML = `<b>Working on it:</b> ${timeOfworking} | <b>Stuck:</b> ${timeOfstuck}`;
-      } else if (endTime) {
-        this.refs.statusLog.innerHTML += `<b>Done:</b> ${timeOfDone}`;
-      } else if (stuckTimer) {
-        this.refs.statusLog.innerHTML += `<b>Stuck:</b> ${timeOfstuck}`;
-      } else if (workingOnIt) {
-        this.refs.statusLog.innerHTML += `<b>Working on it:</b>  ${timeOfworking}`;
+    const working = workingOnIt.map((el, i) => {
+      return {
+        time: el,
+        title: `Working on it`
+      };
+    });
+    const stuck = stuckTimer.map((el, i) => {
+      return {
+        time: el,
+        title: `Stuck`
+      };
+    });
+    const done = {
+      time: endTime,
+      title: `Done`
+    };
+    const all = [...working, ...stuck, done];
+    all.sort((a, b) => {
+      return a.time - b.time;
+    });
+    const sortedTimes = all.filter((el, i) => {
+      return el.time;
+    });
+
+    return sortedTimes.map((el, i) => {
+      if (!sortedTimes[i - 1]) {
+        return (
+          <div>
+            <p>
+              Status was updated from <b>Not Started</b> to <b>{el.title}</b>.
+            </p>
+            <p>
+              Posted By SystemUser on {new Date(el.time).toLocaleTimeString()}{" "}
+              {new Date(el.time).toDateString()}.
+            </p>
+          </div>
+        );
+      } else {
+        return (
+          <div>
+            <p>
+              Status was updated from <b>{sortedTimes[i - 1].title}</b> to{" "}
+              <b>{el.title}</b>.
+            </p>
+            <p>
+              Posted By SystemUser on {new Date(el.time).toLocaleTimeString()}{" "}
+              {new Date(el.time).toDateString()}.
+            </p>
+          </div>
+        );
       }
-    }
+    });
   };
 
   Read = commentId => {
@@ -139,7 +171,6 @@ class Comments extends Component {
         const userTodo = this.state.users.find(el => el.id === todo.userId);
         todo.url = userTodo.url || img;
         this.setState({ todo });
-        this.statusLog();
       });
     });
     //! for rendering comments from database
@@ -215,7 +246,7 @@ class Comments extends Component {
                 className="ml-1 flex  text-gray-500 hover:text-purple-600"
                 style={{ color: "grey", fontSize: "12px" }}
               >
-                Posted By {user.name} on{" "}
+                Posted By&nbsp;<b> {user.name}</b>&nbsp;on{" "}
                 {new Date(comment.date).toLocaleTimeString()}{" "}
                 {new Date(comment.date).toDateString()}
               </p>
@@ -269,14 +300,17 @@ class Comments extends Component {
             <div
               ref="statusLog"
               style={{
+                display: "block",
                 position: `absolute`,
                 width: `450px`,
-                left: `-300px`,
+                right: `10px`,
                 bottom: `-35px`,
                 textAlign: `center`,
-                fontSize: "14px"
+                fontSize: "12px"
               }}
-            ></div>
+            >
+              {this.statusLog()}
+            </div>
           </div>
           <div className="flex justify-start mb-4">
             <i

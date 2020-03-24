@@ -164,6 +164,7 @@ class Index extends Component {
       el.date = null;
       el.state = "";
       el.clone = true;
+      el.stuckTimer = null
       return el;
     });
     document
@@ -397,9 +398,10 @@ class Index extends Component {
       db.collection("todos")
         .add({ title, userId, status, date })
         .then(() => {
-          this.setState({todoId: 1});
+          this.setState({ todoId: 1 });
           window.location.reload();
-        }).catch(error => {
+        })
+        .catch(error => {
           console.error("Error adding document: ", error);
         });
     }
@@ -443,6 +445,66 @@ class Index extends Component {
             Change Password
           </Link>
         </div>
+        {this.state.clone ? (
+          <button
+            onClick={() => window.location.reload()}
+            className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
+          >
+            Go Back
+          </button>
+        ) : this.state.add ? (
+          <button
+            onClick={() => window.location.reload()}
+            className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
+          >
+            Go Back
+          </button>
+        ) : (
+          <Link
+            className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
+            to="/"
+          >
+            Go Back
+          </Link>
+        )}
+        {this.state.clone ? (
+          <button
+            onClick={() => {
+              const getArray = value =>
+                Array.from(
+                  document.querySelector("#panel-0").querySelectorAll(value)
+                );
+              const titles = getArray("td .title");
+              const userIds = getArray("td .userId");
+              const statuses = getArray("td .status");
+              const dates = getArray('td input[type="date"]');
+              const isDatePresent = dates.find(el => el.value === "");
+              const newTodos = titles.map((el, i) => {
+                return {
+                  title: el.textContent,
+                  userId: userIds[i].textContent,
+                  status: statuses[i].textContent,
+                  date: new Date(dates[i].value).getTime()
+                };
+              });
+              const isUserPresent = newTodos.find(el => el.userId === "");
+              if (isUserPresent) return alert("Please Select All Users");
+              if (isDatePresent) return alert("Please Select All Dates");
+              newTodos.forEach(todo => {
+                db.collection("todos")
+                  .add(todo)
+                  .then(() => {
+                    window.location.reload();
+                  });
+              });
+            }}
+            className="rounded px-4 py-2 text-center bg-green-600 border border-purple-600 ml-3 text-white cursor-pointer justify-between outline-none mt-8"
+          >
+            Clone
+          </button>
+        ) : (
+          ""
+        )}
 
         <div className="flex justify-end mb-6">
           <button
@@ -497,69 +559,8 @@ class Index extends Component {
         ) : (
           ""
         )}
+
         {this.showTables()}
-        <div className="flex justify-end mb-4">
-          {this.state.clone ? (
-            <button
-              onClick={() => window.location.reload()}
-              className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
-            >
-              Go Back
-            </button>
-          ) : this.state.add ? (
-            <button
-              onClick={() => window.location.reload()}
-              className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
-            >
-              Go Back
-            </button>
-          ) : (
-            <Link
-              className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
-              to="/"
-            >
-              Go Back
-            </Link>
-          )}
-          {this.state.clone ? (
-            <button
-              onClick={() => {
-                const getArray = value =>
-                  Array.from(
-                    document.querySelector("#panel-0").querySelectorAll(value)
-                  );
-                const titles = getArray("td .title");
-                const userIds = getArray("td .userId");
-                const statuses = getArray("td .status");
-                const dates = getArray('td input[type="date"]');
-                const isDatePresent = dates.find(el => el.value === "");
-                const newTodos = titles.map((el, i) => {
-                  return {
-                    title: el.textContent,
-                    userId: userIds[i].textContent,
-                    status: statuses[i].textContent,
-                    date: new Date(dates[i].value).getTime()
-                  };
-                });
-                const isUserPresent = newTodos.find(el => el.userId === "");
-                if (isUserPresent) return alert("Please Select All Users");
-                if (isDatePresent) return alert("Please Select All Dates");
-                newTodos.forEach(todo => {
-                  db.collection("todos")
-                    .add(todo)
-                    .then(() => {
-                      window.location.reload();
-                    });
-                });
-              }}
-              className="rounded px-4 py-2 text-center bg-green-600 border border-purple-600 ml-3 text-white cursor-pointer justify-between outline-none mt-8"
-            >
-              Clone 
-            </button>
-          ) : (
-            ""
-          )}
-        </div>
       </div>
     );
   }

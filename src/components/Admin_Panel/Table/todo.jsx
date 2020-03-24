@@ -160,16 +160,16 @@ class Todo extends Component {
     let timer;
     if (this.props.timer) {
       if (this.props.stuckTimer) {
-        if (this.props.stuckTimer > this.props.timer) {
-          timer = this.props.timer;
-        } else if (this.props.stuckTimer < this.props.timer) {
-          timer = this.props.stuckTimer;
+        if (this.props.stuckTimer[0] > this.props.timer[0]) {
+          timer = this.props.timer[0];
+        } else if (this.props.stuckTimer[0] < this.props.timer[0]) {
+          timer = this.props.stuckTimer[0];
         }
       } else {
-        timer = this.props.timer;
+        timer = this.props.timer[0];
       }
     } else if (this.props.stuckTimer) {
-      timer = this.props.stuckTimer;
+      timer = this.props.stuckTimer[0];
     } else {
       timer = new Date().getTime();
     }
@@ -255,9 +255,16 @@ class Todo extends Component {
             this.refs.status.innerText = "Stuck";
             status_priority_wrapper.style.backgroundColor = "#E1445B";
             this.updateTime();
-            const stuckTimer = this.props.stuckTimer
-              ? this.props.stuckTimer
-              : new Date().getTime();
+            let stuckTimer;
+            if (this.props.stuckTimer) {
+              if (this.props.stuckTimer.length > 0) {
+                stuckTimer = [...this.props.stuckTimer, new Date().getTime()];
+              } else {
+                stuckTimer = [new Date().getTime()];
+              }
+            } else {
+              stuckTimer = [new Date().getTime()];
+            }
             db.collection("todos")
               .doc(this.props.todoId)
               .update({
@@ -270,10 +277,16 @@ class Todo extends Component {
             this.refs.status.innerText = "Working on it";
             status_priority_wrapper.style.backgroundColor = "#F7AE3C";
             this.updateTime();
-            // let time = this.state.time;
-            const timer = this.props.timer
-              ? this.props.timer
-              : new Date().getTime();
+            let timer;
+            if (this.props.timer) {
+              if (this.props.timer.length > 0) {
+                timer = [...this.props.timer, new Date().getTime()];
+              } else {
+                timer = [new Date().getTime()];
+              }
+            } else {
+              timer = [new Date().getTime()];
+            }
             db.collection("todos")
               .doc(this.props.todoId)
               .update({
@@ -439,7 +452,7 @@ class Todo extends Component {
         <td>
           <span
             style={{ backgroundColor: this.props.stuckTimer ? "#E1445B" : "" }}
-            className="block mx-auto rounded-full h-5 w-6/7  bg-blue-600 overflow-hidden relative"
+            className="block mx-auto rounded-full h-5 w-6/7  bg-blue-600 overflow-hidden relative timeline"
           >
             <div
               style={{
