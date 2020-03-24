@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { db } from "../../config/firebase";
 import img from "../../images/no_image.jpg";
-
+import { Picker } from "emoji-mart";
+import 'emoji-mart/css/emoji-mart.css'
 class Comments extends Component {
   state = {
     comments: [],
@@ -11,7 +12,8 @@ class Comments extends Component {
     userId: "",
     todoId: "",
     todo: {},
-    name: ""
+    name: "",
+    sortedTimes: []
   };
   removeDropDown = e => {
     if (
@@ -67,56 +69,57 @@ class Comments extends Component {
     let endTime = this.state.todo.endTime;
     const working = workingOnIt.map((el, i) => {
       return {
-        time: el,
-        title: `Working on it`
+        date: el,
+        title: `Working on it`,
+        read: true
       };
     });
     const stuck = stuckTimer.map((el, i) => {
       return {
-        time: el,
-        title: `Stuck`
+        date: el,
+        title: `Stuck`,
+        read: true
       };
     });
     const done = {
-      time: endTime,
-      title: `Done`
+      date: endTime,
+      title: `Done`,
+      read: true
     };
     const all = [...working, ...stuck, done];
     all.sort((a, b) => {
-      return a.time - b.time;
+      return a.date - b.date;
     });
-    const sortedTimes = all.filter((el, i) => {
-      return el.time;
+    const times = all.filter((el, i) => {
+      return el.date;
     });
-
-    return sortedTimes.map((el, i) => {
-      if (!sortedTimes[i - 1]) {
-        return (
-          <div>
+    const sortedTimes = times.map((el, i) => {
+      if (!times[i - 1]) {
+        return {
+          content: (
             <p>
               Status was updated from <b>Not Started</b> to <b>{el.title}</b>.
             </p>
-            <p>
-              Posted By SystemUser on {new Date(el.time).toLocaleTimeString()}{" "}
-              {new Date(el.time).toDateString()}.
-            </p>
-          </div>
-        );
+          ),
+          date: el.date,
+          read: true,
+          statusLog: true
+        };
       } else {
-        return (
-          <div>
+        return {
+          content: (
             <p>
-              Status was updated from <b>{sortedTimes[i - 1].title}</b> to{" "}
+              Status was updated from <b>{times[i - 1].title}</b> to{" "}
               <b>{el.title}</b>.
             </p>
-            <p>
-              Posted By SystemUser on {new Date(el.time).toLocaleTimeString()}{" "}
-              {new Date(el.time).toDateString()}.
-            </p>
-          </div>
-        );
+          ),
+          date: el.date,
+          read: true,
+          statusLog: true
+        };
       }
     });
+    this.setState({ sortedTimes });
   };
 
   Read = commentId => {
@@ -135,16 +138,13 @@ class Comments extends Component {
     let read = false;
     db.collection("comments")
       .doc(commentId)
-      .update({
-        read
-      });
+      .update({ read });
   };
 
   componentWillUnmount = () =>
     window.removeEventListener("click", this.removeDropDown);
   componentDidMount() {
     window.addEventListener("click", this.removeDropDown);
-
     //! for rendering user from database
     db.collection("users").onSnapshot(querySnapshot => {
       let users = [];
@@ -171,6 +171,7 @@ class Comments extends Component {
         const userTodo = this.state.users.find(el => el.id === todo.userId);
         todo.url = userTodo.url || img;
         this.setState({ todo });
+        this.statusLog()
       });
     });
     //! for rendering comments from database
@@ -184,7 +185,6 @@ class Comments extends Component {
       comments = comments.filter(
         el => el.todoId === this.props.match.params.commentId
       );
-      comments.sort((a, b) => b.date - a.date);
       this.setState({ comments });
       if (this.refs.popup) {
         this.refs.popup.style.right = "0";
@@ -215,8 +215,12 @@ class Comments extends Component {
   //! showComments
 
   showComments = () => {
-    return this.state.comments.map((comment, i) => {
-      const user = this.state.users.find(el => el.id === comment.userId);
+    const comments = [...this.state.comments, ...this.state.sortedTimes];
+    comments.sort((a, b) => b.date - a.date);
+    
+    return comments.map((comment, i) => {
+      const user =
+        this.state.users.find(el => el.id === comment.userId) || {};
       if (user) {
         return (
           <article
@@ -227,7 +231,7 @@ class Comments extends Component {
           >
             <div className="text-base pt-1 pl-3">
               {comment.content}
-              {!comment.read ? (
+              {comment.statusLog ? "": !comment.read ? (
                 <i
                   title="Click here to mark comment read"
                   onClick={() => this.Read(comment.id)}
@@ -246,7 +250,7 @@ class Comments extends Component {
                 className="ml-1 flex  text-gray-500 hover:text-purple-600"
                 style={{ color: "grey", fontSize: "12px" }}
               >
-                Posted By&nbsp;<b> {user.name}</b>&nbsp;on{" "}
+                Posted By&nbsp;<b> {user.name || "System User"}</b>&nbsp;on{" "}
                 {new Date(comment.date).toLocaleTimeString()}{" "}
                 {new Date(comment.date).toDateString()}
               </p>
@@ -296,21 +300,6 @@ class Comments extends Component {
               />
             </div>
             <div className="personTask">{this.state.todo.title}</div>
-
-            <div
-              ref="statusLog"
-              style={{
-                display: "block",
-                position: `absolute`,
-                width: `450px`,
-                right: `10px`,
-                bottom: `-35px`,
-                textAlign: `center`,
-                fontSize: "12px"
-              }}
-            >
-              {this.statusLog()}
-            </div>
           </div>
           <div className="flex justify-start mb-4">
             <i
@@ -351,6 +340,7 @@ class Comments extends Component {
               </p>
             </div>
             <form action="/" onSubmit={this.handleUpdate}>
+            <div className="relative">
               <textarea
                 onChange={this.handleChange}
                 name="content"
@@ -359,6 +349,11 @@ class Comments extends Component {
                 required
                 value={this.state.content}
               ></textarea>
+              <i className="far fa-smile" onClick={(e)=>{
+                document.querySelector("section.emoji-mart").classList.toggle("block");
+              }} style={{position: `absolute`, bottom: `15%`,right: `5%`}}></i>
+              <Picker title="" emoji="" onSelect={(e)=>{this.setState({content: this.state.content+e.native})}} />
+              </div>
               <div className="flex justify-between items-center mt-4">
                 <button className="rounded px-8  py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none">
                   Add Comment
@@ -366,6 +361,7 @@ class Comments extends Component {
               </div>
             </form>
           </div>
+          
           {this.showComments()}
         </div>
       </div>

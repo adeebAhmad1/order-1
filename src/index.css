@@ -158,3 +158,10 @@ table .dropdown0::before {
   overflow: hidden;
   transition: max-height 0.2s ease-out;
 }
+
+section.emoji-mart{
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+}
