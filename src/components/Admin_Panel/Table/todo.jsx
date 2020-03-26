@@ -20,14 +20,14 @@ class Todo extends Component {
   // ! update status function
   updateStatus = todosId => {
     let status = this.refs.status.innerText;
-    db.collection("todos")
+    db.collection(this.props.board)
       .doc(todosId)
       .update({ status });
   };
 
   //! handle submit for deleting todo
   deleteOne = todoId => {
-    db.collection("todos")
+    db.collection(this.props.board)
       .doc(todoId)
       .delete()
       .then(() => {
@@ -207,7 +207,7 @@ class Todo extends Component {
       ? this.state.endTime
       : new Date().getTime();
     if (!this.props.endTime) {
-      db.collection("todos")
+      db.collection(this.props.board)
         .doc(this.props.url)
         .update({ endTime })
         .then(() => {
@@ -265,7 +265,7 @@ class Todo extends Component {
             } else {
               stuckTimer = [new Date().getTime()];
             }
-            db.collection("todos")
+            db.collection(this.props.board)
               .doc(this.props.todoId)
               .update({
                 stuckTimer
@@ -287,7 +287,7 @@ class Todo extends Component {
             } else {
               timer = [new Date().getTime()];
             }
-            db.collection("todos")
+            db.collection(this.props.board)
               .doc(this.props.todoId)
               .update({
                 timer
@@ -333,7 +333,7 @@ class Todo extends Component {
           {!this.props.clone ? (
             this.props.url ? (
               <Link
-                to={`/admin_panel/comments/${this.props.url}`}
+                to={`/admin_panel/${this.props.board}/comments/${this.props.url}`}
                 className="relative chat-wrapper cursor-pointer"
               >
                 <i

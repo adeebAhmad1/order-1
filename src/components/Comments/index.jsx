@@ -158,7 +158,7 @@ class Comments extends Component {
         userId: users[0].id,
         todoId: this.props.match.params.commentId
       });
-      db.collection("todos").onSnapshot(querySnapshot => {
+      db.collection(this.props.match.params.board).onSnapshot(querySnapshot => {
         let todos = [];
         querySnapshot.forEach(doc => {
           let todo = doc.data();

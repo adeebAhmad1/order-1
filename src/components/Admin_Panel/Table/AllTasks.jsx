@@ -77,12 +77,11 @@ class AllTasks extends Component {
           >
             Add task
           </button>
-
         </Link>
         <div className="flex justify-end mb-4">
           <Link
             className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
-            to="/admin_panel"
+            to="/admin_panel/todos"
           >
             Go Back
           </Link>

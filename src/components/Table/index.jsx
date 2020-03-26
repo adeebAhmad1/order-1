@@ -13,13 +13,17 @@ class Table extends Component {
     todos: [],
     comments: [],
     readComment: [],
-    group: {}
+    group: {},
+    board: ""
   };
 
   //! getting data from fatabase
   componentDidMount = () => {
+    this.setState({
+      board: this.props.match ? this.props.match.params.board : "todos"
+    });
     //! for todos
-    db.collection("todos")
+    db.collection(this.props.match ? this.props.match.params.board : "todos")
       .get()
       .then(querySnapshot => {
         let todos = [];
@@ -34,10 +38,12 @@ class Table extends Component {
         todos.sort((a, b) => {
           return b.date - a.date;
         });
-        this.setState({todos});
+        this.setState({ todos });
         const group = {};
         this.state.todos.forEach(el => {
-          const date = new Date(el.date + new Date().getTimezoneOffset()*60*1000).toDateString();
+          const date = new Date(
+            el.date + new Date().getTimezoneOffset() * 60 * 1000
+          ).toDateString();
           if (date in group) {
             group[date].push(el);
           } else {
@@ -63,8 +69,7 @@ class Table extends Component {
       });
     //! for rendering comments from database
     db.collection("comments")
-      .get()
-      .then(querySnapshot => {
+      .onSnapshot(querySnapshot => {
         let comments = [];
         querySnapshot.forEach(doc => {
           let comment = doc.data();
@@ -79,7 +84,39 @@ class Table extends Component {
         });
       });
   };
-  
+  componentWillReceiveProps(props) {
+    if (props.match) {
+      if (props.match.params.board !== this.state.board) {
+        db.collection(props.match.params ? props.match.params.board : "todos")
+          .get()
+          .then(querySnapshot => {
+            let todos = [];
+            querySnapshot.forEach(doc => {
+              let todo = doc.data();
+              todo.id = doc.id;
+              todos.push(todo);
+            });
+            //! for sorting
+            todos.sort((a, b) => a.title.localeCompare(b.title));
+            todos.sort((a, b) => b.date - a.date);
+            this.setState({ todos, todoIds: todos.map(el => el.id) });
+            var group = {};
+            this.state.todos.forEach(el => {
+              const date = new Date(
+                el.date + new Date().getTimezoneOffset() * 60 * 1000
+              ).toDateString();
+              if (date in group) {
+                group[date].push(el);
+              } else {
+                group[date] = new Array(el);
+              }
+            });
+            this.setState({ group });
+          });
+        this.setState({ board: props.match.params.board });
+      }
+    }
+  }
   showTables = () => {
     const dates = Object.keys(this.state.group);
     const todos = Object.values(this.state.group);
@@ -102,7 +139,7 @@ class Table extends Component {
                   <th>Time Tracking</th>
                 </tr>
               </thead>
-              <tbody ref="tbody">{this.showTodos(todos[i],i)}</tbody>
+              <tbody ref="tbody">{this.showTodos(todos[i], i)}</tbody>
             </table>
           }
           i={i}
@@ -112,16 +149,15 @@ class Table extends Component {
     });
   };
 
-
   //! show todos from database
-  showTodos = (todos,arrayIndex) => {
+  showTodos = (todos, arrayIndex) => {
     return todos.map((el, i) => {
       if (this.state.users.length > 0) {
         const comments = this.state.comments.filter(comment => {
           return el.id === comment.todoId;
         });
         const commentsLength = comments.length;
-        const commentReads = comments.map(el=>el.read)
+        const commentReads = comments.map(el => el.read);
         const user = this.state.users.find(user => user.id === el.userId) || {};
         const userId = user.id || "";
         return (
@@ -140,6 +176,7 @@ class Table extends Component {
             userId={userId}
             commentReads={commentReads}
             stuckTimer={el.stuckTimer}
+            board={this.state.board || "todos"}
           />
         );
       } else {
@@ -149,11 +186,7 @@ class Table extends Component {
   };
 
   render() {
-    return (
-      <div style={{marginTop: `30px`}}>
-        {this.showTables()}
-      </div>
-    );
+    return <div style={{ marginTop: `30px` }}>{this.showTables()}</div>;
   }
 }
 

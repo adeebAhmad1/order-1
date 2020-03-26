@@ -15,14 +15,15 @@ class Todo extends Component {
     confettiStart: false,
     time: ``,
     user: {},
-    colorState: []
+    colorState: [],
+    board: null
   };
   stopTimer = () => {
     const endTime = this.state.endTime
       ? this.state.endTime
       : new Date().getTime();
     if (!this.props.endTime) {
-      db.collection("todos")
+      db.collection(this.state.board || "todos")
         .doc(this.props.url)
         .update({ endTime })
         .then(() => this.setState({ endTime }));
@@ -32,7 +33,7 @@ class Todo extends Component {
   // ! update status function
   updateStatus = todosId => {
     let status = this.refs.status.innerText;
-    db.collection("todos")
+    db.collection(this.state.board)
       .doc(todosId)
       .update({
         status
@@ -77,7 +78,7 @@ class Todo extends Component {
     }
   }
   componentDidMount = () => {
-    this.setState({ commentsLength: this.props.commentsLength });
+    this.setState({ commentsLength: this.props.commentsLength,board: this.props.board });
 
     //! getting users from fatabase
     db.collection("users")
@@ -108,7 +109,9 @@ class Todo extends Component {
         }
       });
   };
-
+  componentWillReceiveProps(props){
+    this.setState({board: props.board})
+  }
   //! show timer for users
   updateTime = () => {
     let timer;
@@ -197,7 +200,7 @@ class Todo extends Component {
             } else {
               stuckTimer = [new Date().getTime()];
             }
-            db.collection("todos")
+            db.collection(this.state.board || "todos")
               .doc(this.props.todoId)
               .update({
                 stuckTimer
@@ -219,7 +222,7 @@ class Todo extends Component {
             } else {
               timer = [new Date().getTime()];
             }
-            db.collection("todos")
+            db.collection(this.state.board || "todos")
               .doc(this.props.todoId)
               .update({
                 timer
@@ -249,7 +252,7 @@ class Todo extends Component {
         >
           {this.props.title}
           <Link
-            to={`/home/comments/${this.props.url}`}
+            to={`/home/${this.state.board}/comments/${this.props.url}`}
             className="relative chat-wrapper cursor-pointer"
           >
             <i

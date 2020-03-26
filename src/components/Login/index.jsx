@@ -28,7 +28,7 @@ class Login extends Component {
       .auth()
       .signInWithEmailAndPassword(this.state.email, this.state.password)
       .then(() => {
-        this.props.history.push("/admin_panel");
+        this.props.history.push("/admin_panel/todos");
       })
       .catch(error => {
         // Handle Errors here.

@@ -28,6 +28,7 @@ import AuthContextProvider from "./context/AuthContext";
 
 //css
 import "./App.css";
+import Add_Board from "./components/Admin_Panel/Add_Board";
 
 class App extends Component {
   render() {
@@ -37,17 +38,17 @@ class App extends Component {
           <div>
             <Header />
             <Route exact path="/" component={Home}  />
-            <Route path="/home" component={Home} />
-            <Route path="/home/comments/:commentId" component={Comments} />
+            <Route path="/home/:board" component={Home} />
+            <Route path="/home/:board/comments/:commentId" component={Comments} />
 
             <Route exact path="/admin-login" component={Login} />
             <Route exact path="/admin_forgot" component={Forgot} />
-            <Route path="/admin_panel" component={Admin_Panel}  />
+            <Route path="/admin_panel/:board" component={Admin_Panel}  />
             <Route
-              path="/admin_panel/comments/:commentId"
+              path="/admin_panel/:board/comments/:commentId"
               component={Comments}
             />
-
+            <Route path="/admin_panel/add_board" component={Add_Board} />
             <Route path="/all_user/add_user" component={Add_user} />
             <Route path="/all_user" component={All_user} />
             <Route path="/all_users/edit_user/:userId" component={Edit_user} />

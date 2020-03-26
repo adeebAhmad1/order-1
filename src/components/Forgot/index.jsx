@@ -20,7 +20,7 @@ class Forgot extends Component {
       .updatePassword(newPassword)
       .then(() => {
         // Update successful.
-        this.props.history.push('/admin_panel')
+        this.props.history.push('/admin_panel/todos')
       })
       .catch(error => {
         // An error happened.
