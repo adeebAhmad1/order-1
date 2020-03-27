@@ -159,11 +159,14 @@ class Todo extends Component {
     const status_priority_dropdown = document.querySelectorAll(
       `#panel-${arrI} .status_priority_wrapper > .status_priority_dropdown`
     );
-    if (this.state.id !== id) {
-      for (let i = 0; i < status_priority_dropdown.length; i++) {
-        status_priority_dropdown[i].style.display = "none";
-      }
-    }
+    
+    const all_dropdowns = document.querySelectorAll(
+      `.status_priority_wrapper > .status_priority_dropdown`
+    );
+    all_dropdowns.forEach(el => {
+      el.style.display = "none";
+      el.classList.remove("block");
+    });
     status_priority_dropdown[id].classList.toggle("block");
     const status_priority_wrapper = document.querySelector(
       `#panel-${arrI} .status_priority_wrapper${id}`
@@ -357,7 +360,6 @@ class Todo extends Component {
               }}
               className="bg-blue-600 w-1/2 h-full z-10 relative"
             ></div>
-            {console.log(this.props.stuckTimer)}
             <input
               readOnly
               ref="date"

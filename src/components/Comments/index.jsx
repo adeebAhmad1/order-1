@@ -124,8 +124,6 @@ class Comments extends Component {
 
   Read = commentId => {
     let read = true;
-    // this.refs.comment1.classList.remove("bg-blue-200");
-    // this.refs.comment1.classList.add("bg-white");
     db.collection("comments")
       .doc(commentId)
       .update({
@@ -133,18 +131,23 @@ class Comments extends Component {
       });
   };
   unRead = commentId => {
-    // this.refs.comment1.classList.add("bg-blue-200");
-    // this.refs.comment1.classList.remove("bg-white");
     let read = false;
     db.collection("comments")
       .doc(commentId)
       .update({ read });
   };
 
-  componentWillUnmount = () =>
+  componentWillUnmount = () =>{
     window.removeEventListener("click", this.removeDropDown);
+    window.removeEventListener("click",this.handleDropdown2);
+  }
+  handleDropdown2 = (e)=>{
+    if(e.target.id === "icon") return;
+    document.querySelector(".emoji-mart").classList.remove("block")
+  }
   componentDidMount() {
     window.addEventListener("click", this.removeDropDown);
+    window.addEventListener("click",this.handleDropdown2);
     //! for rendering user from database
     db.collection("users").onSnapshot(querySnapshot => {
       let users = [];
@@ -349,7 +352,7 @@ class Comments extends Component {
                 required
                 value={this.state.content}
               ></textarea>
-              <i className="far fa-smile" onClick={(e)=>{
+              <i className="far fa-smile" id="icon" onClick={(e)=>{
                 document.querySelector("section.emoji-mart").classList.toggle("block");
               }} style={{position: `absolute`, bottom: `15%`,right: `5%`}}></i>
               <Picker title="" emoji="" onSelect={(e)=>{this.setState({content: this.state.content+e.native})}} />

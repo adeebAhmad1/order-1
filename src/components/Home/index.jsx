@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 //components
+import Goals from "../utils/goals";
 import Table from "../Table";
 
 //firebase
@@ -11,15 +12,16 @@ import SideNav from "../utils/SideNav";
 
 class Home extends Component {
   static contextType = AuthContext;
-  state={
+  state = {
     board: this.props.match.params.board
-  }
-  componentWillReceiveProps(props){
-    this.setState({board:props.match.params.board})
+  };
+  componentWillReceiveProps(props) {
+    this.setState({ board: props.match.params.board });
   }
   render() {
     return (
       <div>
+        <Goals />
         <SideNav page="home" board={this.state.board || "todos"} />
         <div className="container mx-auto py-16">
           {this.context.isAuthenticated ? (

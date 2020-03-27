@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^7.2.1",
     "emoji-mart": "^3.0.0",
     "firebase": "^7.9.3",
+    "jodit-react": "^1.0.42",
     "moment-timezone": "^0.5.28",
     "react": "^16.13.0",
     "react-confetti": "^5.0.1",

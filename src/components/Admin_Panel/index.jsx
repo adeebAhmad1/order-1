@@ -457,7 +457,7 @@ class Index extends Component {
   render() {
     return (
       <div>
-        <SideNav page="admin_panel" board={this.state.board}/>
+        <SideNav page="admin_panel" board={this.state.board} history={this.props.history} />
         <div className="container mx-auto pt-16">
           <div className="left  justify-end mb-6">
             <Link
@@ -619,7 +619,7 @@ class Table extends Component {
     this.setState({match: props.match})
   }
   render() {
-    return this.context.isAuthenticated ? <Index match={this.state.match}/> : <div></div>;
+    return this.context.isAuthenticated ? <Index match={this.state.match} history={this.props.history} /> : <div></div>;
   }
 }
 

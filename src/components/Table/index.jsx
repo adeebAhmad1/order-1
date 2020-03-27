@@ -20,10 +20,10 @@ class Table extends Component {
   //! getting data from fatabase
   componentDidMount = () => {
     this.setState({
-      board: this.props.match ? this.props.match.params.board : "todos"
+      board: this.props.match.params.board ? this.props.match.params.board : "todos"
     });
     //! for todos
-    db.collection(this.props.match ? this.props.match.params.board : "todos")
+    db.collection(this.props.match.params.board ? this.props.match.params.board : "todos")
       .get()
       .then(querySnapshot => {
         let todos = [];
@@ -87,7 +87,7 @@ class Table extends Component {
   componentWillReceiveProps(props) {
     if (props.match) {
       if (props.match.params.board !== this.state.board) {
-        db.collection(props.match.params ? props.match.params.board : "todos")
+        db.collection(props.match.params.board ? props.match.params.board : "todos")
           .get()
           .then(querySnapshot => {
             let todos = [];
