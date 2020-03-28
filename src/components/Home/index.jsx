@@ -21,7 +21,7 @@ class Home extends Component {
   render() {
     return (
       <div>
-        <Goals />
+        <Goals board={this.state.board || "todos"} />
         <SideNav page="home" board={this.state.board || "todos"} />
         <div className="container mx-auto py-16">
           {this.context.isAuthenticated ? (
@@ -31,7 +31,9 @@ class Home extends Component {
                 firebase
                   .auth()
                   .signOut()
-                  .then(() => {})
+                  .then(() => {
+                    window.location.reload();
+                  })
                   .catch(error => {
                     // An error happened.
                     alert(error);

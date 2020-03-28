@@ -342,6 +342,8 @@ section.emoji-mart {
   margin-right: 10px;
 }
 .jodit_statusbar,
+.emoji-mart-bar,
+.emoji-mart-search,
 .jodit_toolbar_btn.jodit_toolbar_btn-source,
 .jodit_toolbar_btn.jodit_toolbar_btn-ul,
 .jodit_toolbar_btn.jodit_toolbar_btn-ol,
@@ -368,7 +370,6 @@ section.emoji-mart {
 .jodit_toolbar_btn.jodit_toolbar_btn-cut.jodit_disabled,
 .jodit_toolbar_btn.jodit_toolbar_btn-copy.jodit_disabled,
 .jodit_toolbar_btn.jodit_toolbar_btn-paste,
-/* .jodit_toolbar_btn.jodit_toolbar_btn-symbol, */
 .jodit_toolbar_btn.jodit_toolbar_btn-print,
 .jodit_toolbar_btn.jodit_toolbar_btn-about {
   display: none !important;
@@ -383,6 +384,6 @@ section.emoji-mart {
 .jodit_container.jodit_default_theme.jodit_wysiwyg_mode {
   min-height: 70px !important;
 }
-.jodit_workplace p{
+.jodit_workplace p {
   text-align: justify !important;
 }

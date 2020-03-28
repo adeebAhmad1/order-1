@@ -175,9 +175,7 @@ class Todo extends Component {
     }
     this.setState({ iTimes: 1 });
     setInterval(() => {
-      const now = this.state.endTime
-        ? this.state.endTime
-        : new Date().getTime();
+      const now = this.state.endTime || this.props.endTime || new Date().getTime();
       const remainingTime = now - timer;
 
       const seconds = Math.floor(remainingTime / 1000);

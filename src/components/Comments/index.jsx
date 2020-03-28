@@ -353,7 +353,7 @@ class Comments extends Component {
                 value={this.state.content}
               ></textarea>
               <i className="far fa-smile" id="icon" onClick={(e)=>{
-                document.querySelector("section.emoji-mart").classList.toggle("block");
+                document.querySelectorAll("section.emoji-mart")[1].classList.toggle("block");
               }} style={{position: `absolute`, bottom: `15%`,right: `5%`}}></i>
               <Picker title="" emoji="" onSelect={(e)=>{this.setState({content: this.state.content+e.native})}} />
               </div>
@@ -364,12 +364,10 @@ class Comments extends Component {
               </div>
             </form>
           </div>
-          
           {this.showComments()}
         </div>
       </div>
     );
   }
 }
-
 export default Comments;

@@ -2,8 +2,9 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 //components
 import Todo from "./Table/todo";
-import firebase from "../../config/firebase";
+import Goal from '../utils/goals'
 //firebase
+import firebase from "../../config/firebase";
 import { db } from "../../config/firebase";
 import Img from "../../images/no_image.jpg";
 //context
@@ -457,6 +458,7 @@ class Index extends Component {
   render() {
     return (
       <div>
+      <Goal board={this.state.board || "todos"} />
         <SideNav page="admin_panel" board={this.state.board} history={this.props.history} />
         <div className="container mx-auto pt-16">
           <div className="left  justify-end mb-6">
