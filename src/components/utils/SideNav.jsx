@@ -69,7 +69,7 @@ class SideNav extends Component {
         {this.state.board === el.name ? (
           <Link to={`/${this.props.page}/${el.name}`}>{el.name}</Link>
         ) : (
-          <a href={`/${this.props.page}/${el.name}`}>{el.name}</a>
+          <a href={`/${this.props.page}/${el.name}`}>{el.name ==="todos" ? "Client Relations": el.name}</a>
         )}
         {this.props.page === "home" ? (
           ""

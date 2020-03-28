@@ -18,11 +18,23 @@ class Goals extends Component {
   };
   handleDropdown2 = e => {
     if (e.target.id === "icon") return;
+    if(
+      e.target.classList.contains("emoji-mart")||
+      e.target.parentNode.classList.contains("emoji-mart")||
+      e.target.parentNode.parentNode.classList.contains("emoji-mart")||
+      e.target.parentNode.parentNode.parentNode.classList.contains("emoji-mart")||
+      e.target.parentNode.parentNode.parentNode.parentNode.classList.contains("emoji-mart")||
+      e.target.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains("emoji-mart")||
+      e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains("emoji-mart")||
+      e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains("emoji-mart") ||
+      e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains("emoji-mart")
+    ) return;
     document.querySelector(".emoji-mart").classList.remove("block");
   };
   componentWillUnmount() {
     window.removeEventListener("click", this.handleDropdown2);
   }
+  
   componentDidMount = () => {
     this.setState({board: this.props.board})
     window.addEventListener("click", this.handleDropdown2);
@@ -38,7 +50,6 @@ class Goals extends Component {
           goals.push(goal);
         });
         const goal = goals.find(goal=> goal.board === this.state.board);
-        console.log(goal)
         if(goal){
           this.refs.goal.innerHTML = goal.title;
           this.setState({ goal });
@@ -52,7 +63,6 @@ class Goals extends Component {
   Save = goalId => {
     const goal = {
       title: document.querySelector(".jodit_wysiwyg").innerHTML,
-      time: new Date().getTime(),
       board: this.state.board
     };
     if (goalId)

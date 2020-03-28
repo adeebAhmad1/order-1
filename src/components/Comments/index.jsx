@@ -143,6 +143,17 @@ class Comments extends Component {
   }
   handleDropdown2 = (e)=>{
     if(e.target.id === "icon") return;
+    if(
+      e.target.classList.contains("emoji-mart")||
+      e.target.parentNode.classList.contains("emoji-mart")||
+      e.target.parentNode.parentNode.classList.contains("emoji-mart")||
+      e.target.parentNode.parentNode.parentNode.classList.contains("emoji-mart")||
+      e.target.parentNode.parentNode.parentNode.parentNode.classList.contains("emoji-mart")||
+      e.target.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains("emoji-mart")||
+      e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains("emoji-mart")||
+      e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains("emoji-mart") ||
+      e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains("emoji-mart")
+    ) return;
     document.querySelector(".emoji-mart").classList.remove("block")
   }
   componentDidMount() {

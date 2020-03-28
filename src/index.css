@@ -342,14 +342,13 @@ section.emoji-mart {
   margin-right: 10px;
 }
 .jodit_statusbar,
-.emoji-mart-bar,
 .emoji-mart-search,
 .jodit_toolbar_btn.jodit_toolbar_btn-source,
 .jodit_toolbar_btn.jodit_toolbar_btn-ul,
 .jodit_toolbar_btn.jodit_toolbar_btn-ol,
 .jodit_toolbar_btn.jodit_toolbar_btn-eraser,
 .jodit_toolbar_btn.jodit_toolbar_btn-separator,
-.jodit_toolbar_btn.jodit_with_dropdownlist,
+.jodit_toolbar_btn.jodit_with_dropdownlist:not(.jodit_toolbar_btn-paragraph),
 .jodit_toolbar_btn.jodit_toolbar_btn-brush,
 .jodit_toolbar_btn.jodit_toolbar_btn-table,
 .jodit_toolbar_btn.jodit_toolbar_btn-image,
@@ -386,4 +385,24 @@ section.emoji-mart {
 }
 .jodit_workplace p {
   text-align: justify !important;
+}
+.jodit_wysiwyg h1{
+  font-size: 36px;
+  font-weight: bold;
+}
+.jodit_wysiwyg h2{
+  font-size: 28px;
+  font-weight: bold;
+}
+.jodit_wysiwyg h3{
+  font-size: 22px;
+  font-weight: bold;
+}
+.jodit_wysiwyg h4{
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.jodit_toolbar_btn svg{
+  width: 10px !important;
 }
