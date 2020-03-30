@@ -74,8 +74,8 @@ class Index extends Component {
 
   componentDidMount = () => {
     //! for getting all todos
-    this.setState({board: this.props.match.params.board})
-    db.collection( this.state.board || this.props.match.params.board )
+    this.setState({board: this.props.match.params ? this.props.match.params.board || "todos" : "todos"})
+    db.collection( this.props.match.params ? this.props.match.params.board || "todos" : "todos" )
       .get()
       .then(querySnapshot => {
         let todos = [];

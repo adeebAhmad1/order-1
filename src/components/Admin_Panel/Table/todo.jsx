@@ -93,7 +93,8 @@ class Todo extends Component {
         });
         if (this.state.status === "Done") {
           this.refs.status1.style.backgroundColor = "#03C977";
-          this.refs.dropdown1.classList.add("invisible");
+          if (this.refs.dropdown1)
+            this.refs.dropdown1.classList.add("invisible");
           this.updateTime();
           this.stopTimer();
         } else if (this.state.status === "Stuck") {
@@ -103,7 +104,8 @@ class Todo extends Component {
           this.refs.status1.style.backgroundColor = "#F7AE3C";
           if (this.state.iTimes === 0) this.updateTime();
         } else if (this.state.status === "Not Started") {
-          this.refs.dropdown1.classList.remove("invisible");
+          if (this.refs.dropdown1)
+            this.refs.dropdown1.classList.remove("invisible");
           this.refs.status1.style.backgroundColor = "#599EFD";
         }
         if (this.props.clone)
@@ -175,7 +177,8 @@ class Todo extends Component {
     }
     this.setState({ iTimes: 1 });
     setInterval(() => {
-      const now = this.state.endTime || this.props.endTime || new Date().getTime();
+      const now =
+        this.state.endTime || this.props.endTime || new Date().getTime();
       const remainingTime = now - timer;
 
       const seconds = Math.floor(remainingTime / 1000);

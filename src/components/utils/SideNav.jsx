@@ -67,7 +67,7 @@ class SideNav extends Component {
     this.state.collections.map((el, i) => (
       <li key={i} className={this.state.board === el.name ? "item-active" : ""}>
         {this.state.board === el.name ? (
-          <Link to={`/${this.props.page}/${el.name}`}>{el.name}</Link>
+         <Link to={`/${this.props.page}/${el.name}`}>{el.name ==="todos" ? "Client Relations": el.name}</Link>
         ) : (
           <a href={`/${this.props.page}/${el.name}`}>{el.name ==="todos" ? "Client Relations": el.name}</a>
         )}

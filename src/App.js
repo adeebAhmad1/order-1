@@ -40,7 +40,6 @@ class App extends Component {
             <Route exact path="/" component={Home}  />
             <Route path="/home/:board" component={Home} />
             <Route path="/home/:board/comments/:commentId" component={Comments} />
-
             <Route exact path="/admin-login" component={Login} />
             <Route exact path="/admin_forgot" component={Forgot} />
             <Route path="/admin_panel/:board" component={Admin_Panel}  />
@@ -52,7 +51,6 @@ class App extends Component {
             <Route path="/all_user/add_user" component={Add_user} />
             <Route path="/all_user" component={All_user} />
             <Route path="/all_users/edit_user/:userId" component={Edit_user} />
-
             <Route path="/all_tasks/add_task" component={Add_Task} />
             <Route path="/all_tasks" component={All_tasks} />
             <Route path="/all_tasks/edit_task/:taskId" component={Edit_task} />

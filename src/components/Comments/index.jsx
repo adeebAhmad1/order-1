@@ -2,8 +2,10 @@ import React, { Component } from "react";
 import { db } from "../../config/firebase";
 import img from "../../images/no_image.jpg";
 import { Picker } from "emoji-mart";
-import 'emoji-mart/css/emoji-mart.css'
+import "emoji-mart/css/emoji-mart.css";
+import { AuthContext } from "../../context/AuthContext"
 class Comments extends Component {
+  static contextType = AuthContext;
   state = {
     comments: [],
     commentIndex: null,
@@ -13,7 +15,8 @@ class Comments extends Component {
     todoId: "",
     todo: {},
     name: "",
-    sortedTimes: []
+    sortedTimes: [],
+    caretPosition: 0
   };
   removeDropDown = e => {
     if (
@@ -137,28 +140,43 @@ class Comments extends Component {
       .update({ read });
   };
 
-  componentWillUnmount = () =>{
+  componentWillUnmount = () => {
     window.removeEventListener("click", this.removeDropDown);
-    window.removeEventListener("click",this.handleDropdown2);
-  }
-  handleDropdown2 = (e)=>{
-    if(e.target.id === "icon") return;
-    if(
-      e.target.classList.contains("emoji-mart")||
-      e.target.parentNode.classList.contains("emoji-mart")||
-      e.target.parentNode.parentNode.classList.contains("emoji-mart")||
-      e.target.parentNode.parentNode.parentNode.classList.contains("emoji-mart")||
-      e.target.parentNode.parentNode.parentNode.parentNode.classList.contains("emoji-mart")||
-      e.target.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains("emoji-mart")||
-      e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains("emoji-mart")||
-      e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains("emoji-mart") ||
-      e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains("emoji-mart")
-    ) return;
-    document.querySelector(".emoji-mart").classList.remove("block")
-  }
+    window.removeEventListener("click", this.handleDropdown2);
+  };
+  handleDropdown2 = e => {
+    if (e.target.id === "icon") return;
+    if (document.querySelector(".emoji-mart")) {
+      if (
+        e.target.classList.contains("emoji-mart") ||
+        e.target.parentNode.classList.contains("emoji-mart") ||
+        e.target.parentNode.parentNode.classList.contains("emoji-mart") ||
+        e.target.parentNode.parentNode.parentNode.classList.contains(
+          "emoji-mart"
+        ) ||
+        e.target.parentNode.parentNode.parentNode.parentNode.classList.contains(
+          "emoji-mart"
+        ) ||
+        e.target.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
+          "emoji-mart"
+        ) ||
+        e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
+          "emoji-mart"
+        ) ||
+        e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
+          "emoji-mart"
+        ) ||
+        e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
+          "emoji-mart"
+        )
+      )
+        return;
+      document.querySelector(".emoji-mart").classList.remove("block");
+    }
+  };
   componentDidMount() {
     window.addEventListener("click", this.removeDropDown);
-    window.addEventListener("click",this.handleDropdown2);
+    window.addEventListener("click", this.handleDropdown2);
     //! for rendering user from database
     db.collection("users").onSnapshot(querySnapshot => {
       let users = [];
@@ -185,7 +203,8 @@ class Comments extends Component {
         const userTodo = this.state.users.find(el => el.id === todo.userId);
         todo.url = userTodo.url || img;
         this.setState({ todo });
-        this.statusLog()
+        this.statusLog1();
+        this.statusLog();
       });
     });
     //! for rendering comments from database
@@ -225,16 +244,43 @@ class Comments extends Component {
       </li>
     ));
   };
+  // !status log
+  statusLog1 = () => {
+    let workingOnIt = this.state.todo.timer ? this.state.todo.timer[0] : null;
+    let endTime = this.state.todo.endTime;
+    let stuckTimer = this.state.todo.stuckTimer
+      ? this.state.todo.stuckTimer[0]
+      : null;
+    let timeOfDone = new Date(endTime).toLocaleTimeString();
+    let timeOfworking = new Date(workingOnIt).toLocaleTimeString();
+    let timeOfstuck = new Date(stuckTimer).toLocaleTimeString();
+    if (this.refs.statusLog1) {
+      if (workingOnIt && endTime && stuckTimer) {
+        this.refs.statusLog1.innerHTML = `<b>Working on it:</b> ${timeOfworking} | <b>Stuck:</b> ${timeOfstuck} | <b>Done:</b> ${timeOfDone}`;
+      } else if (endTime && stuckTimer) {
+        this.refs.statusLog1.innerHTML = `<b>Stuck:</b> ${timeOfstuck} | <b>Done:</b> ${timeOfDone}`;
+      } else if (workingOnIt && endTime) {
+        this.refs.statusLog1.innerHTML = `<b>Working on it:</b> ${timeOfworking} | <b>Done:</b> ${timeOfDone}`;
+      } else if (workingOnIt && stuckTimer) {
+        this.refs.statusLog1.innerHTML = `<b>Working on it:</b> ${timeOfworking} | <b>Stuck:</b> ${timeOfstuck}`;
+      } else if (endTime) {
+        this.refs.statusLog1.innerHTML += `<b>Done:</b> ${timeOfDone}`;
+      } else if (stuckTimer) {
+        this.refs.statusLog1.innerHTML += `<b>Stuck:</b> ${timeOfstuck}`;
+      } else if (workingOnIt) {
+        this.refs.statusLog1.innerHTML += `<b>Working on it:</b> : ${timeOfworking}`;
+      }
+    }
+  };
 
   //! showComments
 
   showComments = () => {
     const comments = [...this.state.comments, ...this.state.sortedTimes];
     comments.sort((a, b) => b.date - a.date);
-    
+
     return comments.map((comment, i) => {
-      const user =
-        this.state.users.find(el => el.id === comment.userId) || {};
+      const user = this.state.users.find(el => el.id === comment.userId) || {};
       if (user) {
         return (
           <article
@@ -245,7 +291,9 @@ class Comments extends Component {
           >
             <div className="text-base pt-1 pl-3">
               {comment.content}
-              {comment.statusLog ? "": !comment.read ? (
+              {comment.statusLog ? (
+                ""
+              ) : !comment.read ? (
                 <i
                   title="Click here to mark comment read"
                   onClick={() => this.Read(comment.id)}
@@ -314,6 +362,17 @@ class Comments extends Component {
               />
             </div>
             <div className="personTask">{this.state.todo.title}</div>
+            <div
+              ref="statusLog1"
+              style={{
+                position: `absolute`,
+                width: `450px`,
+                right: `30px`,
+                bottom: `-35px`,
+                textAlign: `center`,
+                fontSize: "14px"
+              }}
+            ></div>
           </div>
           <div className="flex justify-start mb-4">
             <i
@@ -354,19 +413,46 @@ class Comments extends Component {
               </p>
             </div>
             <form action="/" onSubmit={this.handleUpdate}>
-            <div className="relative">
-              <textarea
-                onChange={this.handleChange}
-                name="content"
-                className="w-full py-3 px-6 border border-gary-600 rounded-lg text-sm text-black outline-none focus:border-purple-600 overflow-hidden"
-                placeholder="Write an Update..."
-                required
-                value={this.state.content}
-              ></textarea>
-              <i className="far fa-smile" id="icon" onClick={(e)=>{
-                document.querySelectorAll("section.emoji-mart")[1].classList.toggle("block");
-              }} style={{position: `absolute`, bottom: `15%`,right: `5%`}}></i>
-              <Picker title="" emoji="" onSelect={(e)=>{this.setState({content: this.state.content+e.native})}} />
+              <div className="relative">
+                <textarea
+                  onChange={this.handleChange}
+                  name="content"
+                  className="w-full py-3 px-6 border border-gary-600 rounded-lg text-sm text-black outline-none focus:border-purple-600 overflow-hidden"
+                  placeholder="Write an Update..."
+                  required
+                  value={this.state.content}
+                  onKeyDown={(e)=>{
+                    this.setState({caretPosition: e.target.selectionEnd})
+                  }}
+                  onKeyUp={(e)=>{
+                    this.setState({caretPosition: e.target.selectionEnd})
+                  }}
+                  onBlur={(e)=>{this.setState({caretPosition: e.target.selectionEnd})}}
+                ></textarea>
+                <i
+                  className="far fa-smile"
+                  id="icon"
+                  onClick={e => {
+                    if(this.context.isAuthenticated){
+                      document
+                      .querySelectorAll("section.emoji-mart")[1]
+                      .classList.toggle("block");
+                    }else{
+                      document
+                      .querySelectorAll("section.emoji-mart")[0]
+                      .classList.toggle("block");
+                    }
+                  }}
+                  style={{ position: `absolute`, bottom: `15%`, right: `5%` }}
+                ></i>
+                <Picker
+                  title=""
+                  emoji=""
+                  onSelect={e => {
+                    const content = this.state.content.slice(0,this.state.caretPosition) + e.native + this.state.content.slice(this.state.caretPosition)
+                    this.setState({ content });
+                  }}
+                />
               </div>
               <div className="flex justify-between items-center mt-4">
                 <button className="rounded px-8  py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none">

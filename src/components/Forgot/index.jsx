@@ -20,10 +20,14 @@ class Forgot extends Component {
       .updatePassword(newPassword)
       .then(() => {
         // Update successful.
-        this.props.history.push('/admin_panel/todos')
+        this.props.history.push("/admin_panel/todos");
       })
       .catch(error => {
-        // An error happened.
+        if (
+          error.message ===
+          "This operation is sensitive and requires recent authentication. Log in again before retrying this request."
+        )
+          this.props.history.push("/admin-login");
         console.error(error);
       });
   };
