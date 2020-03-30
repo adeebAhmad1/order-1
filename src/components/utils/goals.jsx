@@ -167,8 +167,6 @@ class Goals extends Component {
                 value={this.state.goal.title}
                 config={config}
                 tabIndex={1}
-                onChange={(e)=>console.log(e)}
-                onBlur={(e)=>console.log(e)}
               />
               {this.state.goal.time ? (
                 <p style={{ color: "grey", fontSize: "12px" }}>
@@ -196,8 +194,15 @@ class Goals extends Component {
               title=""
               emoji=""
               onSelect={e => {
+                const input = document.querySelector(".jodit_wysiwyg");
                 if(document.execCommand('insertText', false, e.native)) return;
-                document.querySelector(".jodit_wysiwyg").innerHTML += e.native
+                let textFinding;
+                textFinding = input.textContent.slice(this.refs.caretPosition.value,+this.refs.caretPosition.value+5)
+                let index = input.innerHTML.indexOf(textFinding);
+                if(index === -1) textFinding = input.textContent.slice(+this.refs.caretPosition.value-5,+this.refs.caretPosition.value);
+                index = input.innerHTML.indexOf(textFinding)
+                if(index === 0) index = input.innerHTML.length
+                input.innerHTML = input.innerHTML.slice(0,index) + e.native + input.innerHTML.slice(index);
               }}
             />
             <button
