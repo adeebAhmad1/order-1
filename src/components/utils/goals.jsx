@@ -57,6 +57,7 @@ class Goals extends Component {
         )
           return;
       }
+      if(e.target.classList.contains("jodit_wysiwyg") || e.target.parentNode.classList.contains("jodit_wysiwyg") || e.target.parentNode.classList.contains("jodit_wysiwyg")|| e.target.parentNode.parentNode.classList.contains("jodit_wysiwyg")) return;
       document.querySelector(".emoji-mart").classList.remove("block");
     }
   };
@@ -195,13 +196,7 @@ class Goals extends Component {
               title=""
               emoji=""
               onSelect={e => {
-                const input = document.querySelector(".jodit_wysiwyg");
-                let textFinding;
-                textFinding = input.textContent.slice(this.refs.caretPosition.value,+this.refs.caretPosition.value+5)
-                let index = input.innerHTML.indexOf(textFinding);
-                if(index === -1) textFinding = input.textContent.slice(+this.refs.caretPosition.value-5,+this.refs.caretPosition.value);
-                index = input.innerHTML.indexOf(textFinding)
-                input.innerHTML = input.innerHTML.slice(0,index) + e.native + input.innerHTML.slice(index) 
+                document.execCommand('insertText', false, e.native)
               }}
             />
             <button
