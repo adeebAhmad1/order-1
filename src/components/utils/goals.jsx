@@ -196,7 +196,8 @@ class Goals extends Component {
               title=""
               emoji=""
               onSelect={e => {
-                document.execCommand('insertText', false, e.native)
+                if(document.execCommand('insertText', false, e.native)) return;
+                document.querySelector(".jodit_wysiwyg").innerHTML += e.native
               }}
             />
             <button
