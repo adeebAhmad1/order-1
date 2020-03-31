@@ -89,25 +89,16 @@ class Comments extends Component {
       title: `Done`,
       read: true
     };
-    const all = [...working, ...stuck, done];
+    const all = [...working, ...stuck];
     all.sort((a, b) => {
       return a.date - b.date;
     });
-    const times = all.filter((el, i) => {
+    let times = all.filter((el, i) => {
       return el.date;
     });
-    const sortedTimes = times.map((el, i) => {
+    times = times.map((el, i) => {
       if (!times[i - 1]) {
-        return {
-          content: (
-            <p>
-              Status was updated from <b>Not Started</b> to <b>{el.title}</b>.
-            </p>
-          ),
-          date: el.date,
-          read: true,
-          statusLog: true
-        };
+        return;
       } else {
         return {
           content: (
@@ -122,6 +113,7 @@ class Comments extends Component {
         };
       }
     });
+    const sortedTimes = times.filter(el=> el);
     this.setState({ sortedTimes });
   };
 

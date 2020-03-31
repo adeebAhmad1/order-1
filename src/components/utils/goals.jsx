@@ -195,14 +195,9 @@ class Goals extends Component {
               emoji=""
               onSelect={e => {
                 const input = document.querySelector(".jodit_wysiwyg");
+                input.focus()
                 if(document.execCommand('insertText', false, e.native)) return;
-                let textFinding;
-                textFinding = input.textContent.slice(this.refs.caretPosition.value,+this.refs.caretPosition.value+5)
-                let index = input.innerHTML.indexOf(textFinding);
-                if(index === -1) textFinding = input.textContent.slice(+this.refs.caretPosition.value-5,+this.refs.caretPosition.value);
-                index = input.innerHTML.indexOf(textFinding)
-                if(index === 0) index = input.innerHTML.length
-                input.innerHTML = input.innerHTML.slice(0,index) + e.native + input.innerHTML.slice(index);
+                input.innerHTML+= e.native
               }}
             />
             <button
