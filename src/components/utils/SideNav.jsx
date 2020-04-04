@@ -1,26 +1,30 @@
 import React, { Component } from "react";
-import { db } from "../../config/firebase";
+import firebase, { db } from "../../config/firebase";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 
 class SideNav extends Component {
+  static contextType = AuthContext;
   state = {
     collections: [],
-    board: null
+    board: null,
+    isLoading: true
   };
   componentDidMount() {
     this.setState({ board: this.props.board });
     db.collection("collections").onSnapshot(snapShot => {
+      this.setState({isLoading: false})
       const collections = [];
       snapShot.forEach(doc => {
         const collection = doc.data();
         collection.id = doc.id;
         collections.push(collection);
+        if (collections.length === 0)
+          db.collection("collections")
+            .add({ name: "todos" })
+            .then(() => console.log("SUCCESS"));
+        this.setState({ collections });
       });
-      if (collections.length === 0)
-        db.collection("collections")
-          .add({ name: "todos" })
-          .then(() => console.log("SUCCESS"));
-      this.setState({ collections });
     });
     this.refs.main.addEventListener("mouseenter", () => {
       if (!this.refs.main.classList.contains("main-active"))
@@ -35,19 +39,18 @@ class SideNav extends Component {
       this.refs.main.classList.toggle("main-active");
     });
   }
-  componentWillReceiveProps(props) {
+  UNSAFE_componentWillReceiveProps(props) {
     this.setState({ board: props.board });
   }
   deleteCollection = e => {
     const target = e.target.dataset || e.target.parentNode.dataset;
+    this.setState({isLoading:true})
     db.collection("collections")
       .doc(target.id)
       .delete()
       .then(() => {
-        console.log(db.collection(target.name))
         db.collection(target.name)
-          .get()
-          .then(snapShot => {
+          .onSnapshot(snapShot => {
             const boardIds = [];
             snapShot.forEach(doc => {
               boardIds.push(doc.id);
@@ -57,7 +60,7 @@ class SideNav extends Component {
                 .doc(el)
                 .delete()
                 .then(() => {
-                  window.location.replace("/admin_panel/todos")
+                  this.setState({isLoading: false})
                 });
             });
           });
@@ -67,9 +70,13 @@ class SideNav extends Component {
     this.state.collections.map((el, i) => (
       <li key={i} className={this.state.board === el.name ? "item-active" : ""}>
         {this.state.board === el.name ? (
-         <Link to={`/${this.props.page}/${el.name}`}>{el.name ==="todos" ? "Client Relations": el.name}</Link>
+          <Link to={`/${this.props.page}/${el.name}`}>
+            {el.name === "todos" ? "Client Relations" : el.name}
+          </Link>
         ) : (
-          <a href={`/${this.props.page}/${el.name}`}>{el.name ==="todos" ? "Client Relations": el.name}</a>
+          <Link to={`/${this.props.page}/${el.name}`}>
+            {el.name === "todos" ? "Client Relations" : el.name}
+          </Link>
         )}
         {this.props.page === "home" ? (
           ""
@@ -93,32 +100,62 @@ class SideNav extends Component {
         </div>
         <header className="main-head" ref="main">
           <nav className="head-nav">
-            <ul className="menu">
+            {this.state.isLoading
+            ? <div className="loader_wrapper">
+              <div className="loader"></div>
+            </div>
+            : <ul className="menu">
+            <li>
+              <Link
+                to="/"
+                onClick={e => e.preventDefault()}
+                style={{ fontSize: `35px` }}
+              >
+                Boards
+              </Link>
+            </li>
+            {this.showItems()}
+            {!(this.props.page === "home") ? (
               <li>
-                <Link
-                  to="/"
-                  onClick={e => e.preventDefault()}
-                  style={{ fontSize: `35px` }}
-                >
-                  Boards
+                <Link to="/admin_panel/add_board">
+                  <i className="fas fa-plus-circle">
+                    {" "}
+                    <span>Add Board</span>
+                  </i>
+                  &nbsp;
                 </Link>
               </li>
-              {this.showItems()}
-              {!(this.props.page === "home") ? (
-                <li>
-                  <Link to="/admin_panel/add_board">
-                    <i className="fas fa-plus-circle">
-                      {" "}
-                      <span>Add Board</span>
-                    </i>
-                    &nbsp;
-                  </Link>
-                </li>
-              ) : (
-                ""
-              )}
-            </ul>
+            ) : (
+              ""
+            )}
+          </ul>
+            }
           </nav>
+          {this.context.isAuthenticated ? (
+            <Link
+              className="login-button"
+              onClick={() =>
+                firebase
+                  .auth()
+                  .signOut()
+                  .then(() => {})
+                  .catch(error => {
+                    // An error happened.
+                    alert(error);
+                  })
+              }
+              to="/"
+            >
+              Sign Out
+            </Link>
+          ) : (
+            <Link
+              className="login-button"
+              to="/admin-login"
+            >
+              Admin Login
+            </Link>
+          )}
         </header>
       </div>
     );

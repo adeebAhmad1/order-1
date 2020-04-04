@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { db } from "../../../config/firebase";
-import { Link } from "react-router-dom";
 class Add_Board extends Component {
   state={
     board: ""

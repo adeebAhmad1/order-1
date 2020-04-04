@@ -6,6 +6,7 @@ import img from "../../images/no_image.jpg";
 import { db } from "../../config/firebase";
 
 class Todo extends Component {
+  _isMounted = false;
   state = {
     id: null,
     users: [],
@@ -41,15 +42,31 @@ class Todo extends Component {
   };
   componentWillUnmount() {
     window.removeEventListener("click", this.removeDropdown2);
+    this._isMounted = false
   }
   removeDropdown2 = e => {
     if (e.target.id === "dropdown1") return false;
     this.refs.dropdown1.classList.remove("block");
   };
-  UNSAFE_componentWillReceiveProps() {
-    var text = this.refs.status.textContent;
-    this.setState({ endTime: this.props.endTime, status: text });
-    this.state.status = text;
+  UNSAFE_componentWillReceiveProps(props) {
+    this.setState({ endTime: props.endTime, status: props.status, board: props.board  });
+    if (props.status !== "Not Started") {
+      if (this.state.iTimes === 0) {
+        if (props.timer && props.stuckTimer) {
+          if (props.stuckTimer[0] > props.timer[0]) {
+            this.updateTime(props.timer[0], props.endTime);
+          } else {
+            this.updateTime(props.stuckTimer[0], props.endTime);
+          }
+        } else if (props.timer) {
+          this.updateTime(props.timer[0], props.endTime);
+        } else if (props.stuckTimer) {
+          this.updateTime(props.stuckTimer[0], props.endTime);
+        } else {
+          this.updateTime();
+        }
+      }
+    }
     if (this.state.status === "Done") {
       this.refs.status_wrapper.style.backgroundColor = "#03C977";
       this.refs.dropdown1.classList.add("invisible");
@@ -78,61 +95,61 @@ class Todo extends Component {
     }
   }
   componentDidMount = () => {
-    this.setState({ commentsLength: this.props.commentsLength,board: this.props.board });
-
+    this._isMounted = true
+    this.setState({
+      commentsLength: this.props.commentsLength,
+      board: this.props.board
+    });
     //! getting users from fatabase
-    db.collection("users")
-      .get()
-      .then(querySnapshot => {
-        let users = [];
-        querySnapshot.forEach(doc => {
-          let user = doc.data();
-          user.id = doc.id;
-          users.push(user);
-        });
-        window.addEventListener("click", this.removeDropdown2);
-        const user = users.find(el => el.id === this.props.userId) || {};
-        this.setState({ users, user, status: this.props.status });
-        if (this.state.status === "Done") {
-          this.refs.status_wrapper.style.backgroundColor = "#03C977";
-          this.refs.dropdown1.classList.add("invisible");
-          this.updateTime();
-          this.stopTimer();
-        } else if (this.state.status === "Stuck") {
-          this.refs.status_wrapper.style.backgroundColor = "#E1445B";
-          if (this.state.iTimes === 0) this.updateTime();
-        } else if (this.state.status === "Working on it") {
-          this.refs.status_wrapper.style.backgroundColor = "#F7AE3C";
-          if (this.state.iTimes === 0) this.updateTime();
-        } else if (this.state.status === "Not Started") {
-          this.refs.status_wrapper.style.backgroundColor = "#599EFD";
+    db.collection("users").get().then(querySnapshot => {
+        if (this._isMounted) {
+          let users = [];
+          querySnapshot.forEach(doc => {
+            let user = doc.data();
+            user.id = doc.id;
+            users.push(user);
+          });
+          console.log(this.props.userId)
+          window.addEventListener("click", this.removeDropdown2);
+          const user = users.find(el => el.id === this.props.userId) || {};
+          this.setState({ users, user, status: this.props.status });
+          if (this.props.status !== "Not Started") {
+            if (this.state.iTimes === 0) {
+              if (this.props.timer && this.props.stuckTimer) {
+                if (this.props.stuckTimer[0] > this.props.timer[0]) {
+                  this.updateTime(this.props.timer[0], this.props.endTime);
+                } else {
+                  this.updateTime(this.props.stuckTimer[0], this.props.endTime);
+                }
+              } else if (this.props.timer) {
+                this.updateTime(this.props.timer[0], this.props.endTime);
+              } else if (this.props.stuckTimer) {
+                this.updateTime(this.props.stuckTimer[0], this.props.endTime);
+              } else {
+                this.updateTime();
+              }
+            }
+          }
+          if (this.state.status === "Done") {
+            this.refs.status_wrapper.style.backgroundColor = "#03C977";
+            this.refs.dropdown1.classList.add("invisible");
+            this.stopTimer();
+          } else if (this.state.status === "Stuck") {
+            this.refs.status_wrapper.style.backgroundColor = "#E1445B";
+          } else if (this.state.status === "Working on it") {
+            this.refs.status_wrapper.style.backgroundColor = "#F7AE3C";
+          } else if (this.state.status === "Not Started") {
+            this.refs.status_wrapper.style.backgroundColor = "#599EFD";
+          }
         }
       });
   };
-  componentWillReceiveProps(props){
-    this.setState({board: props.board})
-  }
   //! show timer for users
-  updateTime = () => {
-    let timer;
-    if (this.props.timer) {
-      if (this.props.stuckTimer) {
-        if (this.props.stuckTimer[0] > this.props.timer[0]) {
-          timer = this.props.timer[0];
-        } else if (this.props.stuckTimer[0] < this.props.timer[0]) {
-          timer = this.props.stuckTimer[0];
-        }
-      } else {
-        timer = this.props.timer[0];
-      }
-    } else if (this.props.stuckTimer) {
-      timer = this.props.stuckTimer[0];
-    } else {
-      timer = new Date().getTime();
-    }
+  updateTime = (startTime, endTime) => {
+    const timer = startTime || new Date().getTime();
     this.setState({ iTimes: 1 });
     setInterval(() => {
-      const now = this.state.endTime || this.props.endTime || new Date().getTime();
+      const now = endTime || new Date().getTime();
       const remainingTime = now - timer;
       const seconds = Math.floor(remainingTime / 1000);
       const mins = Math.floor(seconds / 60);
@@ -150,6 +167,9 @@ class Todo extends Component {
       } else {
         this.setState({ time: `00:00:00` });
       }
+      if (this.props.clone) {
+        this.setState({ time: `` });
+      }
     }, 1000);
   };
   //status dropdown
@@ -157,7 +177,7 @@ class Todo extends Component {
     const status_priority_dropdown = document.querySelectorAll(
       `#panel-${arrI} .status_priority_wrapper > .status_priority_dropdown`
     );
-    
+
     const all_dropdowns = document.querySelectorAll(
       `.status_priority_wrapper > .status_priority_dropdown`
     );
@@ -179,18 +199,31 @@ class Todo extends Component {
         [i].addEventListener("click", e => {
           var text = e.target.innerText;
           this.setState({ status: text });
+          if (this.state.status !== "Not Started") {
+            if (this.props.timer && this.props.stuckTimer) {
+              if (this.props.stuckTimer[0] > this.props.timer[0]) {
+                this.updateTime(this.props.timer[0], this.props.endTime);
+              } else {
+                this.updateTime(this.props.stuckTimer[0], this.props.endTime);
+              }
+            } else if (this.props.timer) {
+              this.updateTime(this.props.timer[0], this.props.endTime);
+            } else if (this.props.stuckTimer) {
+              this.updateTime(this.props.stuckTimer[0], this.props.endTime);
+            } else {
+              this.updateTime();
+            }
+          }
           if (this.state.status === "Done") {
             this.setState({
               confettiStart: true
             });
             status_priority_wrapper.style.backgroundColor = "#48bb77";
             this.refs.status.innerText = "Done";
-            this.updateTime();
             this.stopTimer();
           } else if (this.state.status === "Stuck") {
             this.refs.status.innerText = "Stuck";
             status_priority_wrapper.style.backgroundColor = "#E1445B";
-            this.updateTime();
             let stuckTimer;
             if (this.props.stuckTimer) {
               if (this.props.stuckTimer.length > 0) {
@@ -206,13 +239,9 @@ class Todo extends Component {
               .update({
                 stuckTimer
               })
-              .then(() => {
-                window.location.reload();
-              });
           } else if (this.state.status === "Working on it") {
             this.refs.status.innerText = "Working on it";
             status_priority_wrapper.style.backgroundColor = "#d69e2e";
-            this.updateTime();
             let timer;
             if (this.props.timer) {
               if (this.props.timer.length > 0) {
@@ -227,8 +256,7 @@ class Todo extends Component {
               .doc(this.props.todoId)
               .update({
                 timer
-              })
-              .then(() => window.location.reload());
+              });
           } else if (this.state.status === "Not Started") {
             this.refs.status.innerText = "Not Started";
             status_priority_wrapper.style.backgroundColor = "#599EFD";
@@ -240,6 +268,7 @@ class Todo extends Component {
     }
     this.setState({ id });
   };
+  
   render() {
     const isRead = this.props.commentReads.find(el => el === false);
     return (
@@ -289,9 +318,9 @@ class Todo extends Component {
         </td>
         <td style={{ position: "relative" }}>
           <div
-          onMouseEnter={(e)=>{
-            e.target.title=`${this.state.user.name}`
-          }}
+            onMouseEnter={e => {
+              e.target.title = `${this.state.user.name}`;
+            }}
             className="h-full bg-cover rounded-full mx-auto "
             style={{
               width: "35px",

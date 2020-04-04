@@ -4,6 +4,7 @@ import Confetti from "react-confetti";
 import { db } from "../../../config/firebase";
 import { Link } from "react-router-dom";
 class Todo extends Component {
+  _isMounted = false;
   state = {
     userId: "",
     id: null,
@@ -26,43 +27,48 @@ class Todo extends Component {
   };
 
   //! handle submit for deleting todo
-  deleteOne = todoId => {
-    db.collection(this.props.board)
-      .doc(todoId)
-      .delete()
-      .then(() => {
-        window.location.reload();
-      })
-      .catch(error => {
-        console.error("Error removing document: ", error);
-      });
-  };
-  componentWillReceiveProps(props) {
+
+  UNSAFE_componentWillReceiveProps (props) {
     this.forceUpdate();
     this.refs.status.textContent = props.status;
     var text = this.refs.status.textContent;
     this.setState({
       status: text,
       endTime: props.endTime,
-      userId: props.userId || this.state.userId
+      userId: props.userId || this.state.userId,
+      
     });
-    if (this.state.status === "Done") {
+    if (props.status !== "Not Started") {
+      if (this.state.iTimes === 0) {
+        if (props.timer && props.stuckTimer) {
+          if (props.stuckTimer[0] > props.timer[0]) {
+            this.updateTime(props.timer[0], props.endTime);
+          } else {
+            this.updateTime(props.stuckTimer[0], props.endTime);
+          }
+        } else if (props.timer) {
+          this.updateTime(props.timer[0], props.endTime);
+        } else if (props.stuckTimer) {
+          this.updateTime(props.stuckTimer[0], props.endTime);
+        } else {
+          this.updateTime();
+        }
+      }
+    }
+    if (props.status === "Done") {
       this.refs.status1.style.backgroundColor = "#03C977";
       this.refs.dropdown1.classList.add("invisible");
-      this.updateTime();
       this.stopTimer();
-    } else if (this.state.status === "Stuck") {
-      if (this.state.iTimes === 0) this.updateTime();
+    } else if (props.status === "Stuck") {
       this.refs.status1.style.backgroundColor = "#E1445B";
-    } else if (this.state.status === "Working on it") {
+    } else if (props.status === "Working on it") {
       this.refs.status1.style.backgroundColor = "#F7AE3C";
-      if (this.state.iTimes === 0) this.updateTime();
-    } else if (this.state.status === "Not Started") {
+    } else if (props.status === "Not Started") {
       this.refs.dropdown1.classList.remove("invisible");
       this.refs.status1.style.backgroundColor = "#599EFD";
     }
   }
-  componentWillUpdate() {
+  UNSAFE_componentWillUpdate () {
     if (this.state.status === "Done") {
       this.refs.status1.style.backgroundColor = "#03C977";
       this.refs.dropdown1.classList.add("invisible");
@@ -77,9 +83,9 @@ class Todo extends Component {
   }
   componentDidMount() {
     //! getting users from fatabase
-    db.collection("users")
-      .get()
-      .then(querySnapshot => {
+    this._isMounted = true;
+    db.collection("users").onSnapshot(querySnapshot => {
+      if (this._isMounted) {
         let users = [];
         querySnapshot.forEach(doc => {
           let user = doc.data();
@@ -91,18 +97,32 @@ class Todo extends Component {
           userId: this.props.userId,
           status: this.props.status
         });
+        if (this.props.status !== "Not Started") {
+          if (this.state.iTimes === 0) {
+            if (this.props.timer && this.props.stuckTimer) {
+              if (this.props.stuckTimer[0] > this.props.timer[0]) {
+                this.updateTime(this.props.timer[0], this.props.endTime);
+              } else {
+                this.updateTime(this.props.stuckTimer[0], this.props.endTime);
+              }
+            } else if (this.props.timer) {
+              this.updateTime(this.props.timer[0], this.props.endTime);
+            } else if (this.props.stuckTimer) {
+              this.updateTime(this.props.stuckTimer[0], this.props.endTime);
+            } else {
+              this.updateTime();
+            }
+          }
+        }
         if (this.state.status === "Done") {
           this.refs.status1.style.backgroundColor = "#03C977";
           if (this.refs.dropdown1)
             this.refs.dropdown1.classList.add("invisible");
-          this.updateTime();
           this.stopTimer();
         } else if (this.state.status === "Stuck") {
-          if (this.state.iTimes === 0) this.updateTime();
           this.refs.status1.style.backgroundColor = "#E1445B";
         } else if (this.state.status === "Working on it") {
           this.refs.status1.style.backgroundColor = "#F7AE3C";
-          if (this.state.iTimes === 0) this.updateTime();
         } else if (this.state.status === "Not Started") {
           if (this.refs.dropdown1)
             this.refs.dropdown1.classList.remove("invisible");
@@ -115,9 +135,11 @@ class Todo extends Component {
           });
         window.addEventListener("click", this.removeDropdown);
         window.addEventListener("click", this.removeDropdown2);
-      });
+      }
+    });
   }
   componentWillUnmount() {
+    this._isMounted = false;
     window.removeEventListener("click", this.removeDropdown);
     window.removeEventListener("click", this.removeDropdown2);
   }
@@ -158,29 +180,12 @@ class Todo extends Component {
     if (e.target.id === "dropdown1") return false;
     if (this.refs.dropdown1) this.refs.dropdown1.classList.remove("block");
   };
-  updateTime = () => {
-    let timer;
-    if (this.props.timer) {
-      if (this.props.stuckTimer) {
-        if (this.props.stuckTimer[0] > this.props.timer[0]) {
-          timer = this.props.timer[0];
-        } else if (this.props.stuckTimer[0] < this.props.timer[0]) {
-          timer = this.props.stuckTimer[0];
-        }
-      } else {
-        timer = this.props.timer[0];
-      }
-    } else if (this.props.stuckTimer) {
-      timer = this.props.stuckTimer[0];
-    } else {
-      timer = new Date().getTime();
-    }
+  updateTime = (startTime, endTime) => {
+    const timer = startTime || new Date().getTime();
     this.setState({ iTimes: 1 });
     setInterval(() => {
-      const now =
-        this.state.endTime || this.props.endTime || new Date().getTime();
+      const now = endTime || new Date().getTime();
       const remainingTime = now - timer;
-
       const seconds = Math.floor(remainingTime / 1000);
       const mins = Math.floor(seconds / 60);
       const remainingSeconds = seconds % 60;
@@ -197,7 +202,6 @@ class Todo extends Component {
       } else {
         this.setState({ time: `00:00:00` });
       }
-
       if (this.props.clone) {
         this.setState({ time: `` });
       }
@@ -243,6 +247,22 @@ class Todo extends Component {
         [i].addEventListener("click", e => {
           const text = e.target.innerText;
           this.setState({ status: text });
+
+          if (this.state.status !== "Not Started") {
+            if (this.props.timer && this.props.stuckTimer) {
+              if (this.props.stuckTimer[0] > this.props.timer[0]) {
+                this.updateTime(this.props.timer[0], this.props.endTime);
+              } else {
+                this.updateTime(this.props.stuckTimer[0], this.props.endTime);
+              }
+            } else if (this.props.timer) {
+              this.updateTime(this.props.timer[0], this.props.endTime);
+            } else if (this.props.stuckTimer) {
+              this.updateTime(this.props.stuckTimer[0], this.props.endTime);
+            } else {
+              this.updateTime();
+            }
+          }
           if (this.state.status === "Done") {
             this.setState({
               confettiStart: true
@@ -250,12 +270,10 @@ class Todo extends Component {
             status_priority_wrapper.style.backgroundColor = "#03C977";
             this.refs.status.innerText = "Done";
             status_priority_dropdown[id].classList.add("invisible");
-            this.updateTime();
             this.stopTimer();
           } else if (this.state.status === "Stuck") {
             this.refs.status.innerText = "Stuck";
             status_priority_wrapper.style.backgroundColor = "#E1445B";
-            this.updateTime();
             let stuckTimer;
             if (this.props.stuckTimer) {
               if (this.props.stuckTimer.length > 0) {
@@ -270,14 +288,10 @@ class Todo extends Component {
               .doc(this.props.todoId)
               .update({
                 stuckTimer
-              })
-              .then(() => {
-                window.location.reload();
               });
           } else if (this.state.status === "Working on it") {
             this.refs.status.innerText = "Working on it";
             status_priority_wrapper.style.backgroundColor = "#F7AE3C";
-            this.updateTime();
             let timer;
             if (this.props.timer) {
               if (this.props.timer.length > 0) {
@@ -292,9 +306,6 @@ class Todo extends Component {
               .doc(this.props.todoId)
               .update({
                 timer
-              })
-              .then(() => {
-                window.location.reload();
               });
           } else if (text === "Not Started") {
             this.refs.status.innerText = "Not Started";
@@ -483,7 +494,7 @@ class Todo extends Component {
         <td>
           {!this.props.clone ? (
             <button
-              onClick={e => this.deleteOne(this.props.todoId)}
+              onClick={() => this.props.deleteOne(this.props.todoId)}
               className="rounded px-4 py-2 text-center bg-red-800 text-white cursor-pointer ml-3 outline-none"
             >
               {this.props.state}

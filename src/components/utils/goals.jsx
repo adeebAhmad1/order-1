@@ -57,74 +57,71 @@ class Goals extends Component {
         )
           return;
       }
-      if(e.target.classList.contains("jodit_wysiwyg") || e.target.parentNode.classList.contains("jodit_wysiwyg") || e.target.parentNode.classList.contains("jodit_wysiwyg")|| e.target.parentNode.parentNode.classList.contains("jodit_wysiwyg")) return;
+      if (
+        e.target &&
+        e.target.parentNode &&
+        e.target.parentNode.parentNode &&
+        e.target.parentNode.parentNode.parentNode
+      )
+        if (
+          e.target.classList.contains("jodit_wysiwyg") ||
+          e.target.parentNode.classList.contains("jodit_wysiwyg") ||
+          e.target.parentNode.parentNode.classList.contains("jodit_wysiwyg") ||
+          e.target.parentNode.parentNode.parentNode.classList.contains(
+            "jodit_wysiwyg"
+          )
+        )
+          return;
       document.querySelector(".emoji-mart").classList.remove("block");
     }
   };
   componentWillUnmount() {
     window.removeEventListener("click", this.handleDropdown2);
   }
-  printCaretPosition = (e, elm) => {
-    this.refs.caretPosition.value = this.getCaretCharOffset(elm);
-    console.log(this.refs.caretPosition.value)
-  };
-  getCaretCharOffset = element => {
-    var caretOffset = 0;
-
-    if (window.getSelection) {
-      var range = window.getSelection().getRangeAt(0);
-      var preCaretRange = range.cloneRange();
-      preCaretRange.selectNodeContents(element);
-      preCaretRange.setEnd(range.endContainer, range.endOffset);
-      caretOffset = preCaretRange.toString().length;
-    } else if (document.selection && document.selection.type !== "Control") {
-      var textRange = document.selection.createRange();
-      var preCaretTextRange = document.body.createTextRange();
-      preCaretTextRange.moveToElementText(element);
-      preCaretTextRange.setEndPoint("EndToEnd", textRange);
-      caretOffset = preCaretTextRange.text.length;
-    }
-    return caretOffset;
-  };
-  abcd=()=>{
-    document.querySelector(".jodit_wysiwyg").focus()
-    setTimeout(()=>{
-      const event = new KeyboardEvent("keypress",{
-        metaKey: true,
-        key: ".",
-        code: "Period"
-      });
-      document.querySelector(".jodit_wysiwyg").dispatchEvent(event)
-    },1000)
-  }
   componentDidMount = () => {
     this.setState({ board: this.props.board });
-    window.addEventListener("click", this.handleDropdown2);
-    //! for getting all goals
-    db.collection("goals")
-      .get()
-      .then(querySnapshot => {
-        const goals = [];
-        querySnapshot.forEach(doc => {
-          const goal = doc.data();
-          goal.id = doc.id;
-          if (!goal.board) goal.board = "todos";
-          goals.push(goal);
+      window.addEventListener("click", this.handleDropdown2);
+      //! for getting all goals
+      db.collection("goals")
+        .get()
+        .then(querySnapshot => {
+          const goals = [];
+          querySnapshot.forEach(doc => {
+            const goal = doc.data();
+            goal.id = doc.id;
+            if (!goal.board) goal.board = "todos";
+            goals.push(goal);
+          });
+          const goal = goals.find(goal => goal.board === this.state.board);
+          if (goal) {
+            this.refs.goal.innerHTML = goal.title;
+            this.setState({ goal });
+          }
         });
-        const goal = goals.find(goal => goal.board === this.state.board);
-        if (goal) {
-          this.refs.goal.innerHTML = goal.title;
-          this.setState({ goal });
-        }
-        setTimeout(() => {
-          const elm = document.querySelector(".jodit_wysiwyg");
-          elm.addEventListener("click", e => this.printCaretPosition(e, elm));
-          elm.addEventListener("keydown", e => this.printCaretPosition(e, elm));
-        }, 700);
-      });
   };
-  componentWillReceiveProps(props) {
-    this.setState({ board: props.board });
+  UNSAFE_componentWillReceiveProps(props) {
+    if(props.board !== this.state.board){
+      this.setState({ board: props.board });
+      window.addEventListener("click", this.handleDropdown2);
+      //! for getting all goals
+      db.collection("goals")
+        .get()
+        .then(querySnapshot => {
+          const goals = [];
+          querySnapshot.forEach(doc => {
+            const goal = doc.data();
+            goal.id = doc.id;
+            if (!goal.board) goal.board = "todos";
+            goals.push(goal);
+          });
+          const goal = goals.find(goal => goal.board === this.state.board);
+          if (goal) {
+            this.refs.goal.innerHTML = goal.title;
+            this.setState({ goal });
+          }
+        });
+      this.setState({ board: props.board });
+    }
   }
   //! handle submit for Saving update goal
   Save = goalId => {
@@ -148,9 +145,11 @@ class Goals extends Component {
     const config = {
       readonly: false
     };
+    if(this.refs.goal){
+      this.refs.goal.innerHTML = this.state.goal.title || "";
+    }
     return (
-      <div>
-        <input type="text" style={{display: `none`}} defaultValue="0" ref="caretPosition" />
+      <div style={{position: `relative`}}>
         {this.context.isAuthenticated ? (
           <div style={{ margin: "0 auto", textAlign: "center" }}>
             <div
@@ -169,6 +168,8 @@ class Goals extends Component {
                 tabIndex={1}
               />
               {this.state.goal.time ? (
+                this.state.goal.title === "" ? ""
+                :
                 <p style={{ color: "grey", fontSize: "12px" }}>
                   {" "}
                   Posted By <b>Admin</b> on{" "}
@@ -183,25 +184,23 @@ class Goals extends Component {
               className="far fa-smile left"
               id="icon"
               onClick={() => {
-                document
-                  .querySelector("section.emoji-mart")
-                  .classList.toggle("block");
+                document.querySelector("section.emoji-mart").classList.toggle("block");
               }}
-              style={{ position: `absolute`,left:'20%', color: "blue" }}
+              style={{ position: `absolute`, left: "81%",bottom:`0`, color: "blue" }}
             ></i>
             <Picker
-              style={{ position: `absolute`, left: "20%", top: "45%" }}
+              style={{ position: `absolute`, left: "60%", top: "100%" }}
               title=""
               emoji=""
               onSelect={e => {
                 const input = document.querySelector(".jodit_wysiwyg");
-                input.focus()
-                if(document.execCommand('insertText', false, e.native)) return;
-                input.innerHTML+= e.native
+                input.focus();
+                if (document.execCommand("insertText", false, e.native)) return;
+                input.innerHTML += e.native;
               }}
             />
             <button
-              style={{ position: `relative`, left: `23%` }}
+              style={{ position: `absolute`, left: `50%` }}
               onClick={() => this.Save(this.state.goal.id)}
               className="rounded btn mt-1 px-4 py-2 text-center bg-blue-600 text-white cursor-pointer ml-3 outline-none"
             >
@@ -214,22 +213,24 @@ class Goals extends Component {
               textAlign: "center",
               backgroundColor: "#F5F6F8",
               padding: "10px",
-              width: "100vh",
+              width: "60%",
               margin: "0 auto",
               position: `relative`
             }}
           >
-            <p ref="goal"></p>
+            <p className="jodit_wysiwyg" ref="goal"></p>
             {this.state.goal.time ? (
-              <p style={{ color: "grey", fontSize: "12px" }}>
-                {" "}
-                Posted By <b>Admin</b> on{" "}
-                {new Date(this.state.goal.time).toLocaleTimeString()}{" "}
-                {new Date(this.state.goal.time).toDateString()}
-              </p>
-            ) : (
-              ""
-            )}
+                this.state.goal.title === "" ? ""
+                :
+                <p style={{ color: "grey", fontSize: "12px" }}>
+                  {" "}
+                  Posted By <b>Admin</b> on{" "}
+                  {new Date(this.state.goal.time).toLocaleTimeString()}{" "}
+                  {new Date(this.state.goal.time).toDateString()}
+                </p>
+              ) : (
+                ""
+              )}
           </div>
         )}
       </div>
@@ -238,4 +239,3 @@ class Goals extends Component {
 }
 
 export default Goals;
-

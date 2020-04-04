@@ -6,7 +6,6 @@ import { BrowserRouter, Route } from "react-router-dom";
 
 import Header from "./components/layout/Header";
 
-import Home from "./components/Home";
 
 import Login from "./components/Login";
 import Forgot from "./components/Forgot";
@@ -29,6 +28,7 @@ import AuthContextProvider from "./context/AuthContext";
 //css
 import "./App.css";
 import Add_Board from "./components/Admin_Panel/Add_Board";
+import Table from "./components/Table";
 
 class App extends Component {
   render() {
@@ -37,8 +37,8 @@ class App extends Component {
         <BrowserRouter>
           <div>
             <Header />
-            <Route exact path="/" component={Home}  />
-            <Route path="/home/:board" component={Home} />
+            <Route exact path="/" component={Table}  />
+            <Route path="/home/:board" component={Table} />
             <Route path="/home/:board/comments/:commentId" component={Comments} />
             <Route exact path="/admin-login" component={Login} />
             <Route exact path="/admin_forgot" component={Forgot} />

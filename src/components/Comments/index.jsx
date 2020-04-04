@@ -69,7 +69,7 @@ class Comments extends Component {
   statusLog = () => {
     let workingOnIt = this.state.todo.timer || [];
     let stuckTimer = this.state.todo.stuckTimer || [];
-    let endTime = this.state.todo.endTime;
+    // let endTime = this.state.todo.endTime;
     const working = workingOnIt.map((el, i) => {
       return {
         date: el,
@@ -84,11 +84,11 @@ class Comments extends Component {
         read: true
       };
     });
-    const done = {
-      date: endTime,
-      title: `Done`,
-      read: true
-    };
+    // const done = {
+    //   date: endTime,
+    //   title: `Done`,
+    //   read: true
+    // };
     const all = [...working, ...stuck];
     all.sort((a, b) => {
       return a.date - b.date;
@@ -98,7 +98,7 @@ class Comments extends Component {
     });
     times = times.map((el, i) => {
       if (!times[i - 1]) {
-        return;
+        return null;
       } else {
         return {
           content: (
@@ -362,7 +362,7 @@ class Comments extends Component {
                 right: `30px`,
                 bottom: `-35px`,
                 textAlign: `center`,
-                fontSize: "14px"
+                fontSize: "12px"
               }}
             ></div>
           </div>

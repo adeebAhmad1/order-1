@@ -1,10 +1,11 @@
+//jshint esversion: 6
 import React, { Component } from "react";
+
 import { Link } from "react-router-dom";
 //components
 import Todo from "./Table/todo";
-import Goal from '../utils/goals'
+import Goal from "../utils/goals";
 //firebase
-import firebase from "../../config/firebase";
 import { db } from "../../config/firebase";
 import Img from "../../images/no_image.jpg";
 //context
@@ -13,6 +14,7 @@ import Collapsible from "../utils/Collapsible";
 import SideNav from "../utils/SideNav";
 
 class Index extends Component {
+  _isMounted = false
   static contextType = AuthContext;
   state = {
     todos: [],
@@ -26,8 +28,11 @@ class Index extends Component {
     isOpened: false,
     add: false,
     activeUser: {},
-    board: ""
+    board: "",
+    isLoading: true,
+    boardLoading: true
   };
+  
   //! for showing users in dropdown
   showUsers = () => {
     return this.state.users.map((user, i) => {
@@ -71,11 +76,12 @@ class Index extends Component {
     this.setState({ activeUser: user });
     this.refs.images.style.backgroundImage = `url(${user.url})`;
   };
-
-  componentDidMount = () => {
-    //! for getting all todos
-    this.setState({board: this.props.match.params ? this.props.match.params.board || "todos" : "todos"})
-    db.collection( this.props.match.params ? this.props.match.params.board || "todos" : "todos" )
+  getTodos = (board) => {
+    db.collection(
+      board || (this.props.match.params
+        ? this.props.match.params.board || "todos"
+        : "todos")
+    )
       .get()
       .then(querySnapshot => {
         let todos = [];
@@ -87,7 +93,7 @@ class Index extends Component {
         //! for sorting
         todos.sort((a, b) => a.title.localeCompare(b.title));
         todos.sort((a, b) => b.date - a.date);
-        this.setState({ todos, todoIds: todos.map(el => el.id) });
+        this.setState({ todos, todoIds: todos.map(el => el.id) , isLoading: false,boardLoading: false });
         var group = {};
         this.state.todos.forEach(el => {
           const date = new Date(
@@ -99,19 +105,27 @@ class Index extends Component {
             group[date] = new Array(el);
           }
         });
-        this.setState({ group });
+        this.setState({ group});
       });
+  };
+  componentDidMount = () => {
+    this._isMounted = true
+    //! for getting all todos
+    this.setState({
+      board: this.props.match.params
+        ? this.props.match.params.board || "todos"
+        : "todos"
+    });
+    this.getTodos();
     //! getting tasks from fatabase
-    db.collection("tasks")
-      .get()
-      .then(querySnapshot => {
-        let tasks = [];
-        querySnapshot.forEach(doc => {
-          let task = doc.data();
-          tasks.push(task);
-        });
-        this.setState({ tasks });
+    db.collection("tasks").onSnapshot(querySnapshot => {
+      let tasks = [];
+      querySnapshot.forEach(doc => {
+        let task = doc.data();
+        tasks.push(task);
       });
+      this.setState({ tasks });
+    });
     //! for rendering comments from database
     db.collection("comments").onSnapshot(querySnapshot => {
       let comments = [];
@@ -128,18 +142,16 @@ class Index extends Component {
       });
     });
     //! for rendering comments from database
-    db.collection("users")
-      .get()
-      .then(querySnapshot => {
-        let users = [];
-        querySnapshot.forEach(doc => {
-          let user = doc.data();
-          user.id = doc.id;
-          users.push(user);
-        });
-        this.setState({ users });
-        window.addEventListener("click", this.removeDropdown);
+    db.collection("users").onSnapshot(querySnapshot => {
+      let users = [];
+      querySnapshot.forEach(doc => {
+        let user = doc.data();
+        user.id = doc.id;
+        users.push(user);
       });
+      this.setState({ users });
+      window.addEventListener("click", this.removeDropdown);
+    });
   };
 
   //!dropdown for tasksvalues
@@ -154,7 +166,10 @@ class Index extends Component {
       </option>
     ));
   };
-
+  deleteTodo=()=>{
+    
+    this.getTodos()
+  }
   //? For Cloning the Existing Todos
   cloneAll = () => {
     //* Clone All Todo
@@ -332,89 +347,86 @@ class Index extends Component {
     });
   };
   componentWillUnmount() {
+    this._isMounted = false
     window.removeEventListener("click", this.removeDropdown);
   }
-  componentWillReceiveProps(props){
-    if(props.match.params.board !== this.state.board){
-      db.collection(props.match.params ? props.match.params.board : "todos")
-      .get()
-      .then(querySnapshot => {
-        let todos = [];
-        querySnapshot.forEach(doc => {
-          let todo = doc.data();
-          todo.id = doc.id;
-          todos.push(todo);
-        });
-        //! for sorting
-        todos.sort((a, b) => a.title.localeCompare(b.title));
-        todos.sort((a, b) => b.date - a.date);
-        this.setState({ todos, todoIds: todos.map(el => el.id) });
-        var group = {};
-        this.state.todos.forEach(el => {
-          const date = new Date(
-            el.date + new Date().getTimezoneOffset() * 60 * 1000
-          ).toDateString();
-          if (date in group) {
-            group[date].push(el);
-          } else {
-            group[date] = new Array(el);
-          }
-        });
-        this.setState({ group });
-      });
-      this.setState({board: props.match.params.board})
+  UNSAFE_componentWillReceiveProps (props) {
+    if (props.match.params.board !== this.state.board) {
+      this.setState({isLoading: true,boardLoading: true})
+      this.getTodos(props.match.params.board)
+      this.setState({ board: props.match.params.board });
     }
   }
   //! for rendering all todos
   showTodos = (todos, arrI) => {
-    return todos.map((el, i) => {
-      let date;
-      if (el.date) {
-        let dateArray = new Date(
-          el.date + new Date().getTimezoneOffset() * 60 * 1000
-        )
-          .toLocaleDateString()
-          .split("/");
-        date = [
-          dateArray[2],
-          dateArray[0] >= 10 ? dateArray[0] : "0" + dateArray[0],
-          dateArray[1] >= 10 ? dateArray[1] : "0" + dateArray[1]
-        ].join("-");
+    if(todos.length > 0){
+      if(this._isMounted){
+        return todos.map((el, i) => {
+          let date;
+          if (el.date) {
+            let dateArray = new Date(
+              el.date + new Date().getTimezoneOffset() * 60 * 1000
+            )
+              .toLocaleDateString()
+              .split("/");
+            date = [
+              dateArray[2],
+              dateArray[0] >= 10 ? dateArray[0] : "0" + dateArray[0],
+              dateArray[1] >= 10 ? dateArray[1] : "0" + dateArray[1]
+            ].join("-");
+          }
+          const comments = this.state.comments.filter(
+            comment => el.id === comment.todoId
+          );
+          const commentsLength = comments.length;
+          const commentReads = comments.map(el => el.read);
+          const user = this.state.users.find(user => user.id === el.userId) || {};
+          const userId = user.id || "";
+          return (
+            <Todo
+              key={i}
+              title={<p className="title">{el.title}</p>}
+              commentsLength={commentsLength}
+              status={el.status}
+              index={i}
+              arrI={arrI}
+              stuckTimer={el.stuckTimer}
+              state={el.state ? el.state : "Delete"}
+              date={date}
+              todoId={el.id}
+              timer={el.timer}
+              url={el.id}
+              endTime={el.endTime}
+              userId={userId}
+              userImg={user.url || Img}
+              userName={user.name}
+              clone={el.clone || undefined}
+              cloneDate={this.cloneDate}
+              commentReads={commentReads}
+              board={this.state.board || "todos"}
+              deleteOne = {this.deleteOne}
+            />
+          );
+        });
+      } else{
+        return;
       }
-      const comments = this.state.comments.filter(
-        comment => el.id === comment.todoId
-      );
-      const commentsLength = comments.length;
-      const commentReads = comments.map(el => el.read);
-      const user = this.state.users.find(user => user.id === el.userId) || {};
-      const userId = user.id || "";
-      return (
-        <Todo
-          key={i}
-          title={<p className="title">{el.title}</p>}
-          commentsLength={commentsLength}
-          status={el.status}
-          index={i}
-          arrI={arrI}
-          stuckTimer={el.stuckTimer}
-          state={el.state ? el.state : "Delete"}
-          date={date}
-          todoId={el.id}
-          timer={el.timer}
-          url={el.id}
-          endTime={el.endTime}
-          userId={userId}
-          userImg={user.url || Img}
-          userName={user.name}
-          clone={el.clone || undefined}
-          cloneDate={this.cloneDate}
-          commentReads={commentReads}
-          board={this.state.board || "todos"}
-        />
-      );
-    });
+    }
+  };
+  deleteOne = todoId => { 
+    this.setState({isLoading:true});
+    db.collection(this.state.board)
+      .doc(todoId)
+      .delete()
+      .then(()=>{
+        this.getTodos()
+      })
+      .catch(error => {
+        console.error("Error removing document: ", error);
+      });
   };
   add = () => {
+    this.setState({ add: false });
     let picker = document.querySelector(".valuePicker");
     const title = picker.selectedOptions[0].innerText;
     let status = this.refs.status.innerText;
@@ -430,11 +442,12 @@ class Index extends Component {
     } else if (this.state.userId === "") {
       return;
     } else {
+      this.setState({ isLoading: true });
       db.collection(this.state.board || "todos")
         .add({ title, userId, status, date })
         .then(() => {
           this.setState({ todoId: 1 });
-          window.location.reload();
+          this.getTodos();
         })
         .catch(error => {
           console.error("Error adding document: ", error);
@@ -443,12 +456,13 @@ class Index extends Component {
   };
   //!for deleting all todos
   deleteAll = todoIds => {
+    this.setState({isLoading:true})
     todoIds.forEach(el => {
       db.collection(this.state.board || "todos")
         .doc(el)
         .delete()
         .then(() => {
-          window.location.reload();
+          this.getTodos()
         })
         .catch(error => {
           console.error("Error removing document: ", error);
@@ -457,25 +471,17 @@ class Index extends Component {
   };
   render() {
     return (
-      <div>
-      <Goal board={this.state.board || "todos"} />
-        <SideNav page="admin_panel" board={this.state.board} history={this.props.history} />
+      this.state.boardLoading ? <div className="loader_wrapper">
+        <div className="loader"></div>
+      </div> : <div>
+        <Goal board={this.state.board || "todos"} />
+        <SideNav
+          page="admin_panel"
+          board={this.state.board}
+          history={this.props.history}
+        />
         <div className="container mx-auto pt-16">
           <div className="left  justify-end mb-6">
-            <Link
-              className="rounded px-8 ml-3 py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none"
-              to="/"
-              onClick={() => {
-                firebase
-                  .auth()
-                  .signOut()
-                  .catch(error => {
-                    console.log(error);
-                  });
-              }}
-            >
-              Sign Out
-            </Link>
             <Link
               className="rounded px-8 ml-3 py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none"
               to="/admin_forgot"
@@ -485,15 +491,19 @@ class Index extends Component {
           </div>
           {this.state.clone ? (
             <button
-              onClick={() => window.location.reload()}
+              onClick={()=>{
+                this.setState({isLoading: true,clone: false});
+                this.getTodos()
+                
+              }}
               className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
             >
               Go Back
             </button>
           ) : this.state.add ? (
             <button
-              onClick={() => window.location.reload()}
               className="rounded px-4 py-2 text-center bg-white-600 border border-purple-600 ml-3 text-purple-600 cursor-pointer justify-between outline-none mt-8"
+              onClick={()=> this.setState({add: false})}
             >
               Go Back
             </button>
@@ -528,11 +538,12 @@ class Index extends Component {
                 const isUserPresent = newTodos.find(el => el.userId === "");
                 if (isUserPresent) return alert("Please Select All Users");
                 if (isDatePresent) return alert("Please Select All Dates");
+                this.setState({isLoading: true})
                 newTodos.forEach(todo => {
                   db.collection(this.state.board || "todos")
                     .add(todo)
                     .then(() => {
-                      window.location.reload();
+                      this.getTodos()
                     });
                 });
               }}
@@ -587,18 +598,25 @@ class Index extends Component {
               Clone All
             </button>
           </div>
-          {this.state.add ? (
-            <Collapsible
-              date="New Todo"
-              active={true}
-              i={-1}
-              content={this.showNewTodo()}
-            />
+          {this.state.isLoading ? (
+            <div className="loader_wrapper">
+              <div className="loader"></div>
+            </div>
           ) : (
-            ""
+            <div ref="tables">
+              {this.state.add ? (
+                <Collapsible
+                  date="New Todo"
+                  active={true}
+                  i={-1}
+                  content={this.showNewTodo()}
+                />
+              ) : ( 
+                ""
+              )}
+              {this.showTables()}
+            </div>
           )}
-
-          {this.showTables()}
         </div>
       </div>
     );
@@ -607,9 +625,9 @@ class Index extends Component {
 
 class Table extends Component {
   static contextType = AuthContext;
-  state={
+  state = {
     match: {}
-  }
+  };
   componentDidMount() {
     setTimeout(() => {
       if (!this.context.isAuthenticated) {
@@ -617,11 +635,15 @@ class Table extends Component {
       }
     }, 7000);
   }
-  componentWillReceiveProps(props){
-    this.setState({match: props.match})
+  UNSAFE_componentWillReceiveProps (props) {
+    this.setState({ match: props.match });
   }
   render() {
-    return this.context.isAuthenticated ? <Index match={this.state.match} history={this.props.history} /> : <div></div>;
+    return this.context.isAuthenticated ? (
+      <Index match={this.state.match} history={this.props.history} />
+    ) : (
+      <div></div>
+    );
   }
 }
 
