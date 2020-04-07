@@ -8,7 +8,6 @@ import { db } from "../../config/firebase";
 import Editor from "jodit-react";
 
 import EmojiBox from "./EmojiBoard"
-import "emoji-mart/css/emoji-mart.css";
 
 class Goals extends Component {
   static contextType = AuthContext;
