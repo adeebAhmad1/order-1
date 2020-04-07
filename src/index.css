@@ -387,42 +387,43 @@ section.emoji-mart {
 .jodit_workplace p {
   text-align: justify !important;
 }
-.jodit_wysiwyg h1{
+.jodit_wysiwyg h1 {
   font-size: 36px;
   font-weight: bold;
 }
-.jodit_wysiwyg h2{
+.jodit_wysiwyg h2 {
   font-size: 28px;
   font-weight: bold;
 }
-.jodit_wysiwyg h3{
+.jodit_wysiwyg h3 {
   font-size: 22px;
   font-weight: bold;
 }
-.jodit_wysiwyg h4{
+.jodit_wysiwyg h4 {
   font-size: 18px;
   font-weight: bold;
 }
 
-.jodit_toolbar_btn svg{
+.jodit_toolbar_btn svg {
   width: 10px !important;
 }
 
-.jodit_wysiwyg a{
- color:blue !important;
- text-decoration: underline !important;
+.jodit_wysiwyg a {
+  color: blue !important;
+  text-decoration: underline !important;
 }
 
-.login-button{
+.login-button {
   display: none;
   position: absolute;
-  top:90%;
-  width:90%;
+  top: 90%;
+  width: 90%;
   margin: 0 auto;
-  color:#999;
+  color: #999;
   padding: 20px;
 }
-.main-head:hover .login-button,.main-active .login-button{
+.main-head:hover .login-button,
+.main-active .login-button {
   display: block;
 }
 
@@ -434,7 +435,7 @@ section.emoji-mart {
   height: 120px;
   animation: spin 2s linear infinite;
 }
-.loader_wrapper{
+.loader_wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -442,15 +443,56 @@ section.emoji-mart {
   width: 100%;
   margin-top: 100px;
 }
-.main-head .loader_wrapper{
+.main-head .loader_wrapper {
   display: none;
   opacity: 0;
 }
-.main-active .loader_wrapper,.main-head:hover .loader_wrapper{
+.main-active .loader_wrapper,
+.main-head:hover .loader_wrapper {
   display: flex;
   opacity: 1;
 }
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.rdw-fontsize-wrapper,
+.rdw-fontfamily-wrapper {
+  display: none !important;
+}
+.emojiBox {
+  width: 300px;
+  height: 300px;
+  overflow-y: scroll;
+  display: none;
+  background-color: #fff;
+  padding: 10px;
+  box-shadow: 0 5px 20px #000;
+  transform: translate(-100px, 20px);
+  margin-top: 10px;
+}
+#icon{
+  position: absolute;
+  left: 10px;
+}
+.noselect {
+  -webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+.emojiBox a{
+  font-size: 20px;
+}
+.commentsIcon{
+  left: 70px !important;
+}
+.commentsIcon + .emojiBox{
+  transform: translate(-170px, 10px); ;
 }

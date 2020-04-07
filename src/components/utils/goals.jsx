@@ -7,7 +7,7 @@ import { db } from "../../config/firebase";
 
 import Editor from "jodit-react";
 
-import { Picker } from "emoji-mart";
+import EmojiBox from "./EmojiBoard"
 import "emoji-mart/css/emoji-mart.css";
 
 class Goals extends Component {
@@ -17,70 +17,13 @@ class Goals extends Component {
     board: this.props.board,
     caretPosition: 0
   };
-  handleDropdown2 = e => {
-    if (document.querySelector(".emoji-mart")) {
-      if (e.target.id === "icon") return;
-      if (
-        e.target &&
-        e.target.parentNode &&
-        e.target.parentNode.parentNode &&
-        e.target.parentNode.parentNode.parentNode &&
-        e.target.parentNode.parentNode.parentNode.parentNode &&
-        e.target.parentNode.parentNode.parentNode.parentNode.parentNode &&
-        e.target.parentNode.parentNode.parentNode.parentNode.parentNode
-          .parentNode &&
-        e.target.parentNode.parentNode.parentNode.parentNode.parentNode
-          .parentNode.parentNode
-      ) {
-        if (
-          e.target.classList.contains("emoji-mart") ||
-          e.target.parentNode.classList.contains("emoji-mart") ||
-          e.target.parentNode.parentNode.classList.contains("emoji-mart") ||
-          e.target.parentNode.parentNode.parentNode.classList.contains(
-            "emoji-mart"
-          ) ||
-          e.target.parentNode.parentNode.parentNode.parentNode.classList.contains(
-            "emoji-mart"
-          ) ||
-          e.target.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
-            "emoji-mart"
-          ) ||
-          e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
-            "emoji-mart"
-          ) ||
-          e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
-            "emoji-mart"
-          ) ||
-          e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
-            "emoji-mart"
-          )
-        )
-          return;
-      }
-      if (
-        e.target &&
-        e.target.parentNode &&
-        e.target.parentNode.parentNode &&
-        e.target.parentNode.parentNode.parentNode
-      )
-        if (
-          e.target.classList.contains("jodit_wysiwyg") ||
-          e.target.parentNode.classList.contains("jodit_wysiwyg") ||
-          e.target.parentNode.parentNode.classList.contains("jodit_wysiwyg") ||
-          e.target.parentNode.parentNode.parentNode.classList.contains(
-            "jodit_wysiwyg"
-          )
-        )
-          return;
-      document.querySelector(".emoji-mart").classList.remove("block");
-    }
-  };
+ 
   componentWillUnmount() {
-    window.removeEventListener("click", this.handleDropdown2);
+    // window.removeEventListener("click", this.handleDropdown2);
   }
   componentDidMount = () => {
     this.setState({ board: this.props.board });
-      window.addEventListener("click", this.handleDropdown2);
+      // window.addEventListener("click", this.handleDropdown2);
       //! for getting all goals
       db.collection("goals")
         .get()
@@ -141,6 +84,14 @@ class Goals extends Component {
         .then(() => this.setState({ goal }));
   };
 
+  addEmoji = (e,emoji)=>{
+    e.preventDefault()
+    const input = document.querySelector(".jodit_wysiwyg");
+
+    if (document.execCommand("insertText", false, emoji)) return;
+    input.focus()
+    input.innerHTML += emoji;
+  }
   render() {
     const config = {
       readonly: false
@@ -150,6 +101,7 @@ class Goals extends Component {
     }
     return (
       <div style={{position: `relative`}}>
+        
         {this.context.isAuthenticated ? (
           <div style={{ margin: "0 auto", textAlign: "center" }}>
             <div
@@ -180,25 +132,7 @@ class Goals extends Component {
                 ""
               )}
             </div>
-            <i
-              className="far fa-smile left"
-              id="icon"
-              onClick={() => {
-                document.querySelector("section.emoji-mart").classList.toggle("block");
-              }}
-              style={{ position: `absolute`, left: "81%",bottom:`0`, color: "blue" }}
-            ></i>
-            <Picker
-              style={{ position: `absolute`, left: "60%", top: "100%" }}
-              title=""
-              emoji=""
-              onSelect={e => {
-                const input = document.querySelector(".jodit_wysiwyg");
-                input.focus();
-                if (document.execCommand("insertText", false, e.native)) return;
-                input.innerHTML += e.native;
-              }}
-            />
+            <EmojiBox addEmoji={this.addEmoji}  />
             <button
               style={{ position: `absolute`, left: `50%` }}
               onClick={() => this.Save(this.state.goal.id)}

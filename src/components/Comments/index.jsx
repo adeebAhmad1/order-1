@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { db } from "../../config/firebase";
 import img from "../../images/no_image.jpg";
-import { Picker } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
 import { AuthContext } from "../../context/AuthContext"
+import EmojiBox from "../utils/EmojiBoard";
 class Comments extends Component {
   static contextType = AuthContext;
   state = {
@@ -137,34 +137,38 @@ class Comments extends Component {
     window.removeEventListener("click", this.handleDropdown2);
   };
   handleDropdown2 = e => {
-    if (e.target.id === "icon") return;
-    if (document.querySelector(".emoji-mart")) {
-      if (
-        e.target.classList.contains("emoji-mart") ||
-        e.target.parentNode.classList.contains("emoji-mart") ||
-        e.target.parentNode.parentNode.classList.contains("emoji-mart") ||
-        e.target.parentNode.parentNode.parentNode.classList.contains(
-          "emoji-mart"
-        ) ||
-        e.target.parentNode.parentNode.parentNode.parentNode.classList.contains(
-          "emoji-mart"
-        ) ||
-        e.target.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
-          "emoji-mart"
-        ) ||
-        e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
-          "emoji-mart"
-        ) ||
-        e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
-          "emoji-mart"
-        ) ||
-        e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
-          "emoji-mart"
-        )
-      )
-        return;
-      document.querySelector(".emoji-mart").classList.remove("block");
-    }
+      if (document.querySelector(".emojiBox")) {
+        if (e.target.id === "icon") return;
+        if (
+          e.target &&
+          e.target.parentNode &&
+          e.target.parentNode.parentNode &&
+          e.target.parentNode.parentNode.parentNode
+        ) {
+          if (
+            e.target.parentNode.classList.contains("emojiBox") ||
+            e.target.parentNode.parentNode.classList.contains("emojiBox") ||
+            e.target.parentNode.parentNode.parentNode.classList.contains(
+              "emojiBox"
+            ) ||
+            e.target.parentNode.parentNode.parentNode.parentNode.classList.contains(
+              "emojiBox"
+            )
+          )
+            return;
+          if (
+            e.target.classList.contains("jodit_wysiwyg") ||
+            e.target.parentNode.classList.contains("jodit_wysiwyg") ||
+            e.target.parentNode.parentNode.classList.contains("jodit_wysiwyg") ||
+            e.target.parentNode.parentNode.parentNode.classList.contains(
+              "jodit_wysiwyg"
+            )
+          )
+            return;
+        }
+        if (e.target.classList.contains("textarea")) return;
+        document.querySelector(".emojiBox").classList.remove("block");
+      }
   };
   componentDidMount() {
     window.addEventListener("click", this.removeDropDown);
@@ -270,14 +274,13 @@ class Comments extends Component {
   showComments = () => {
     const comments = [...this.state.comments, ...this.state.sortedTimes];
     comments.sort((a, b) => b.date - a.date);
-
     return comments.map((comment, i) => {
       const user = this.state.users.find(el => el.id === comment.userId) || {};
       if (user) {
         return (
           <article
             ref="comment1"
-            className="p-1 pl-2  border     bg-blue-200"
+            className="p-1 pl-2 border bg-blue-200"
             key={i}
             style={{ backgroundColor: comment.read ? "white" : "#ADD8E6" }}
           >
@@ -326,6 +329,12 @@ class Comments extends Component {
   handleChange = e => {
     this.setState({ [e.target.name]: e.target.value });
   };
+  addEmoji = (e,emoji)=>{
+    e.preventDefault();
+    const content = this.state.content.slice(0,this.state.caretPosition) + emoji + this.state.content.slice(this.state.caretPosition)
+    this.setState({ content });
+  }
+  setPosition = (e)=>this.setState({caretPosition: e.target.selectionEnd})
   render() {
     return (
       <div
@@ -409,42 +418,15 @@ class Comments extends Component {
                 <textarea
                   onChange={this.handleChange}
                   name="content"
-                  className="w-full py-3 px-6 border border-gary-600 rounded-lg text-sm text-black outline-none focus:border-purple-600 overflow-hidden"
+                  className="w-full py-3 px-6 border border-gary-600 rounded-lg text-sm text-black outline-none focus:border-purple-600 overflow-hidden textarea"
                   placeholder="Write an Update..."
                   required
                   value={this.state.content}
-                  onKeyDown={(e)=>{
-                    this.setState({caretPosition: e.target.selectionEnd})
-                  }}
-                  onKeyUp={(e)=>{
-                    this.setState({caretPosition: e.target.selectionEnd})
-                  }}
-                  onBlur={(e)=>{this.setState({caretPosition: e.target.selectionEnd})}}
+                  onKeyDown={this.setPosition}
+                  onKeyUp={this.setPosition}
+                  onBlur={this.setPosition}
                 ></textarea>
-                <i
-                  className="far fa-smile"
-                  id="icon"
-                  onClick={e => {
-                    if(this.context.isAuthenticated){
-                      document
-                      .querySelectorAll("section.emoji-mart")[1]
-                      .classList.toggle("block");
-                    }else{
-                      document
-                      .querySelectorAll("section.emoji-mart")[0]
-                      .classList.toggle("block");
-                    }
-                  }}
-                  style={{ position: `absolute`, bottom: `15%`, right: `5%` }}
-                ></i>
-                <Picker
-                  title=""
-                  emoji=""
-                  onSelect={e => {
-                    const content = this.state.content.slice(0,this.state.caretPosition) + e.native + this.state.content.slice(this.state.caretPosition)
-                    this.setState({ content });
-                  }}
-                />
+                <EmojiBox addEmoji={this.addEmoji} commentsIcon="commentsIcon" />
               </div>
               <div className="flex justify-between items-center mt-4">
                 <button className="rounded px-8  py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none">

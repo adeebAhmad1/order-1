@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import firebase, { db } from "../../config/firebase";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-
 class SideNav extends Component {
   static contextType = AuthContext;
   state = {
