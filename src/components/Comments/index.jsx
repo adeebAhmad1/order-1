@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { db } from "../../config/firebase";
 import img from "../../images/no_image.jpg";
-import "emoji-mart/css/emoji-mart.css";
 import { AuthContext } from "../../context/AuthContext"
 import EmojiBox from "../utils/EmojiBoard";
 class Comments extends Component {
