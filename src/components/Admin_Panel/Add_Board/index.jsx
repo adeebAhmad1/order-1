@@ -12,7 +12,7 @@ class Add_Board extends Component {
     if (this.state.board === "") {
       return false;
     }
-
+    if(this.state.board === "todos" || this.state.board === "Client Relations") return false
     db.collection("collections")
       .add({
         name: this.state.board

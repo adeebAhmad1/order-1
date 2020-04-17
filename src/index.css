@@ -407,7 +407,9 @@ section.emoji-mart {
 .jodit_toolbar_btn svg {
   width: 10px !important;
 }
-
+.jodit_wysiwyg *,.jodit_wysiwyg {
+  color: #805ad5 !important;
+}
 .jodit_wysiwyg a {
   color: blue !important;
   text-decoration: underline !important;
@@ -494,5 +496,8 @@ section.emoji-mart {
   left: 70px !important;
 }
 .commentsIcon + .emojiBox{
-  transform: translate(-170px, 10px); ;
+  transform: translate(-170px, 10px);
+}
+.undefined + .emojiBox{
+  transform: translate(-270px, 30px);
 }

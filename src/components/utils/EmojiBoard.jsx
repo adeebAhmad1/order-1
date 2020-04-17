@@ -33,46 +33,39 @@ class EmojiBox extends Component {
     window.removeEventListener("click", this.handleClick);
   }
   handleClick = (e) => {
+    const { target } = e;
+    const parent = "parentNode"
     if (this.refs.emojis) {
-      if (e.target.id === "icon") return;
+      if (target.id === "icon") return;
       if (
-        e.target &&
-        e.target.parentNode &&
-        e.target.parentNode.parentNode &&
-        e.target.parentNode.parentNode.parentNode &&
-        e.target.parentNode.parentNode.parentNode.parentNode
+        target &&
+        target[parent] &&
+        target[parent][parent] &&
+        target[parent][parent][parent] &&
+        target[parent][parent][parent][parent]
       ) {
         if (
-          e.target.parentNode.classList.contains("emojiBox") ||
-          e.target.parentNode.parentNode.classList.contains("emojiBox") ||
-          e.target.parentNode.parentNode.parentNode.classList.contains(
-            "emojiBox"
-          ) ||
-          e.target.parentNode.parentNode.parentNode.parentNode.classList.contains(
-            "emojiBox"
-          )||
-          e.target.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
-            "emojiBox"
-          )
+          target[parent].classList.contains("emojiBox") ||
+          target[parent][parent].classList.contains("emojiBox") ||
+          target[parent][parent][parent].classList.contains("emojiBox") ||
+          target[parent][parent][parent][parent].classList.contains("emojiBox")||
+          target[parent][parent][parent][parent][parent].classList.contains("emojiBox")
         )
           return;
         if (
-          e.target.classList.contains("jodit_wysiwyg") ||
-          e.target.parentNode.classList.contains("jodit_wysiwyg") ||
-          e.target.parentNode.parentNode.classList.contains("jodit_wysiwyg") ||
-          e.target.parentNode.parentNode.parentNode.classList.contains(
-            "jodit_wysiwyg"
-          )
+          target.classList.contains("jodit_wysiwyg") ||
+          target[parent].classList.contains("jodit_wysiwyg") ||
+          target[parent][parent].classList.contains("jodit_wysiwyg") ||
+          target[parent][parent][parent].classList.contains("jodit_wysiwyg")
         )
           return;
       }
-      if (e.target.classList.contains("textarea")) return;
-      if(e.target.classList.contains("emoji-icon")) return;
+      if (target.classList.contains("textarea")) return;
+      if(target.classList.contains("emoji-icon")) return;
       this.refs.emojis.classList.remove("block");
     }
   };
   showEmojis = (emojis) => {
-    console.log(emojis)
     if (emojis.length > 500) emojis = emojis.slice(0, 500);
     return emojis.map((emoji) => {
       return (
@@ -95,7 +88,7 @@ class EmojiBox extends Component {
     return (
       <div
         className="noselect"
-        style={{ position: `absolute`, top: `50%`, left: `81%`, zIndex: 10 }}
+        style={{ position: `absolute`, top: `70%`, left: `100%`, zIndex: 10 }}
       >
         <i
           className={`far fa-smile left ${this.props.commentsIcon}`}

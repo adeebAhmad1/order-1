@@ -15,7 +15,8 @@ class Todo extends Component {
     status: "Not Started",
     endTime: ``,
     name: "",
-    activeUser: {}
+    activeUser: {},
+    stuckTimer: null
   };
 
   // ! update status function
@@ -23,13 +24,17 @@ class Todo extends Component {
     let status = this.refs.status.innerText;
     db.collection(this.props.board)
       .doc(todosId)
-      .update({ status });
+      .update({ status }).then(()=>{
+        this.props.getTodos()
+      });
   };
 
   //! handle submit for deleting todo
 
   UNSAFE_componentWillReceiveProps (props) {
     this.forceUpdate();
+    console.log(props.stuckTimer)
+    this.setState({stuckTimer: props.stuckTimer})
     this.refs.status.textContent = props.status;
     var text = this.refs.status.textContent;
     this.setState({
@@ -84,6 +89,7 @@ class Todo extends Component {
   componentDidMount() {
     //! getting users from fatabase
     this._isMounted = true;
+    this.setState({stuckTimer: this.props.stuckTimer})
     db.collection("users").onSnapshot(querySnapshot => {
       if (this._isMounted) {
         let users = [];
@@ -247,7 +253,6 @@ class Todo extends Component {
         [i].addEventListener("click", e => {
           const text = e.target.innerText;
           this.setState({ status: text });
-
           if (this.state.status !== "Not Started") {
             if (this.props.timer && this.props.stuckTimer) {
               if (this.props.stuckTimer[0] > this.props.timer[0]) {
@@ -259,8 +264,6 @@ class Todo extends Component {
               this.updateTime(this.props.timer[0], this.props.endTime);
             } else if (this.props.stuckTimer) {
               this.updateTime(this.props.stuckTimer[0], this.props.endTime);
-            } else {
-              this.updateTime();
             }
           }
           if (this.state.status === "Done") {
@@ -311,6 +314,7 @@ class Todo extends Component {
             this.refs.status.innerText = "Not Started";
             status_priority_wrapper.style.backgroundColor = "royalblue";
           }
+          this._isMounted = false
           if (this.props.todoId) {
             this.updateStatus(this.props.todoId);
           }
@@ -463,12 +467,12 @@ class Todo extends Component {
         </td>
         <td>
           <span
-            style={{ backgroundColor: this.props.stuckTimer ? "#E1445B" : "" }}
+            style={{ backgroundColor: this.state.stuckTimer ? "#E1445B" : "" }}
             className="block mx-auto rounded-full h-5 w-6/7  bg-blue-600 overflow-hidden relative timeline"
           >
             <div
               style={{
-                backgroundColor: this.props.stuckTimer ? "#E1445B" : ""
+                backgroundColor: this.state.stuckTimer ? "#E1445B" : ""
               }}
               className="bg-blue-600 w-1/2 h-full z-10 relative"
             ></div>

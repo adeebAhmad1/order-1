@@ -133,45 +133,9 @@ class Comments extends Component {
 
   componentWillUnmount = () => {
     window.removeEventListener("click", this.removeDropDown);
-    window.removeEventListener("click", this.handleDropdown2);
-  };
-  handleDropdown2 = e => {
-      if (document.querySelector(".emojiBox")) {
-        if (e.target.id === "icon") return;
-        if (
-          e.target &&
-          e.target.parentNode &&
-          e.target.parentNode.parentNode &&
-          e.target.parentNode.parentNode.parentNode
-        ) {
-          if (
-            e.target.parentNode.classList.contains("emojiBox") ||
-            e.target.parentNode.parentNode.classList.contains("emojiBox") ||
-            e.target.parentNode.parentNode.parentNode.classList.contains(
-              "emojiBox"
-            ) ||
-            e.target.parentNode.parentNode.parentNode.parentNode.classList.contains(
-              "emojiBox"
-            )
-          )
-            return;
-          if (
-            e.target.classList.contains("jodit_wysiwyg") ||
-            e.target.parentNode.classList.contains("jodit_wysiwyg") ||
-            e.target.parentNode.parentNode.classList.contains("jodit_wysiwyg") ||
-            e.target.parentNode.parentNode.parentNode.classList.contains(
-              "jodit_wysiwyg"
-            )
-          )
-            return;
-        }
-        if (e.target.classList.contains("textarea")) return;
-        document.querySelector(".emojiBox").classList.remove("block");
-      }
   };
   componentDidMount() {
     window.addEventListener("click", this.removeDropDown);
-    window.addEventListener("click", this.handleDropdown2);
     //! for rendering user from database
     db.collection("users").onSnapshot(querySnapshot => {
       let users = [];

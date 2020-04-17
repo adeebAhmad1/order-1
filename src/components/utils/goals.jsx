@@ -16,13 +16,8 @@ class Goals extends Component {
     board: this.props.board,
     caretPosition: 0
   };
- 
-  componentWillUnmount() {
-    // window.removeEventListener("click", this.handleDropdown2);
-  }
   componentDidMount = () => {
     this.setState({ board: this.props.board });
-      // window.addEventListener("click", this.handleDropdown2);
       //! for getting all goals
       db.collection("goals")
         .get()
@@ -86,7 +81,6 @@ class Goals extends Component {
   addEmoji = (e,emoji)=>{
     e.preventDefault()
     const input = document.querySelector(".jodit_wysiwyg");
-
     if (document.execCommand("insertText", false, emoji)) return;
     input.focus()
     input.innerHTML += emoji;
@@ -99,14 +93,13 @@ class Goals extends Component {
       this.refs.goal.innerHTML = this.state.goal.title || "";
     }
     return (
-      <div style={{position: `relative`}}>
-        
+      <div style={{position: `relative`}} className="container mx-auto">
         {this.context.isAuthenticated ? (
           <div style={{ margin: "0 auto", textAlign: "center" }}>
             <div
               style={{
                 backgroundColor: "#F5F6F8",
-                width: "60%",
+                width: "99%",
                 margin: "0 auto",
                 position: `relative`
               }}
@@ -124,8 +117,7 @@ class Goals extends Component {
                 <p style={{ color: "grey", fontSize: "12px" }}>
                   {" "}
                   Posted By <b>Admin</b> on{" "}
-                  {new Date(this.state.goal.time).toLocaleTimeString()}{" "}
-                  {new Date(this.state.goal.time).toDateString()}
+                  {new Date(this.state.goal.time).toLocaleTimeString() + " " + new Date(this.state.goal.time).toDateString()}
                 </p>
               ) : (
                 ""
@@ -145,7 +137,7 @@ class Goals extends Component {
             style={{
               textAlign: "center",
               backgroundColor: "#F5F6F8",
-              padding: "10px",
+              // padding: "20px",
               width: "60%",
               margin: "0 auto",
               position: `relative`
@@ -158,8 +150,7 @@ class Goals extends Component {
                 <p style={{ color: "grey", fontSize: "12px" }}>
                   {" "}
                   Posted By <b>Admin</b> on{" "}
-                  {new Date(this.state.goal.time).toLocaleTimeString()}{" "}
-                  {new Date(this.state.goal.time).toDateString()}
+                  {new Date(this.state.goal.time).toLocaleTimeString() + " " + new Date(this.state.goal.time).toDateString()}
                 </p>
               ) : (
                 ""

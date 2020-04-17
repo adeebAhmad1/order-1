@@ -22,20 +22,28 @@ class SideNav extends Component {
           db.collection("collections")
             .add({ name: "todos" })
             .then(() => console.log("SUCCESS"));
+        const todos = collections.filter(el=> el.name.toLowerCase() === "todos" || el.name.toLowerCase() === "Client Relations");
+        todos.splice(todos.findIndex(el=> el.name === "todos"),1)
+        if(todos.length >= 1){
+          todos.forEach(({id})=>db.collection("collections").doc(id).delete().then(()=>{
+            console.log("EXTRA DELETED")
+          }))
+        }
         this.setState({ collections });
       });
     });
-    this.refs.main.addEventListener("mouseenter", () => {
-      if (!this.refs.main.classList.contains("main-active"))
-        this.refs.icon.classList.add("resize-icon");
+    const {main , icon} = this.refs
+    main.addEventListener("mouseenter", () => {
+      if (!main.classList.contains("main-active"))
+        icon.classList.add("resize-icon");
     });
-    this.refs.main.addEventListener("mouseleave", () => {
-      if (!this.refs.main.classList.contains("main-active"))
-        this.refs.icon.classList.remove("resize-icon");
+    main.addEventListener("mouseleave", () => {
+      if (!main.classList.contains("main-active"))
+        icon.classList.remove("resize-icon");
     });
-    this.refs.icon.addEventListener("click", () => {
-      this.refs.icon.classList.toggle("resize-icon");
-      this.refs.main.classList.toggle("main-active");
+    icon.addEventListener("click", () => {
+      icon.classList.toggle("resize-icon");
+      main.classList.toggle("main-active");
     });
   }
   UNSAFE_componentWillReceiveProps(props) {

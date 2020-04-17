@@ -1,4 +1,3 @@
-//jshint esversion: 6
 import React, { Component } from "react";
 
 import { Link } from "react-router-dom";
@@ -77,6 +76,7 @@ class Index extends Component {
     this.refs.images.style.backgroundImage = `url(${user.url})`;
   };
   getTodos = (board) => {
+    this.setState({ isLoading: true})
     db.collection(
       board || (this.props.match.params
         ? this.props.match.params.board || "todos"
@@ -167,7 +167,6 @@ class Index extends Component {
     ));
   };
   deleteTodo=()=>{
-    
     this.getTodos()
   }
   //? For Cloning the Existing Todos
@@ -405,6 +404,7 @@ class Index extends Component {
               commentReads={commentReads}
               board={this.state.board || "todos"}
               deleteOne = {this.deleteOne}
+              getTodos={this.getTodos}
             />
           );
         });
