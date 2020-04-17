@@ -25,7 +25,14 @@ class Todo extends Component {
     db.collection(this.props.board)
       .doc(todosId)
       .update({ status }).then(()=>{
-        this.props.getTodos()
+        if(status === "Done"){
+          this.setState({
+            confettiStart: true
+          });
+        } else{
+          this.props.getTodos();
+        }
+
       });
   };
 
@@ -41,7 +48,6 @@ class Todo extends Component {
       status: text,
       endTime: props.endTime,
       userId: props.userId || this.state.userId,
-      
     });
     if (props.status !== "Not Started") {
       if (this.state.iTimes === 0) {
@@ -56,7 +62,7 @@ class Todo extends Component {
         } else if (props.stuckTimer) {
           this.updateTime(props.stuckTimer[0], props.endTime);
         } else {
-          this.updateTime();
+          this.updateTime(Date.now(),Date.now());
         }
       }
     }
@@ -116,7 +122,7 @@ class Todo extends Component {
             } else if (this.props.stuckTimer) {
               this.updateTime(this.props.stuckTimer[0], this.props.endTime);
             } else {
-              this.updateTime();
+              this.updateTime(Date.now(),Date.now());
             }
           }
         }
@@ -264,12 +270,11 @@ class Todo extends Component {
               this.updateTime(this.props.timer[0], this.props.endTime);
             } else if (this.props.stuckTimer) {
               this.updateTime(this.props.stuckTimer[0], this.props.endTime);
+            } else{
+              this.updateTime(Date.now(),Date.now())
             }
           }
           if (this.state.status === "Done") {
-            this.setState({
-              confettiStart: true
-            });
             status_priority_wrapper.style.backgroundColor = "#03C977";
             this.refs.status.innerText = "Done";
             status_priority_dropdown[id].classList.add("invisible");

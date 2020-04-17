@@ -79,7 +79,7 @@ class Goals extends Component {
         )
           return;
       }
-      if(e.target.classList.contains("jodit_wysiwyg") || e.target.parentNode.classList.contains("jodit_wysiwyg") || e.target.parentNode.classList.contains("jodit_wysiwyg")|| e.target.parentNode.parentNode.classList.contains("jodit_wysiwyg")) return;
+      if(e.target && e.target.parentNode && e.target.parentNode.parentNode) if(e.target.classList.contains("jodit_wysiwyg") || e.target.parentNode.classList.contains("jodit_wysiwyg") || e.target.parentNode.parentNode.classList.contains("jodit_wysiwyg")|| e.target.parentNode.parentNode.classList.contains("jodit_wysiwyg")) return;
       document.querySelector(".emoji-mart").classList.remove("block");
     }
   };

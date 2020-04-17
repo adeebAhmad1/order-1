@@ -28,12 +28,10 @@ import AuthContextProvider from "./context/AuthContext";
 import "./App.css";
 import Add_Board from "./components/Admin_Panel/Add_Board";
 import Table from "./components/Table";
-import DataContextProvider from "./context/DataContext";
 
 class App extends Component {
   render() {
     return (
-      <DataContextProvider>
         <AuthContextProvider>
           <BrowserRouter>
             <div>
@@ -67,7 +65,6 @@ class App extends Component {
             </div>
           </BrowserRouter>
         </AuthContextProvider>
-      </DataContextProvider>
     );
   }
 }
