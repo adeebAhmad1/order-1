@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import { db } from "../../config/firebase";
 import img from "../../images/no_image.jpg";
-import { AuthContext } from "../../context/AuthContext"
-import EmojiBox from "../utils/EmojiBoard";
+import { AuthContext } from "../../context/AuthContext";
+import "emoji-mart/css/emoji-mart.css";
+import { Picker } from "emoji-mart";
 class Comments extends Component {
   static contextType = AuthContext;
   state = {
@@ -15,9 +16,9 @@ class Comments extends Component {
     todo: {},
     name: "",
     sortedTimes: [],
-    caretPosition: 0
+    caretPosition: 0,
   };
-  removeDropDown = e => {
+  removeDropDown = (e) => {
     if (
       e.target.classList.contains("dropdown2") &&
       !e.target.classList.contains("status_priority_dropdown")
@@ -28,16 +29,16 @@ class Comments extends Component {
   handleDropdown = () => {
     this.refs.dropdown.classList.toggle("block");
   };
-  selectOption = e => {
+  selectOption = (e) => {
     const id = e.target.dataset.id || e.target.parentNode.dataset.id;
-    const user = this.state.users.find(el => el.id === id);
+    const user = this.state.users.find((el) => el.id === id);
     this.setState({ userId: user.id });
     this.setState({ todoId: this.props.match.params.commentId });
     this.refs.image.style.backgroundImage = `url(${user.url})`;
     this.refs.name.innerHTML = user.name;
     this.setState({ name: user.name });
   };
-  handleUpdate = e => {
+  handleUpdate = (e) => {
     e.preventDefault();
     if (this.state.name === "") {
       this.refs.name.innerHTML = "Please Select a User";
@@ -50,16 +51,16 @@ class Comments extends Component {
           userId: this.state.userId,
           todoId: this.state.todoId,
           date: new Date().getTime(),
-          read: false
+          read: false,
         })
-        .then(docRef => {
+        .then((docRef) => {
           this.setState({ content: "" });
           this.refs.popup.style.right = "-100%";
           setTimeout(() => {
             this.props.history.goBack();
           }, 800);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("Error adding document: ", error);
         });
     }
@@ -73,14 +74,14 @@ class Comments extends Component {
       return {
         date: el,
         title: `Working on it`,
-        read: true
+        read: true,
       };
     });
     const stuck = stuckTimer.map((el, i) => {
       return {
         date: el,
         title: `Stuck`,
-        read: true
+        read: true,
       };
     });
     // const done = {
@@ -108,38 +109,65 @@ class Comments extends Component {
           ),
           date: el.date,
           read: true,
-          statusLog: true
+          statusLog: true,
         };
       }
     });
-    const sortedTimes = times.filter(el=> el);
+    const sortedTimes = times.filter((el) => el);
     this.setState({ sortedTimes });
   };
 
-  Read = commentId => {
+  Read = (commentId) => {
     let read = true;
-    db.collection("comments")
-      .doc(commentId)
-      .update({
-        read
-      });
+    db.collection("comments").doc(commentId).update({
+      read,
+    });
   };
-  unRead = commentId => {
+  unRead = (commentId) => {
     let read = false;
-    db.collection("comments")
-      .doc(commentId)
-      .update({ read });
+    db.collection("comments").doc(commentId).update({ read });
   };
-
+  handleDropdown2 = (e) => {
+    if (e.target.id === "icon") return;
+    if (document.querySelector(".emoji-mart")) {
+      if (
+        e.target.classList.contains("emoji-mart") ||
+        e.target.parentNode.classList.contains("emoji-mart") ||
+        e.target.parentNode.parentNode.classList.contains("emoji-mart") ||
+        e.target.parentNode.parentNode.parentNode.classList.contains(
+          "emoji-mart"
+        ) ||
+        e.target.parentNode.parentNode.parentNode.parentNode.classList.contains(
+          "emoji-mart"
+        ) ||
+        e.target.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
+          "emoji-mart"
+        ) ||
+        e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
+          "emoji-mart"
+        ) ||
+        e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
+          "emoji-mart"
+        ) ||
+        e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
+          "emoji-mart"
+        )
+      )
+        return;
+      document.querySelector(".emoji-mart").classList.remove("block");
+    }
+  };
   componentWillUnmount = () => {
     window.removeEventListener("click", this.removeDropDown);
+    window.removeEventListener("click", this.handleDropdown2);
   };
   componentDidMount() {
     window.addEventListener("click", this.removeDropDown);
+    window.addEventListener("click", this.handleDropdown2);
     //! for rendering user from database
-    db.collection("users").onSnapshot(querySnapshot => {
+    db.collection("users").onSnapshot((querySnapshot) => {
       let users = [];
-      querySnapshot.forEach(doc => {
+      querySnapshot.forEach((doc) => {
         let user = doc.data();
         user.id = doc.id;
         users.push(user);
@@ -147,35 +175,37 @@ class Comments extends Component {
       this.setState({
         users,
         userId: users[0].id,
-        todoId: this.props.match.params.commentId
+        todoId: this.props.match.params.commentId,
       });
-      db.collection(this.props.match.params.board).onSnapshot(querySnapshot => {
-        let todos = [];
-        querySnapshot.forEach(doc => {
-          let todo = doc.data();
-          todo.id = doc.id;
-          todos.push(todo);
-        });
-        const todo = todos.find(
-          el => el.id === this.props.match.params.commentId
-        );
-        const userTodo = this.state.users.find(el => el.id === todo.userId);
-        todo.url = userTodo.url || img;
-        this.setState({ todo });
-        this.statusLog1();
-        this.statusLog();
-      });
+      db.collection(this.props.match.params.board).onSnapshot(
+        (querySnapshot) => {
+          let todos = [];
+          querySnapshot.forEach((doc) => {
+            let todo = doc.data();
+            todo.id = doc.id;
+            todos.push(todo);
+          });
+          const todo = todos.find(
+            (el) => el.id === this.props.match.params.commentId
+          );
+          const userTodo = this.state.users.find((el) => el.id === todo.userId);
+          todo.url = userTodo.url || img;
+          this.setState({ todo });
+          this.statusLog1();
+          this.statusLog();
+        }
+      );
     });
     //! for rendering comments from database
-    db.collection("comments").onSnapshot(querySnapshot => {
+    db.collection("comments").onSnapshot((querySnapshot) => {
       let comments = [];
-      querySnapshot.forEach(doc => {
+      querySnapshot.forEach((doc) => {
         let comment = doc.data();
         comment.id = doc.id;
         comments.push(comment);
       });
       comments = comments.filter(
-        el => el.todoId === this.props.match.params.commentId
+        (el) => el.todoId === this.props.match.params.commentId
       );
       this.setState({ comments });
       if (this.refs.popup) {
@@ -196,7 +226,7 @@ class Comments extends Component {
           style={{
             backgroundImage: `url(${el.url})`,
             width: "30px",
-            height: "30px"
+            height: "30px",
           }}
         ></span>
         <p className="ml-3">{el.name}</p>
@@ -238,7 +268,8 @@ class Comments extends Component {
     const comments = [...this.state.comments, ...this.state.sortedTimes];
     comments.sort((a, b) => b.date - a.date);
     return comments.map((comment, i) => {
-      const user = this.state.users.find(el => el.id === comment.userId) || {};
+      const user =
+        this.state.users.find((el) => el.id === comment.userId) || {};
       if (user) {
         return (
           <article
@@ -289,15 +320,10 @@ class Comments extends Component {
     });
   };
 
-  handleChange = e => {
+  handleChange = (e) => {
     this.setState({ [e.target.name]: e.target.value });
   };
-  addEmoji = (e,emoji)=>{
-    e.preventDefault();
-    const content = this.state.content.slice(0,this.state.caretPosition) + emoji + this.state.content.slice(this.state.caretPosition)
-    this.setState({ content });
-  }
-  setPosition = (e)=>this.setState({caretPosition: e.target.selectionEnd})
+  setPosition = (e) => this.setState({ caretPosition: e.target.selectionEnd });
   render() {
     return (
       <div
@@ -314,7 +340,7 @@ class Comments extends Component {
             width: `50%`,
             height: `max-content`,
             transition: `all 0.6s ease-in-out`,
-            left: `auto`
+            left: `auto`,
           }}
         >
           <div className="myDiv">
@@ -334,7 +360,7 @@ class Comments extends Component {
                 right: `30px`,
                 bottom: `-35px`,
                 textAlign: `center`,
-                fontSize: "12px"
+                fontSize: "12px",
               }}
             ></div>
           </div>
@@ -362,7 +388,7 @@ class Comments extends Component {
                 style={{
                   backgroundImage: `url(${img})`,
                   width: "40px",
-                  height: "40px"
+                  height: "40px",
                 }}
               ></div>
               <ul
@@ -389,7 +415,33 @@ class Comments extends Component {
                   onKeyUp={this.setPosition}
                   onBlur={this.setPosition}
                 ></textarea>
-                <EmojiBox addEmoji={this.addEmoji} commentsIcon="commentsIcon" />
+                <i
+                  className="far fa-smile"
+                  id="icon"
+                  onClick={(e) => {
+                    if (this.context.isAuthenticated) {
+                      document
+                        .querySelectorAll("section.emoji-mart")[1]
+                        .classList.toggle("block");
+                    } else {
+                      document
+                        .querySelectorAll("section.emoji-mart")[0]
+                        .classList.toggle("block");
+                    }
+                  }}
+                  style={{ position: `absolute`, bottom: `15%`, right: `5%` }}
+                ></i>
+                <Picker
+                  title=""
+                  emoji=""
+                  onSelect={(e) => {
+                    const content =
+                      this.state.content.slice(0, this.state.caretPosition) +
+                      e.native +
+                      this.state.content.slice(this.state.caretPosition);
+                    this.setState({ content });
+                  }}
+                />
               </div>
               <div className="flex justify-between items-center mt-4">
                 <button className="rounded px-8  py-2 text-center bg-purple-600 text-white cursor-pointer justify-between outline-none">

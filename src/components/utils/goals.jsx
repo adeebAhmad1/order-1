@@ -7,8 +7,7 @@ import { db } from "../../config/firebase";
 
 import Editor from "jodit-react";
 
-import EmojiBox from "./EmojiBoard"
-
+import { Picker } from "emoji-mart";
 class Goals extends Component {
   static contextType = AuthContext;
   state = {
@@ -17,6 +16,7 @@ class Goals extends Component {
     caretPosition: 0
   };
   componentDidMount = () => {
+    window.addEventListener("click", this.handleDropdown2);
     this.setState({ board: this.props.board });
       //! for getting all goals
       db.collection("goals")
@@ -35,6 +35,53 @@ class Goals extends Component {
             this.setState({ goal });
           }
         });
+  };
+  componentWillUnmount(){
+    window.removeEventListener("click", this.handleDropdown2);
+  }
+  handleDropdown2 = e => {
+    if (document.querySelector(".emoji-mart")) {
+      if (e.target.id === "icon") return;
+      if (
+        e.target &&
+        e.target.parentNode &&
+        e.target.parentNode.parentNode &&
+        e.target.parentNode.parentNode.parentNode &&
+        e.target.parentNode.parentNode.parentNode.parentNode &&
+        e.target.parentNode.parentNode.parentNode.parentNode.parentNode &&
+        e.target.parentNode.parentNode.parentNode.parentNode.parentNode
+          .parentNode &&
+        e.target.parentNode.parentNode.parentNode.parentNode.parentNode
+          .parentNode.parentNode
+      ) {
+        if (
+          e.target.classList.contains("emoji-mart") ||
+          e.target.parentNode.classList.contains("emoji-mart") ||
+          e.target.parentNode.parentNode.classList.contains("emoji-mart") ||
+          e.target.parentNode.parentNode.parentNode.classList.contains(
+            "emoji-mart"
+          ) ||
+          e.target.parentNode.parentNode.parentNode.parentNode.classList.contains(
+            "emoji-mart"
+          ) ||
+          e.target.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
+            "emoji-mart"
+          ) ||
+          e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
+            "emoji-mart"
+          ) ||
+          e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
+            "emoji-mart"
+          ) ||
+          e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.contains(
+            "emoji-mart"
+          )
+        )
+          return;
+      }
+      if(e.target.classList.contains("jodit_wysiwyg") || e.target.parentNode.classList.contains("jodit_wysiwyg") || e.target.parentNode.classList.contains("jodit_wysiwyg")|| e.target.parentNode.parentNode.classList.contains("jodit_wysiwyg")) return;
+      document.querySelector(".emoji-mart").classList.remove("block");
+    }
   };
   UNSAFE_componentWillReceiveProps(props) {
     if(props.board !== this.state.board){
@@ -123,7 +170,25 @@ class Goals extends Component {
                 ""
               )}
             </div>
-            <EmojiBox addEmoji={this.addEmoji}  />
+            <i
+              className="far fa-smile left"
+              id="icon"
+              onClick={() => {
+                document
+                  .querySelector("section.emoji-mart")
+                  .classList.toggle("block");
+              }}
+              style={{ position: `absolute`,left:'100%', color: "blue",top: 0 }}
+            ></i>
+            <Picker
+              style={{ position: `absolute`, left: "75%", top: "10%" }}
+              title=""
+              emoji=""
+              onSelect={e => {
+                if(document.execCommand('insertText', false, e.native)) return;
+                document.querySelector(".jodit_wysiwyg").innerHTML += e.native
+              }}
+            />
             <button
               style={{ position: `absolute`, left: `50%` }}
               onClick={() => this.Save(this.state.goal.id)}
@@ -137,8 +202,7 @@ class Goals extends Component {
             style={{
               textAlign: "center",
               backgroundColor: "#F5F6F8",
-              // padding: "20px",
-              width: "60%",
+              // width: "60%",
               margin: "0 auto",
               position: `relative`
             }}

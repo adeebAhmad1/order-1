@@ -477,10 +477,6 @@ section.emoji-mart {
   transform: translate(-100px, 20px);
   margin-top: 10px;
 }
-#icon{
-  position: absolute;
-  left: 10px;
-}
 .noselect {
   -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -493,11 +489,12 @@ section.emoji-mart {
   font-size: 20px;
 }
 .commentsIcon{
-  left: 70px !important;
+  left: -30px !important;
+  top: -5px;
 }
-.commentsIcon + .emojiBox{
+.emojiBox{
   transform: translate(-170px, 10px);
 }
-.undefined + .emojiBox{
+.emojiBox{
   transform: translate(-270px, 30px);
 }
