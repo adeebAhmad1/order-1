@@ -466,35 +466,3 @@ section.emoji-mart {
 .rdw-fontfamily-wrapper {
   display: none !important;
 }
-.emojiBox {
-  width: 300px;
-  height: 300px;
-  overflow-y: scroll;
-  display: none;
-  background-color: #fff;
-  padding: 10px;
-  box-shadow: 0 5px 20px #000;
-  transform: translate(-100px, 20px);
-  margin-top: 10px;
-}
-.noselect {
-  -webkit-touch-callout: none;
-    -webkit-user-select: none;
-     -khtml-user-select: none;
-       -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
-}
-.emojiBox a{
-  font-size: 20px;
-}
-.commentsIcon{
-  left: -30px !important;
-  top: -5px;
-}
-.emojiBox{
-  transform: translate(-170px, 10px);
-}
-.emojiBox{
-  transform: translate(-270px, 30px);
-}
